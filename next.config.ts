@@ -2,6 +2,14 @@ import type { NextConfig } from "next";
 import path from "path";
 
 const nextConfig: NextConfig = {
+  turbopack: {
+    rules: {
+      '*.svg': {
+        loaders: ['@svgr/webpack'],
+        as: '*.js',
+      },
+    },
+  },
   sassOptions: {
     additionalData: `
       @use "${path.join(__dirname, 'styles/abstracts/variables').replace(/\\/g, '/')}" as v;

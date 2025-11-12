@@ -1,9 +1,7 @@
 @use 'abstracts' as *;  // Import toutes les abstracts
 @use 'base/reset';
 
-* {
-    font-family: $font-primary;
-}
+
 
 
 .Toastify__toast {

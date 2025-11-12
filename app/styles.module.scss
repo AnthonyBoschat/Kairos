@@ -1,7 +1,74 @@
-.container{
+.layout{
     width: 100vw;
     height: 100vh;
+    background-color: v.$bg-dark;
+    color: white;
+    // font-family: inherit;
+    font-family: var(--font-anuphan);
+}
+
+.page{
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
-    align-items: center;
+
+    .container{
+        margin-top: 10rem;
+        width: 50%;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        gap: 4rem;
+
+        .title{
+            font-family: var(--font-antonsc);
+            font-size: 3rem;
+            letter-spacing: 0.25rem;
+            padding: 0.5rem 4rem;
+            border-radius: 0.25rem;
+            outline: 1px solid white;
+        }
+
+        .status{
+            width: clamp(25rem, 50%, 70%);
+            li{
+                margin-top: 1rem;
+                padding: 0.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+                display: grid;
+                grid-template-rows: 1fr;
+                grid-template-columns: 80% 20%;
+                opacity: 0.8;
+                transition: opacity 0.1s linear;
+                &:hover{
+                    opacity: 1;
+                }
+                .name{
+                    letter-spacing: 0.10rem;
+                }
+                .state{
+                    border: none;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    border-radius: 4px;
+                    color: white;
+                    cursor: pointer;
+                    opacity: 0.8;
+                    transition: opacity 0.1s linear;
+                    text-wrap: noWrap;
+                    &.ok{background-color: v.$state-success;}
+                    &.notOk{background-color: v.$state-error;}
+
+                    &:hover{opacity: 1;
+                    }
+                    &.updating {
+                        animation: breath 0.3s ease;
+                    }
+                }
+            }
+        }
+    }
 }
+

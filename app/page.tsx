@@ -1,20 +1,22 @@
-'use client'
-
-import useMounted from "@/hooks/useMounted";
+import ENV from "@/constants/env";
 import s from "./styles.module.scss"
+import AppTitle from "./api/_components/Title";
+import AppStatus from "./api/_components/Status";
+import { addStatus, initStatuses } from "./actions/status";
+import { prisma } from "@/lib/prisma";
 
-export default function Home() {
+export default async function Home() {
 
-  const mounted = useMounted()
 
-  
+  await initStatuses(); // Initialise si besoin
+  const status = await prisma.status.findMany();
 
-  if(!mounted) return null
   return (
-    <div className={s.container}>
-      <h1>
-        Hello world
-      </h1>
+    <div className={s.page}>
+      <div className={s.container}>
+        <AppTitle/>
+        <AppStatus statuses={status}/>
+      </div>
     </div>
   );
 }
