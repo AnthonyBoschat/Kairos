@@ -8,13 +8,13 @@ export async function initStatuses() {
   const count = await prisma.status.count();
   
   if (count === 0) {
-    const statusToCreate = ["Writing", "Reading", "Walking", "Sleeping", "Working"];
+    const statusToCreate = ["Writing", "Reading", "Working", "Walking", "Sleeping"];
     
     await prisma.status.createMany({
       data: statusToCreate.map(name => ({ name, state: true })),
     });
     
-    redirect('/'); // Force le re-render
+    redirect('/');
   }
 }
 
