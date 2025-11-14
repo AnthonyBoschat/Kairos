@@ -3,22 +3,15 @@
 // PALETTE DE COULEURS
 // =============================
 
-// Simplo
-$simplo: rgb(0, 41, 124);
 
 // Couleurs de fond
-$bg-dark: rgb(0, 0, 21);
-$bg-primary: rgb(235, 241, 245); // background principal
-$bg-surface: rgb(251, 251, 251);
+$light-primary: rgb(255, 255, 255);
+$light-secondary: rgb(250, 248, 245);
 
 // Couleurs de texte
-$text-primary: rgb(0, 41, 124); // texte principal
-$text-primary-80: rgba(0, 41, 124, 0.80);
-
-// Dark
-$text-dark: rgb(14, 14, 14);
-$text-dark-light: rgb(50, 50, 50);
-
+$dark-primary: rgb(0, 0, 0); // texte principal
+$dark-primary-80: rgb(0, 0, 0), 0.8;
+$dark-secondary: rgb(0, 9, 43);
 
 // Couleurs d'état
 $state-error: rgb(228, 15, 15);
@@ -26,16 +19,14 @@ $state-error-dark: rgb(165, 10, 10);
 $state-success: rgb(4, 123, 0);
 
 // Toast
+$toast-background: rgb(255, 255, 255);
+$toast-text: rgb(0, 0, 0);
+$toast-close: rgb(0, 0, 0);
+$toast-progress: rgba(0, 0, 0);
+$toast-progress-80: rgba(0, 0, 0, 0.8);
 $toast-success: rgba(4, 123, 0, 1);
 $toast-warning: rgba(188, 116, 0, 1);
 $toast-error: rgba(165, 10, 10, 1);
-
-
-
-// =============================
-// TYPOGRAPHIE
-// =============================
-$font-primary: "Arimo", sans-serif;
 
 // =============================
 // BREAKPOINTS
@@ -51,23 +42,25 @@ $breakpoints: (
 // VARIABLES CSS POUR :root
 // =============================
 :root {
-  // Simplo
-  --simplo: #{$simplo};
-
   // Background
-  --bg-primary: #{$bg-primary};
-  --bg-surface: #{$bg-surface};
+  --light-primary: #{$light-primary};
+  --light-secondary: #{$light-secondary};
 
   // Text
-  --text-primary: #{$text-primary};
-  --text-primary-80: #{$text-primary-80};
+  --dark-primary: #{$dark-primary};
+  --dark-primary-80: #{$dark-primary-80};
+  --dark-secondary: #{$dark-secondary};
 
   // State
   --state-error: #{$state-error};
-  --state-error-dark: #{$state-error-dark};
   --state-success: #{$state-success};
 
   // Toast
+  --toast-background: #{$toast-background};
+  --toast-text: #{$toast-text};
+  --toast-close: #{$toast-close};
+  --toast-progress: #{$toast-progress};
+  --toast-progress-80: #{$toast-progress-80};
   --toast-success: #{$toast-success};
   --toast-warning: #{$toast-warning};
   --toast-error: #{$toast-error};

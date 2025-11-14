@@ -1,16 +1,16 @@
 const COLOR = {
-  simplo: 'var(--simplo)',
-  bg: {
-    primary: 'var(--bg-primary)',
-    surface: 'var(--bg-surface)',
+  light: {
+    primary: 'var(--light-primary)',
+    secondary: 'var(--light-secondary)',
   },
-  text: {
-    primary: 'var(--text-primary)',
+  dark: {
+    primary: 'var(--dark-primary)',
+    primary_80: 'var(--dark-primary-80)',
+    secondary: 'var(--dark-primary)',
   },
   state: {
+    success: 'var(--state-success)', 
     error: 'var(--state-error)',
-    errorDark: 'var(--state-error-dark)',
-    success: 'var(--state-success)',
   },
   toast: {
     success: 'var(--toast-success)',

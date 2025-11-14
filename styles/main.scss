@@ -5,8 +5,8 @@
 
 
 .Toastify__toast {
-  background: $bg-surface !important;
-  color: $text-primary !important;
+  background: $toast-background !important;
+  color: $toast-text !important;
   font-size: 0.8rem;
   max-width: 40rem;
   width: fit-content;
@@ -17,21 +17,21 @@
 
 .Toastify__close-button {
     opacity: 0.5 !important;
-    color: $text-primary !important;
+    color: $toast-close !important;
     &:hover {
         opacity: 1 !important;
     }
 }
 
 .Toastify__progress-bar {
-  background-color: $text-primary !important;
+  background-color: $toast-progress !important;
 }
 
 .Toastify__progress-bar--bg {
-  background-color: $text-primary-80 !important;
+  background-color: $toast-progress-80 !important;
 }
 
 .Toastify__toast-icon {
     transform: scale(0.9);
-    color: $state-error !important;
+    color: $toast-error !important;
 }
