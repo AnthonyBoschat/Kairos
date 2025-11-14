@@ -17,14 +17,7 @@ git clone <url-du-repo> nom_du_projet
 cd nom_du_projet
 ```
 
-#### 2. Installer les dépendances
-```bash
-npm install
-# ou avec Make
-make install
-```
-
-#### 3. Configurer l'environnement
+#### 2. Configurer l'environnement
 ```bash
 # Copier le fichier d'exemple
 cp .env.example .env.local
@@ -34,6 +27,14 @@ node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
 
 Copier la clé générée et la coller dans `NEXTAUTH_SECRET` dans `.env.local`
+
+#### 3. Installer les dépendances
+```bash
+npm install
+# ou avec Make
+make install
+```
+
 
 #### 4. Initialiser la base de données
 ```bash
@@ -192,7 +193,7 @@ model User {
 ### Erreur "Invalid NEXTAUTH_SECRET"
 ➜ Générer une nouvelle clé :
 ```bash
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
 ```
 
 ### La base de données est corrompue
