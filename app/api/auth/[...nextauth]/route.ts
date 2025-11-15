@@ -65,8 +65,11 @@ const handler = NextAuth({
      * Redirige vers /dashboard par défaut
      */
     async redirect({ url, baseUrl }) {
-      // Sécurité : vérifie que l'URL appartient à notre domaine
-      return url.startsWith(baseUrl) ? url : baseUrl + "/dashboard"
+      // Permet les query params dans les URLs relatives
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      // Permet les query params pour les URLs du même domaine
+      else if (new URL(url).origin === baseUrl) return url
+      return baseUrl
     },
     
     /**

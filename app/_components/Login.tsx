@@ -1,10 +1,10 @@
 "use client"
 
 import { signIn } from "next-auth/react"
-import { Dispatch, SetStateAction, useState } from "react"
-import { useRouter } from "next/navigation"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { toast } from "react-toastify"
-import s from "./styles.module.scss"
+import s from "./auth.module.scss"
 import withClass from "@/utils/class"
 import EyesOpenIcon from "@/components/ui/icons/EyesOpen"
 import EyesCloseIcon from "@/components/ui/icons/EyesClose"
@@ -17,13 +17,19 @@ interface LoginProps{
 }
 
 export default function Login(props:LoginProps) {
-  const router = useRouter()
+
+  const router        = useRouter()
+  const searchParams  = useSearchParams()
 
   const [showPassword, setShowPassword] = useState(false)
 
+  // En cas de déconnexion
+  useEffect(() => {
+    if(searchParams.get("signedOut") === "true") toast.success("Vous avez été déconnecter")
+  }, [searchParams])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
     const result = await signIn("credentials", {
       email:props.email,
       password:props.password,
@@ -33,7 +39,7 @@ export default function Login(props:LoginProps) {
     if (result?.error) {
       toast.error("Impossible de vous connecter. Vérifiez vos identifiants et réessayez.")
     } else {
-      // router.push("/dashboard")
+      router.push("/dashboard")
       toast.success("Connexion réussi")
     }
   }
@@ -56,7 +62,7 @@ export default function Login(props:LoginProps) {
         <label htmlFor="password">Mot de passe</label>
         <div style={{position:"relative"}}>
           <input
-            type="password"
+            type={showPassword ? "text" : "password"}
             value={props.password}
             onChange={(e) => props.setPassword(e.target.value)}
             placeholder="Mot de passe"
@@ -65,17 +71,9 @@ export default function Login(props:LoginProps) {
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            style={{
-              position: 'absolute',
-              right: '10px',
-              top: '50%',
-              transform: 'translateY(-50%)',
-              border: 'none',
-              background: 'transparent',
-              cursor: 'pointer'
-            }}
+            className={s.show}
           >
-            {showPassword ? <EyesOpenIcon/> : <EyesCloseIcon/>}
+            {showPassword ? <EyesOpenIcon size={20}/> : <EyesCloseIcon size={20}/>}
           </button>
         </div>
         <span className={s.forgot}>

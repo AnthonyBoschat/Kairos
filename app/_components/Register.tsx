@@ -5,8 +5,10 @@ import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react" // Ajout
 import { api } from "@/lib/axios"
 import { toast } from "react-toastify"
-import s from "./styles.module.scss"
+import s from "./auth.module.scss"
 import withClass from "@/utils/class"
+import EyesOpenIcon from "@/components/ui/icons/EyesOpen"
+import EyesCloseIcon from "@/components/ui/icons/EyesClose"
 
 interface RegisterProps{
     name:string,
@@ -21,6 +23,8 @@ interface RegisterProps{
 
 export default function Register(props: RegisterProps) {
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -75,18 +79,26 @@ export default function Register(props: RegisterProps) {
 
       <div className={s.row}>
         <label htmlFor="password">Mot de passe</label>
-        <input
-          id="password"
-          type="password"
-          value={props.password}
-          onChange={(e) => props.setPassword(e.target.value)}
-          placeholder="Mot de passe"
-          required
-        />
+        <div style={{position:"relative"}}>
+          <input
+            type={showPassword ? "text" : "password"}
+            value={props.password}
+            onChange={(e) => props.setPassword(e.target.value)}
+            placeholder="Mot de passe"
+            required
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className={s.show}
+          >
+            {showPassword ? <EyesOpenIcon size={20}/> : <EyesCloseIcon size={20}/>}
+          </button>
+        </div>
       </div>
 
       <div className={s.row}>
-        <label htmlFor="confirmation">Confirmation du mot de passe</label>
+        <label htmlFor="confirmation">Confirmation</label>
         <input
           id="confirmation"
           type="password"

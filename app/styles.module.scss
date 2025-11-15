@@ -47,20 +47,10 @@
             position: relative;
             margin-top: 1rem;
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.10);
-            border-radius: 0px 4px 4px 0px;
+            border-radius: 4px;
             display: flex;
             justify-content: center;
             align-items: center;
-            &::before{
-                content: "";
-                position: absolute;
-                left: -1rem;
-                width: 1rem;
-                height: 100%;
-                background-color: v.$dark-secondary;
-                border-radius: 4px 0px 0px 4px;
-                box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.20);
-            }
         }
     }
 }

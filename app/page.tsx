@@ -6,6 +6,7 @@ import withClass from "@/utils/class";
 import Login from "./_components/Login";
 import useStorageState from "@/hooks/useStorageState";
 import Register from "./_components/Register";
+import Brand from "@/components/brand";
 
 export default function Home() {
 
@@ -24,6 +25,7 @@ export default function Home() {
   return (
     <div className={s.page}>
         <div className={s.container}>
+
           <div className={s.header}>
             <ul className={s.tabs}>
               <li>
@@ -33,7 +35,9 @@ export default function Home() {
                 <button className={withClass(tab === "register" && s.active)} onClick={() => setTab("register")}>Inscription</button>
               </li>
             </ul>
+            <Brand scale={0.9}/>
           </div>
+
           <div className={s.card}>
             {tab === "login" && (
               <Login
