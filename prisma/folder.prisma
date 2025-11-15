@@ -2,9 +2,9 @@ model Folder {
   id                String   @id @default(cuid())
   title             String   
   color             String
-  order             Int
-  favorite          Boolean
-  showProgression   Boolean
+  order             Int      
+  favorite          Boolean  @default(false)
+  showProgression   Boolean  @default(false)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

@@ -2,8 +2,5 @@
     height: 100%;
     width: 100%;
     display: grid;
-    grid-template-columns: 15% 85%;
-
-    
-
+    grid-template-columns: minmax(250px, 15%) 85%;
 }

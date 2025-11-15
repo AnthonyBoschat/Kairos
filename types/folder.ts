@@ -1,5 +1,10 @@
 // types/index.ts ou components/Divider/types.ts
 export interface Folder {
-    name: string
+    id: string
+    title: string
     color: string
+    order: number
+    favorite: Boolean
+    showProgression: Boolean
+
 }

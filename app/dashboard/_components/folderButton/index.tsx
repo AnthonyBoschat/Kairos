@@ -12,10 +12,10 @@ export default function FolderButton({folder}:FolderProps){
 
 
     return(
-        <button className={s.container}>
+        <button title="Accéder au contenu d'un dossier" className={s.container}>
             <FolderSolidIcon color={folder.color} size={18} />
             <span>
-                {folder.name}
+                {folder.title}
             </span>
         </button>
     )

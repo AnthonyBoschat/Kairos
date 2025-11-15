@@ -1,23 +1,30 @@
 import s from "./styles.module.scss"
 import SideBar from "./_components/sideBar";
 import Content from "./_components/content";
+import { Metadata } from "next";
+import { getCurrentUser } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
-const folders = [
-    {name:"Maurane", color: "#0025AB"},
-    {name:"Cefim", color: "#CF4F00"},
-    {name:"Randonnée", color: "#06AB00"},
-    {name:"Liste de course", color: "#AE05B6"},
-]
-
-
-export default function Dashboard(){
+export const metadata: Metadata = {
+  title: 'Kairos - Dashboard',
+  description: 'Tableau de bord Kairos : gérez vos dossiers, listes et tâches rapidement',
+}
 
 
+export default async function Dashboard(){
+
+    const user = await getCurrentUser()
+    const folders = await prisma.folder.findMany({
+        where:{
+            userId: user?.id
+        }
+    })
+    const sortedFolders = folders.sort((a, b) => a.order - b.order)
 
     return(
         <div className={s.page}>
 
-            <SideBar folders={folders}/>
+            <SideBar folders={sortedFolders}/>
             <Content/>
         </div>
     )
