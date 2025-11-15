@@ -13,7 +13,7 @@ export default function FolderList(props:DefaultProps){
 
     return(
         <div className={s.container}>
-            {props.folders.map(folder => <FolderButton folder={folder}/>)}
+            {props.folders.map((folder, index) => <FolderButton key={index} folder={folder}/>)}
         </div>
     )
 }
