@@ -14,11 +14,11 @@
     align-items: center;
 
     .container{
-        margin-top: -5rem;
+        margin-top: -7rem;
         width: 50%;
         height: 50%;
         display: grid;
-        grid-template-rows: auto 30rem;
+        grid-template-rows: auto 35rem;
         grid-template-columns: 1fr;
 
         .header{
@@ -35,7 +35,7 @@
                     background-color: transparent;
                     font-size: 1.25rem;
                     transition: opacity 0.1s linear;
-                    opacity: 0.5;
+                    opacity: 0.4;
                     cursor: pointer;
                     &.active{opacity: 1;}
                     &:hover{opacity: 1;}

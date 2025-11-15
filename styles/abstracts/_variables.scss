@@ -3,6 +3,7 @@
 // PALETTE DE COULEURS
 // =============================
 
+$blue-primary: rgb(0, 37, 171);
 
 // Couleurs de fond
 $light-primary: rgb(255, 255, 255);
@@ -10,7 +11,9 @@ $light-secondary: rgb(250, 248, 245);
 
 // Couleurs de texte
 $dark-primary: rgb(0, 0, 0); // texte principal
-$dark-primary-80: rgb(0, 0, 0), 0.8;
+$dark-primary-80: rgb(0, 0, 0, 0.8);
+$dark-primary-40: rgb(0, 0, 0, 0.4);
+$dark-primary-05: rgb(0, 0, 0, 0.05);
 $dark-secondary: rgb(0, 9, 43);
 
 // Couleurs d'état

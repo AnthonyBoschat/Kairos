@@ -4,10 +4,14 @@ import { ApiResponse } from "@/lib/api-response"
 
 export async function POST(req: Request) {
   try {
-    const { email, password, name } = await req.json()
+    const { email, password, name, confirmation } = await req.json()
     
-    if (!email || !password) {
-      return ApiResponse.badRequest("Email and password required")
+    if (!email || !password || !name || !confirmation) {
+      return ApiResponse.badRequest("Tous les champs sont requis")
+    }
+
+    if (password !== confirmation) {
+      return ApiResponse.badRequest("Les mots de passe ne correspondent pas")
     }
     
     const exists = await prisma.user.findUnique({
