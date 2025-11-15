@@ -46,7 +46,7 @@ export default function Register(props: RegisterProps) {
     
     if (result?.ok) {
         toast.success("Inscription réussie")
-        // router.push("/dashboard")
+        router.push("/dashboard")
     } 
   }
 
