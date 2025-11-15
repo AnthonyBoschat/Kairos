@@ -18,15 +18,9 @@ interface LoginProps{
 
 export default function Login(props:LoginProps) {
 
-  const router        = useRouter()
-  const searchParams  = useSearchParams()
+  const router = useRouter()
 
   const [showPassword, setShowPassword] = useState(false)
-
-  // En cas de déconnexion
-  useEffect(() => {
-    if(searchParams.get("signedOut") === "true") toast.success("Vous avez été déconnecter")
-  }, [searchParams])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

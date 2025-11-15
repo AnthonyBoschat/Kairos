@@ -1,15 +1,18 @@
 "use client"
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import s from "./styles.module.scss"
 import withClass from "@/utils/class";
 import Login from "./_components/Login";
 import useStorageState from "@/hooks/useStorageState";
 import Register from "./_components/Register";
 import Brand from "@/components/brand";
+import { useSearchParams } from "next/navigation";
+import { toast } from "react-toastify";
 
 export default function Home() {
 
+  const searchParams  = useSearchParams()
   
 
   const [tab, setTab] = useState("login")
@@ -20,6 +23,13 @@ export default function Home() {
   const [emailRegister, setEmailRegister] = useState("")
   const [passwordRegister, setPasswordRegister] = useState("")
   const [confirmationRegister, setConfirmationRegister] = useState("")
+
+    // En cas de déconnexion
+  useEffect(() => {
+    if(searchParams.get("signedOut") === "true") {
+      toast.success("Vous avez été déconnecter")
+    }
+  }, [searchParams])
 
 
   return (
