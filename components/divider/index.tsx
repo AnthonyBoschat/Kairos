@@ -3,7 +3,7 @@ import { CSSProperties } from "react"
 import s from "./styles.module.scss"
 
 interface DividerProps{
-    width?:number
+    width?: string
     style?: CSSProperties
 }
 

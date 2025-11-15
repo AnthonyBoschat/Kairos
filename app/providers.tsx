@@ -20,7 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                         if(type === "warning") return <WarningIcon/>
                         return null
                     }}
-                    position="bottom-right"
+                    position="top-center"
                     autoClose={3000}
                     hideProgressBar={false}
                     newestOnTop={false}
