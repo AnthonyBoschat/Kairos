@@ -2,7 +2,7 @@
 
 import { signOut } from "next-auth/react";
 import s from "./styles.module.scss"
-import Divider from "@/components/separator/index"
+import Divider from "@/components/divider/index"
 import FolderList from "./_components/folderList/index.tsx"
 import AddFolder from "./_components/addFolder/index.tsx"
 
