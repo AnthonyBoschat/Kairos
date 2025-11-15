@@ -1,0 +1,12 @@
+.container{
+    border: none;
+    background-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    opacity: 0.7;
+    transition: opacity 0.1s linear;
+    cursor: pointer;
+    font-size: 1.1rem;
+    &:hover{opacity: 1;}
+}
