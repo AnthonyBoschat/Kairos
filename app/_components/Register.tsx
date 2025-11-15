@@ -16,7 +16,7 @@ interface RegisterProps{
     setName: Dispatch<SetStateAction<string>>;
 }
 
-export default function AppRegister({
+export default function Register({
   email, setEmail,
   password, setPassword,
   name, setName

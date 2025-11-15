@@ -13,7 +13,7 @@ interface LoginProps{
     setPassword: Dispatch<SetStateAction<string>>;
 }
 
-export default function AppLogin({
+export default function Login({
     email, setEmail,
     password, setPassword
 }:LoginProps) {
