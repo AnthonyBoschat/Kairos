@@ -1,7 +1,8 @@
 model Folder {
   id                String   @id @default(cuid())
   title             String   
-  color             String
+  defaultColor      Int?
+  customColor       String?  
   order             Int      
   favorite          Boolean  @default(false)
   showProgression   Boolean  @default(false)

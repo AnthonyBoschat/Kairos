@@ -10,7 +10,7 @@ import { toast } from "react-toastify"
 export default function AddFolder(){
 
     const handleAddFolder = async() => {
-        const response = await addFolder({title:"aaa"})
+        const response = await addFolder({title:"Nouveau dossier"})
         if(response.success){
             toast.success(`Le dossier ${response.folder.title} a été ajouter`)
         }

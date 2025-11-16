@@ -2,7 +2,8 @@
 export interface Folder {
     id: string
     title: string
-    color: string
+    defaultColor: number | null
+    customColor: string | null
     order: number
     favorite: Boolean
     showProgression: Boolean
