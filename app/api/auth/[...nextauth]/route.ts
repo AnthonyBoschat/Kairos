@@ -19,7 +19,7 @@ export const authOptions = {
         })
         
         if (!user || !await bcrypt.compare(credentials.password, user.password)) {
-          return null
+          throw new Error("notFound")
         }
         
         return { 

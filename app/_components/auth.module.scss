@@ -29,6 +29,9 @@
                 outline: none;
                 border: 1px solid rgba(0, 0, 0, 0.4);
             }
+            &.error{
+                outline: 1px solid v.$state-error;
+            }
         }
         .forgot{
             margin-top: 4px;

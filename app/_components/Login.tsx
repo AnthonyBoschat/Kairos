@@ -21,16 +21,24 @@ export default function Login(props:LoginProps) {
   const router = useRouter()
 
   const [showPassword, setShowPassword] = useState(false)
+  const [showError, setShowError] = useState(false)
+
+  useEffect(() => {
+    if(showError){
+      setShowError(false)
+    }
+  }, [props.email, props.password])
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setShowError(false)
     e.preventDefault()
     const result = await signIn("credentials", {
       email:props.email,
       password:props.password,
       redirect: false
     })
-    
     if (result?.error) {
+      if(result?.error === "notFound") setShowError(true)
       toast.error("Impossible de vous connecter. Vérifiez vos identifiants et réessayez.")
     } else {
       router.push("/dashboard")
@@ -44,6 +52,7 @@ export default function Login(props:LoginProps) {
       <div className={s.row}>
         <label htmlFor="email">Adresse e-mail</label>
         <input
+          className={withClass(showError && s.error)}
           id="email"
           type="email"
           value={props.email}
@@ -56,6 +65,7 @@ export default function Login(props:LoginProps) {
         <label htmlFor="password">Mot de passe</label>
         <div style={{position:"relative"}}>
           <input
+            className={withClass(showError && s.error)}
             type={showPassword ? "text" : "password"}
             value={props.password}
             onChange={(e) => props.setPassword(e.target.value)}
