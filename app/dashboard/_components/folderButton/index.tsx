@@ -6,6 +6,7 @@ import FOLDER_COLORS from "@/constants/folderColor"
 import { useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
+import OptionsIcon from "@/components/ui/icons/Options"
 
 interface FolderProps{
     folder: Folder
@@ -25,6 +26,9 @@ export default function FolderButton({folder}:FolderProps){
             </span>
             <div className={withClass(s.indicator, isHover && s.active)}>
                 {isHover && <ArrowLeftIcon size={16}/>}
+            </div>
+            <div className={withClass(s.options, isHover && s.active)}>
+                {isHover && <button onClick={() => console.log("click option")}><OptionsIcon size={20}/></button>}
             </div>
         </button>
     )

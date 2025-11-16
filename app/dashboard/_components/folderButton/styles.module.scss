@@ -49,4 +49,27 @@
             fill: v.$dark-primary-80;
         }
     }
+    .options{
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: -1rem;
+        button{
+            all:unset;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        svg>g{
+            opacity: 0.6;
+            fill: v.$dark-primary-80;
+        }
+        &:hover{
+            svg>g{
+                opacity: 1;
+                fill: v.$dark-primary-80;
+            }
+        }
+    }
 }
