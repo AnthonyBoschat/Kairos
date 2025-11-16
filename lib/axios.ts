@@ -21,7 +21,7 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     // Extraction du message d'erreur
-    const message = error.response?.data?.error || 'Something went wrong'
+    const message = error.response?.data?.error || 'Une erreur est survenue'
     
     toast.error(message)
     

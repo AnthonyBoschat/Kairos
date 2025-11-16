@@ -1,6 +1,6 @@
 "use client"
 
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { signIn } from "next-auth/react" // Ajout
 import { api } from "@/lib/axios"
@@ -9,6 +9,7 @@ import s from "./auth.module.scss"
 import withClass from "@/utils/class"
 import EyesOpenIcon from "@/components/ui/icons/EyesOpen"
 import EyesCloseIcon from "@/components/ui/icons/EyesClose"
+import axios, { AxiosError } from "axios"
 
 interface RegisterProps{
     name:string,
@@ -23,8 +24,18 @@ interface RegisterProps{
 
 export default function Register(props: RegisterProps) {
   const router = useRouter()
-  const [showPassword, setShowPassword] = useState(false)
 
+  const [showPassword, setShowPassword]   = useState(false)
+  const [emailError, setEmailError]       = useState(false)
+  const [passwordError, setPasswordError] = useState(false)
+
+  useEffect(() => {
+    if(emailError) setEmailError(false)
+  }, [props.email])
+
+  useEffect(() => {
+    if(passwordError) setPasswordError(false)
+  }, [props.password, props.confirmation])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -36,18 +47,25 @@ export default function Register(props: RegisterProps) {
        confirmation:props.confirmation, 
     }
     
-    await api.post("/api/register", payload)
-    
-    const result = await signIn("credentials", {
-      email: props.email,
-      password: props.password,
-      redirect: false
-    })
-    
-    if (result?.ok) {
-        toast.success("Inscription réussie")
-        router.push("/dashboard")
-    } 
+    try{
+      await api.post("/api/register", payload)
+      const result = await signIn("credentials", {
+        email: props.email,
+        password: props.password,
+        redirect: false
+      })
+      if (result?.ok) {
+          toast.success("Inscription réussie")
+          router.push("/dashboard")
+      } 
+
+    }catch(error){
+      if (axios.isAxiosError(error)) {
+        const message = error.response?.data?.error
+        if(message === "Les mots de passe ne correspondent pas") setPasswordError(true)
+        if(message === "L'adresse e-mail est déjà utiliser") setEmailError(true)
+      }
+    }
   }
 
   return (
@@ -68,6 +86,7 @@ export default function Register(props: RegisterProps) {
       <div className={s.row}>
         <label htmlFor="email">Adresse e-mail</label>
         <input
+          className={withClass(emailError && s.error)}
           id="email"
           type="email"
           value={props.email}
@@ -81,6 +100,7 @@ export default function Register(props: RegisterProps) {
         <label htmlFor="password">Mot de passe</label>
         <div style={{position:"relative"}}>
           <input
+            className={withClass(passwordError && s.error)}
             type={showPassword ? "text" : "password"}
             value={props.password}
             onChange={(e) => props.setPassword(e.target.value)}
@@ -100,6 +120,7 @@ export default function Register(props: RegisterProps) {
       <div className={s.row}>
         <label htmlFor="confirmation">Confirmation</label>
         <input
+          className={withClass(passwordError && s.error)}
           id="confirmation"
           type="password"
           value={props.confirmation}
