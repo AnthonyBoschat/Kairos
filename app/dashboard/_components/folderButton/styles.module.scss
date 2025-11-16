@@ -8,5 +8,45 @@
     transition: opacity 0.1s linear;
     cursor: pointer;
     font-size: 1.1rem;
-    &:hover{opacity: 1;}
+    position: relative;
+    // outline: 1px solid blue;
+    padding-top: 0.2rem;
+    padding-bottom: 0.2rem;
+
+    &::after{
+        content: "";
+        position: absolute;
+        left: -1.5rem;
+        width: calc(100% + 3rem);
+        height: 100%;
+        background-color: v.$light-primary;
+        opacity: 0;
+        transition: opacity 0.1s linear;
+    }
+    &:hover{
+        opacity: 1;
+        &::after{
+            opacity: 1;
+        }
+    }
+    span, svg{
+        position: relative;
+        z-index: 1;
+    }
+    .indicator{
+        position: absolute;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        right: -3rem;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 0.05s linear;
+        &.active{
+            opacity: 1;
+        }
+        svg>path{
+            fill: v.$dark-primary-80;
+        }
+    }
 }
