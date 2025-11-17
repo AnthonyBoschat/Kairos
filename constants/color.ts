@@ -11,6 +11,7 @@ const COLOR = {
   state: {
     success: 'var(--state-success)', 
     error: 'var(--state-error)',
+    error_dark: 'var(--state-error-dark)',
   },
   toast: {
     success: 'var(--toast-success)',

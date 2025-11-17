@@ -9,9 +9,9 @@
     align-items: center;
     background-color: v.$dark-primary-10;
     font-family: var(--font-mulish);
-    animation: opacityIn 0.05s linear forwards;
+    animation: opacityIn 0.075s linear forwards;
     &.closing{
-        animation: opacityOut 0.05s linear forwards;
+        animation: opacityOut 0.075s linear forwards;
     }
 
     .card{
@@ -130,7 +130,7 @@
                     color: v.$state-error-dark;
                 }
                 &.save{
-                    color: v.$dark-primary;
+                    color: v.$state-success;
                 }
             }
         }

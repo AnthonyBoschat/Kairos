@@ -2,13 +2,15 @@
 import { Folder } from "@prisma/client"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, SetStateAction, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import { deleteFolder } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
+import Confirmation from "@/components/confirm"
+import COLOR from "@/constants/color"
 
 interface FolderOptionsProps{
     folder: null|Folder,
@@ -28,7 +30,7 @@ export default function FolderOptions(props:FolderOptionsProps){
         setIsClosing(true)
         setTimeout(() => {
             props.setSelectedFolderOptions(null)
-        }, 100)
+        }, 150)
     }
     
     const handleDeleteFolder = async() => {
@@ -86,7 +88,17 @@ export default function FolderOptions(props:FolderOptionsProps){
                     </li>
                 </ul>
                 <div className={s.footer}>
-                    <button className={s.delete} onClick={handleDeleteFolder}>Supprimer le dossier</button>
+                    <Confirmation 
+                        onClick={handleDeleteFolder} 
+                        content={
+                            <div>
+                                <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> ce dossier ?</span>
+                                <div>Tout ce que contient ce dossier sera définitivement perdu.</div>
+                            </div>
+                        }
+                    >
+                        <button className={s.delete}>Supprimer le dossier</button>
+                    </Confirmation>
                     <button className={s.save}>Enregister</button>
                 </div>
             </div>
