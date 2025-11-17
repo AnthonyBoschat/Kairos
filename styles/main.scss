@@ -7,15 +7,15 @@
 .Toastify__toast {
   background: $toast-background !important;
   color: $toast-text !important;
-  font-size: 0.8rem;
   max-width: 40rem;
   width: fit-content;
   padding: 1rem 1rem;
-  padding-right: 2rem;
-  font-size: 1rem;
+  padding-right: 3rem;
+  font-size: 0.95rem;
 }
 
 .Toastify__close-button {
+    margin-left: 3rem;
     opacity: 0.5 !important;
     color: $toast-close !important;
     &:hover {
@@ -32,6 +32,7 @@
 }
 
 .Toastify__toast-icon {
-    transform: scale(0.9);
-    color: $toast-error !important;
+  margin-right: 1.5rem;
+  transform: scale(0.9);
+  color: $toast-error !important;
 }
