@@ -6,6 +6,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
+import { deleteFolder } from "@/app/actions/folder"
+import { toast } from "react-toastify"
+import handleResponse from "@/utils/handleResponse"
 
 interface FolderOptionsProps{
     folder: null|Folder,
@@ -22,11 +25,23 @@ export default function FolderOptions(props:FolderOptionsProps){
     const [isClosing, setIsClosing] = useState(false)
 
     const handleClose = () => {
-            setIsClosing(true)
-            setTimeout(() => {
-                props.setSelectedFolderOptions(null)
-            }, 100)
+        setIsClosing(true)
+        setTimeout(() => {
+            props.setSelectedFolderOptions(null)
+        }, 100)
     }
+    
+    const handleDeleteFolder = async() => {
+        if(props.folder?.id){
+            const folderID = props.folder.id
+            handleResponse(async () => {
+                const response = await deleteFolder(folderID)
+                toast.success(response.message)
+                handleClose()
+            })
+        }
+    }
+
 
     if(!props.folder) return null
     return(
@@ -71,7 +86,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                     </li>
                 </ul>
                 <div className={s.footer}>
-                    <button className={s.delete}>Supprimer le dossier</button>
+                    <button className={s.delete} onClick={handleDeleteFolder}>Supprimer le dossier</button>
                     <button className={s.save}>Enregister</button>
                 </div>
             </div>
