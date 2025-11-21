@@ -26,7 +26,7 @@ export default function AddFolderButton(props:FolderProps){
     }
 
     const handleAddFolder = useCallback(async() => {
-        if(title){
+        if(title.trim()){
             handleResponse(async () => {
                 const response = await addFolder({title:title})
                 toast.success(response.message)
@@ -58,7 +58,7 @@ export default function AddFolderButton(props:FolderProps){
             document.removeEventListener("mousedown", handleClickOutside)
             document.removeEventListener("keydown", handleKeyPress)
         }
-    }, [])
+    }, [handleAddFolder])
     
 
 
