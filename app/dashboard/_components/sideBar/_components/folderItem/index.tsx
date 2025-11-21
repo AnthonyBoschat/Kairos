@@ -9,12 +9,12 @@ import OptionsIcon from "@/components/ui/icons/Options"
 import FolderOptions from "../folderOptions"
 import { Folder } from "@prisma/client"
 
-interface FolderProps{
+interface FolderItemProps{
     folder: Folder
 }
 
 
-export default function FolderButton({folder}:FolderProps){
+export default function FolderItem({folder}:FolderItemProps){
 
 
     const [isHover, setIsHover] = useState(false)

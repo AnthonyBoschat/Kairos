@@ -17,6 +17,7 @@
         content: "";
         position: absolute;
         left: -1.5rem;
+        top: -0.05rem;
         width: calc(100% + 3rem);
         height: 100%;
         background-color: v.$light-primary;
@@ -30,7 +31,7 @@
         }
     }
     svg{
-        margin-top: 0.3rem;
+        margin-top: 0.26rem;
         min-width: 18px;
     }
     span{

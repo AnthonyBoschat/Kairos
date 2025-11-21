@@ -1,9 +1,9 @@
 "use client"
 import s from "./styles.module.scss"
-import FolderButton from "../folderButton"
 import { Folder } from "@prisma/client"
-import AddFolderButton from "../addFolderButton"
+import AddFolderButton from "../newFolder"
 import { Dispatch, SetStateAction } from "react"
+import FolderItem from "../folderItem"
 
 interface DefaultProps{
     isAddingFolder:boolean
@@ -18,7 +18,7 @@ export default function FolderList(props:DefaultProps){
     return(
         <div className={s.container}>
             {props.isAddingFolder && <AddFolderButton setIsAddingFolder={props.setIsAddingFolder}/>}
-            {props.folders.map((folder, index) => <FolderButton key={index} folder={folder}/>)}
+            {props.folders.map((folder, index) => <FolderItem key={index} folder={folder}/>)}
         </div>
     )
 }

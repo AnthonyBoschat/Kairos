@@ -8,7 +8,7 @@ interface AddFolderProps{
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
 }
 
-export default function AddFolder(props:AddFolderProps){
+export default function addFolderButton(props:AddFolderProps){
 
     const handleClick = async() => {
         props.setIsAddingFolder(current => !current)
