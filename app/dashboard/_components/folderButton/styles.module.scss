@@ -2,7 +2,7 @@
     border: none;
     background-color: transparent;
     display: flex;
-    align-items: center;
+    align-items: start;
     gap: 0.5rem;
     opacity: 0.7;
     transition: opacity 0.1s linear;
@@ -28,6 +28,13 @@
         &::after{
             opacity: 1;
         }
+    }
+    svg{
+        margin-top: 0.3rem;
+        min-width: 18px;
+    }
+    span{
+        text-align: start;
     }
     span, svg{
         position: relative;
