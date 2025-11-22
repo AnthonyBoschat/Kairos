@@ -47,7 +47,15 @@
             font-size: 1.25rem;
             font-weight: 500;
             gap: 0.5rem;
-            svg{opacity: 1;}
+            button{
+                all:unset;
+                display: flex;
+                align-items: center;
+                opacity: 0.8;
+                transition: opacity 0.1s linear;
+                cursor: pointer;
+                &:hover{opacity: 1;}
+            }
         }
         .options{
             margin-top: 1.5rem;

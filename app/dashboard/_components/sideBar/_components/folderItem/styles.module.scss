@@ -10,7 +10,7 @@
     font-size: 1.1rem;
     position: relative;
     // outline: 1px solid blue;
-    padding-top: 0.2rem;
+    padding-top: 0.1rem;
     padding-bottom: 0.2rem;
 
     &::after{
@@ -30,14 +30,33 @@
             opacity: 1;
         }
     }
-    svg{
-        margin-top: 0.26rem;
-        min-width: 18px;
+
+    .icons{
+        // outline: 1px solid red;
+        margin-top: 0.24rem;
+        height: fit-content;
+        height: 100%;
+        display: flex;
+        position: relative;
+        z-index: 1;
+        svg{
+            z-index: 1;
+            min-width: 18px;
+        }
+
+        .favorite{
+            position: absolute;
+            right: 100%;
+            top: -20%;
+            display: flex;
+            align-items: center;
+            height: fit-content;
+        }
     }
-    span{
+    .title{
         text-align: start;
     }
-    span, svg{
+    .title, .icons, svg{
         position: relative;
         z-index: 1;
     }
@@ -48,6 +67,8 @@
         justify-content: center;
         right: -3rem;
         height: 100%;
+        padding-top: 0.1rem;
+        padding-bottom: 0.4rem;
         opacity: 0;
         transition: opacity 0.05s linear;
         &.active{
@@ -63,6 +84,7 @@
         align-items: center;
         justify-content: center;
         right: -1rem;
+        margin-top: 0.20rem;
         div{
             all:unset;
             display: flex;

@@ -72,5 +72,27 @@ export async function updateFolder({folderID, title}:{folderID:string|undefined,
 
     revalidatePath("/dashboard")
     return {success:true, message:`Le dossier a été correctement modifier`}
+}
 
+export async function togglerFolderFavorite(folderID: string){
+    const user = await getCurrentUser()
+    if (!user?.id) throw new Error("Non autorisé")
+
+    const folder = await prisma.folder.findUnique({
+        where:{id:folderID}
+    })
+
+    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+
+    const newFavoriteState = !folder.favorite
+    await prisma.folder.update({
+        where:{id:folderID},
+        data:{
+            favorite:newFavoriteState
+        }
+    }) 
+
+    const message = newFavoriteState ? "Dossier ajouter aux favoris" : "Dossier retirer des favoris"
+    revalidatePath("/dashboard")
+    return {success:true, message:message}
 }
