@@ -6,11 +6,12 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
-import { deleteFolder, updateFolder } from "@/app/actions/folder"
+import { deleteFolder, togglerFolderFavorite, updateFolder } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
+import StarIcon from "@/components/ui/icons/Star"
 
 interface FolderOptionsProps{
     folder: null|Folder,
@@ -24,6 +25,7 @@ export default function FolderOptions(props:FolderOptionsProps){
     const [folderTitle, setFolderTitle] = useState(props.folder?.title)
     const [folderColor, setFolderColor] = useState(props.folder?.customColor ? props.folder.customColor : FOLDER_COLORS[props.folder?.defaultColor ?? 0])
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
+    const [folderFavorite, setFolderFavorite] = useState(props.folder?.favorite)
     const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
     const [isClosing, setIsClosing] = useState<Boolean>(false)
     const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
@@ -43,6 +45,17 @@ export default function FolderOptions(props:FolderOptionsProps){
                 const response = await deleteFolder(folderID)
                 toast.success(response.message)
                 handleClose()
+            })
+        }
+    }
+
+    const handleToggleFavorite = async() => {
+        if(props.folder?.id){
+            const folderID = props.folder.id
+            handleResponse(async () => {
+                const response = await togglerFolderFavorite(folderID)
+                setFolderFavorite(current => !current)
+                toast.success(response.message)
             })
         }
     }
@@ -79,8 +92,12 @@ export default function FolderOptions(props:FolderOptionsProps){
             
             <div className={s.card}>
                 <div className={s.header}>
-                    Paramètres de dossier
-                    
+                    <span>
+                        Paramètres de dossier
+                    </span>
+                    <button onClick={handleToggleFavorite}>
+                        <StarIcon animate active={folderFavorite} size={32}/>
+                    </button>
                 </div>
                 <ul className={s.options}>
                     <li className={s.title}>

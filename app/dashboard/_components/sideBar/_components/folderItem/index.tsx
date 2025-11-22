@@ -8,9 +8,9 @@ import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
 import FolderOptions from "../folderOptions"
 import { Folder } from "@prisma/client"
-import { useDispatch } from "react-redux"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
+import StarIcon from "@/components/ui/icons/Star"
 
 interface FolderItemProps{
     folder: Folder
@@ -24,6 +24,10 @@ export default function FolderItem({folder}:FolderItemProps){
     const [isHover, setIsHover] = useState(false)
     const [selectedFolderOptions, setSelectedFolderOptions] = useState<null|Folder>(null)
 
+    const isFavorite = useMemo(() => {
+        return folder?.favorite
+    }, [folder])
+
     const isSelected = useMemo(() => {
         return selectedFolderID === folder.id
     }, [selectedFolderID, folder])
@@ -35,8 +39,15 @@ export default function FolderItem({folder}:FolderItemProps){
     return(
         <>
             <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
-                <FolderSolidIcon color={folder.customColor ? folder.customColor : FOLDER_COLORS[folder.defaultColor ?? 0]} size={18} />
-                <span>
+                <div className={s.icons}>
+                    <FolderSolidIcon color={folder.customColor ? folder.customColor : FOLDER_COLORS[folder.defaultColor ?? 0]} size={18} />
+                    {isFavorite && (
+                        <div className={s.favorite}>
+                            <StarIcon animate active size={20}/>
+                        </div>
+                    )}
+                </div>
+                <span className={s.title}>
                     {folder.title}
                 </span>
                 <div className={withClass(s.indicator, isHover && s.active)}>
