@@ -50,5 +50,27 @@ export async function addFolder({title}:{title:string}) {
 
     revalidatePath('/dashboard')
     return {success:true, message:`Le dossier ${createdFolder.title} a été ajouter`}
-        
+}
+
+
+export async function updateFolder({folderID, title}:{folderID:string|undefined, title:string|undefined}){
+    const user = await getCurrentUser()
+    if (!user?.id) throw new Error("Non autorisé")
+
+    const folder = await prisma.folder.findUnique({
+        where:{id:folderID}
+    })
+
+    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+
+    await prisma.folder.update({
+        where:{id:folderID},
+        data:{
+            title:title
+        }
+    })
+
+    revalidatePath("/dashboard")
+    return {success:true, message:`Le dossier a été correctement modifier`}
+
 }

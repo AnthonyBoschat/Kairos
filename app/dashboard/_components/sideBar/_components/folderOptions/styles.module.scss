@@ -68,6 +68,18 @@
                         display: flex;
                         align-items: center;
                         gap: 0.5rem;
+                        input{
+                            border: none;
+                            text-align: right;
+                            padding-right: 0.5rem;
+                            border-radius: 4px;
+                            pointer-events: none;
+                            &.active{
+                                pointer-events: all;
+                                outline: 3px solid black;
+                                border: default;
+                            }
+                        }
                         button{
                             all:unset;
                             display: flex;
@@ -75,7 +87,7 @@
                             opacity: 0.5;
                             transition: opacity 0.05s linear;
                             cursor: pointer;
-                            &:hover{
+                            &:hover, &.active{
                                 opacity: 1;
                             }
                         }
@@ -130,6 +142,7 @@
                     color: v.$state-error-dark;
                 }
                 &.save{
+                    &.active{opacity: 1;}
                     color: v.$state-success;
                 }
             }

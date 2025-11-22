@@ -2,11 +2,11 @@
 import { Folder } from "@prisma/client"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
-import { deleteFolder } from "@/app/actions/folder"
+import { deleteFolder, updateFolder } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
@@ -24,7 +24,10 @@ export default function FolderOptions(props:FolderOptionsProps){
     const [folderTitle, setFolderTitle] = useState(props.folder?.title)
     const [folderColor, setFolderColor] = useState(props.folder?.customColor ? props.folder.customColor : FOLDER_COLORS[props.folder?.defaultColor ?? 0])
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
-    const [isClosing, setIsClosing] = useState(false)
+    const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
+    const [isClosing, setIsClosing] = useState<Boolean>(false)
+    const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
+
 
     const handleClose = () => {
         setIsClosing(true)
@@ -43,6 +46,24 @@ export default function FolderOptions(props:FolderOptionsProps){
             })
         }
     }
+
+    const handleSave = async() => {
+        handleResponse(async() => {
+            const response = await updateFolder({
+                folderID:props.folder?.id,
+                title:folderTitle
+            })
+            toast.success(response.message)
+            setOnEditTitle(false)
+        })
+    }
+
+    useEffect(() => {
+        if(folderTitleInputRef.current){
+            if(onEditTitle) folderTitleInputRef.current.focus()
+            else folderTitleInputRef.current.blur()
+        }
+    }, [onEditTitle, folderTitleInputRef])
 
 
     if(!props.folder) return null
@@ -65,8 +86,8 @@ export default function FolderOptions(props:FolderOptionsProps){
                     <li className={s.title}>
                         <span className={s.key}>Nom</span>
                         <span className={s.value}>
-                            {folderTitle}
-                            <button>
+                            <input ref={folderTitleInputRef} onChange={(e) => setFolderTitle(e.target.value)} className={withClass(onEditTitle && s.active)} type="text" value={folderTitle} />
+                            <button className={withClass(onEditTitle && s.active)} onClick={() => setOnEditTitle(current => !current)}>
                                 <EditIcon/>
                             </button>
                         </span>
@@ -99,7 +120,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                     >
                         <button className={s.delete}>Supprimer le dossier</button>
                     </Confirmation>
-                    <button className={s.save}>Enregister</button>
+                    <button onClick={handleSave} className={s.save}>Enregister</button>
                 </div>
             </div>
         </div>
