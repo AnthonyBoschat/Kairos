@@ -5,6 +5,13 @@ import { getNextAvailableColorIndex } from "@/lib/folder-colors"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
+export async function getNextColorIndexForCurrentUser(){
+    const user = await getCurrentUser();
+    if (!user?.id) throw new Error("Non autorisé");
+    const colorIndex = await getNextAvailableColorIndex(user.id);
+    return colorIndex;
+}
+
 export async function deleteFolder(id:string){
     const user = await getCurrentUser()
     if (!user?.id) throw new Error("Non autorisé")
@@ -22,7 +29,6 @@ export async function deleteFolder(id:string){
     revalidatePath("/dashboard")
     return {success:true, message:`Le dossier ${deletedFolder.title} a été supprimer avec succès`}
 }
-
 
 export async function addFolder({title}:{title:string}) {
     const user = await getCurrentUser()

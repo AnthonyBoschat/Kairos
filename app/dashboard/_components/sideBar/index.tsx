@@ -1,18 +1,20 @@
 "use client"
 import Divider from "@/components/divider"
 import s from "./styles.module.scss"
-import AddFolder from "../addFolder"
-import FolderList from "../folderList"
-import Logout from "../logout"
-import { Folder } from "@/types/folder"
+import AddFolderButton from "./_components/addFolderButton"
+import FolderList from "./_components/folderList"
+import Logout from "./_components/logout"
+import { useState } from "react"
+import { Folder } from "@prisma/client"
 
-interface DefaultProps{
+interface SideBarProps{
     folders: Folder[]
 }
 
 
-export default function SideBar(props:DefaultProps){
+export default function SideBar(props:SideBarProps){
 
+    const [isAddingFolder, setIsAddingFolder] = useState(false)
 
     return(
         <div className={s.side}>
@@ -28,12 +30,12 @@ export default function SideBar(props:DefaultProps){
                 <Divider style={{marginTop:"1rem"}} />
 
                 {/* Ajouter un dossier */}
-                <AddFolder/>
+                <AddFolderButton setIsAddingFolder={setIsAddingFolder}/>
 
                 <Divider width={"30%"} style={{marginTop:"1rem"}} />
                 
                 {/* Liste des dossiers */}
-                <FolderList folders={props.folders}/>
+                <FolderList setIsAddingFolder={setIsAddingFolder} isAddingFolder={isAddingFolder} folders={props.folders}/>
 
             </div>
             <Logout/>

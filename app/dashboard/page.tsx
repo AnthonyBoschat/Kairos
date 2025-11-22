@@ -23,7 +23,6 @@ export default async function Dashboard(){
 
     return(
         <div className={s.page}>
-
             <SideBar folders={sortedFolders}/>
             <Content/>
         </div>
