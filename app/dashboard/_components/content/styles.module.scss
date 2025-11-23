@@ -1,6 +1,21 @@
 .container{
     background-color: v.$light-primary;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    width: 100%;
+    height: 100%;
+    font-family: var(--font-mulish);
+
+    .content{
+        padding-left: 4rem;
+        padding-right: 2rem;
+        height: 100%;
+        width: 100%;
+        display: grid;
+        grid-template-columns: 100%;
+        grid-template-rows: 20% 80%;
+
+        .actions{
+            // background-color: red;
+        }
+        
+    }
 }

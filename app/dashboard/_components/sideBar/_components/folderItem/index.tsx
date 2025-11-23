@@ -36,25 +36,32 @@ export default function FolderItem({folder}:FolderItemProps){
         dispatch(setSelectedFolderID(isSelected ? null : folder?.id))
     }, [isSelected])
 
+    const handleClickOptions = useCallback((event:React.MouseEvent) => {
+        if(folder){
+            event.stopPropagation()
+            setSelectedFolderOptions(folder)
+        }
+    }, [folder])
+
     return(
         <>
             <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
                 <div className={s.icons}>
                     <FolderSolidIcon color={folder.customColor ? folder.customColor : FOLDER_COLORS[folder.defaultColor ?? 0]} size={18} />
                     {isFavorite && (
-                        <div className={s.favorite}>
-                            <StarIcon animate active size={20}/>
+                        <div title="Ce dossier est en favori" className={s.favorite}>
+                            <StarIcon animate active size={16}/>
                         </div>
                     )}
                 </div>
                 <span className={s.title}>
                     {folder.title}
                 </span>
-                <div className={withClass(s.indicator, isHover && s.active)}>
-                    {isHover && <ArrowLeftIcon size={16}/>}
+                <div className={withClass(s.indicator, (isHover || isSelected) && s.active)}>
+                    {(isHover || isSelected) && <ArrowLeftIcon size={16}/>}
                 </div>
                 <div className={withClass(s.options, isHover && s.active)}>
-                    {isHover && <div onClick={() => setSelectedFolderOptions(folder)}><OptionsIcon size={20}/></div>}
+                    {isHover && <div title="Accédez aux options du dossier" onClick={(event) => handleClickOptions(event)}><OptionsIcon size={20}/></div>}
                 </div>
             </button>
             {selectedFolderOptions && <FolderOptions setSelectedFolderOptions={setSelectedFolderOptions} folder={selectedFolderOptions}/>}

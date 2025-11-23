@@ -96,7 +96,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                         Paramètres de dossier
                     </span>
                     <button onClick={handleToggleFavorite}>
-                        <StarIcon animate active={folderFavorite} size={32}/>
+                        <StarIcon animate active={folderFavorite} size={24}/>
                     </button>
                 </div>
                 <ul className={s.options}>
