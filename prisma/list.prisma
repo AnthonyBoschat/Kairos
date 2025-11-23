@@ -1,15 +1,17 @@
 model List {
   id                String   @id @default(cuid())
   title             String   
+  favorite          Boolean  @default(false)
+  countElement      Boolean  @default(true)
+  folder            Folder   @relation(fields: [folderId], references: [id])
   defaultColor      Int?
   customColor       String?  
   order             Int      
-  favorite          Boolean  @default(false)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 
   folderId          String
-  folder            Folder @relation(fields: [folderId], references: [id])
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
 
   @@map("lists")
 }

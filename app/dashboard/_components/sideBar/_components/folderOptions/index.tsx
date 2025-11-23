@@ -6,7 +6,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
-import { deleteFolder, togglerFolderFavorite, updateFolder } from "@/app/actions/folder"
+import { deleteFolder, toggleFolderFavorite, updateFolder } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
@@ -53,7 +53,7 @@ export default function FolderOptions(props:FolderOptionsProps){
         if(props.folder?.id){
             const folderID = props.folder.id
             handleResponse(async () => {
-                const response = await togglerFolderFavorite(folderID)
+                const response = await toggleFolderFavorite(folderID)
                 setFolderFavorite(current => !current)
                 toast.success(response.message)
             })
@@ -64,7 +64,8 @@ export default function FolderOptions(props:FolderOptionsProps){
         handleResponse(async() => {
             const response = await updateFolder({
                 folderID:props.folder?.id,
-                title:folderTitle
+                title:folderTitle,
+                showProgression:folderShowProgression
             })
             toast.success(response.message)
             setOnEditTitle(false)
