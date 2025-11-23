@@ -53,7 +53,15 @@ export async function addFolder({title}:{title:string}) {
 }
 
 
-export async function updateFolder({folderID, title}:{folderID:string|undefined, title:string|undefined}){
+export async function updateFolder({
+    folderID, 
+    title,
+    showProgression
+}:{
+    folderID:string|undefined, 
+    title:string|undefined,
+    showProgression:boolean|undefined
+}){
     const user = await getCurrentUser()
     if (!user?.id) throw new Error("Non autorisé")
 
@@ -66,7 +74,8 @@ export async function updateFolder({folderID, title}:{folderID:string|undefined,
     await prisma.folder.update({
         where:{id:folderID},
         data:{
-            title:title
+            title:title,
+            showProgression:showProgression
         }
     })
 
@@ -74,7 +83,7 @@ export async function updateFolder({folderID, title}:{folderID:string|undefined,
     return {success:true, message:`Le dossier a été correctement modifier`}
 }
 
-export async function togglerFolderFavorite(folderID: string){
+export async function toggleFolderFavorite(folderID: string){
     const user = await getCurrentUser()
     if (!user?.id) throw new Error("Non autorisé")
 
