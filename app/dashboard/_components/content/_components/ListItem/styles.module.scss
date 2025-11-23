@@ -1,0 +1,88 @@
+.container{
+    all:unset;
+    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+                0px 2px 2px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: column;
+    border-radius: 4px;
+    background-color: v.$light-primary;
+    position: relative;
+    z-index: 2;
+    transition: box-shadow 0.1s linear;
+    &:hover{
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15),
+                    0px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .color{
+        position: absolute;
+        top: -0.5rem;
+        left: 0;
+        width: 100%;
+        height: 1rem;
+        background-color: #FFBA60;
+        border-radius: 4px;
+        z-index: -1;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+    }
+
+    .header{
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem;
+        border-radius: 4px;
+        box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+        background-color: rgb(250, 248, 245);
+        .left{
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+
+            .tasksCount{
+                opacity: 0.5;
+            }
+        }
+        .right{
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            svg{
+                opacity: 0.8;
+                fill:v.$dark-primary-80;
+                transition: opacity 0.1s linear;
+                cursor: pointer;
+                &:hover{
+                    opacity: 1;
+                }
+            }
+        }
+    }
+    .listContent{
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+        padding: 0.5rem;
+
+        .addElement{
+            font-size: 14px;
+            width: 100%;
+            padding: 0.5rem;
+            // border: none;
+            border-style: dashed;
+            border-color: rgba(0, 0, 0, 0.5);
+            border-width: 1px;
+            background-color: transparent;
+            color: v.$dark-primary-80;
+            opacity: 0.7;
+            transition: opacity 0.1s linear;
+            cursor: pointer;
+            &:hover{
+                opacity: 1;
+            }
+        }
+    }
+
+}

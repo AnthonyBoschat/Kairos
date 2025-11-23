@@ -17,8 +17,12 @@ export default async function Dashboard(){
     const folders = await prisma.folder.findMany({
         where:{
             userId: user?.id
+        },
+        include:{
+            lists:true
         }
     })
+    
     const sortedFolders = folders.sort((a, b) => {
         if (a.favorite !== b.favorite) {
             return b.favorite ? 1 : -1;
