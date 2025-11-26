@@ -12,6 +12,7 @@ import StarIcon from "@/components/ui/icons/Star"
 import LIST_COLOR from "@/constants/listColor"
 import { deleteList, togglerListFavorite, updateList } from "@/app/actions/list"
 import { useQueryClient } from "@tanstack/react-query"
+import Overlay from "@/components/overlay"
 
 interface ListOptionsProps{
     list: null|List
@@ -27,19 +28,13 @@ export default function ListOptions(props:ListOptionsProps){
     const [listFavorite, setListFavorite] = useState(props.list?.favorite)
     const [listCountElement, setListCountElement] = useState(props.list?.countElement)
     const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
-    const [isClosing, setIsClosing] = useState<Boolean>(false)
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
 
     const refetch = () => {
         queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
     }
 
-    const handleClose = () => {
-        setIsClosing(true)
-        setTimeout(() => {
-            props.setSelectedListOptions(null)
-        }, 150)
-    }
+
     
     const handleDeleteList = async() => {
         if(props.list?.id){
@@ -48,7 +43,7 @@ export default function ListOptions(props:ListOptionsProps){
                 const response = await deleteList(listID)
                 toast.success(response.message)
                 refetch()
-                handleClose()
+                props.setSelectedListOptions(null)
             })
         }
     }
@@ -88,63 +83,65 @@ export default function ListOptions(props:ListOptionsProps){
 
     if(!props.list) return null
     return(
-        <div 
-            onClick={(event: React.MouseEvent<HTMLDivElement>) => {
-                if(event.target === event.currentTarget){
-                    handleClose()
-                }
-            }} 
-            className={withClass(s.container, isClosing && s.closing)}
-        >
-            
-            <div className={s.card}>
-                <div className={s.header}>
-                    <span>
-                        Paramètres de liste
-                    </span>
-                    <button onClick={handleToggleFavorite}>
-                        <StarIcon animate active={listFavorite} size={24}/>
-                    </button>
-                </div>
-                <ul className={s.options}>
-                    <li className={s.title}>
-                        <span className={s.key}>Nom</span>
-                        <span className={s.value}>
-                            <input ref={listTitleInputRef} onChange={(e) => setListTitle(e.target.value)} className={withClass(onEditTitle && s.active)} type="text" value={listTitle} />
-                            <button className={withClass(onEditTitle && s.active)} onClick={() => setOnEditTitle(current => !current)}>
-                                <EditIcon/>
-                            </button>
-                        </span>
-                    </li>
-                    <li className={s.color}>
-                        <span className={s.key}>Couleur</span>
-                        <span className={s.value}>
-                            <button style={{backgroundColor:listColor, boxShadow:"inset 0 0 0 1px rgba(0, 0, 0, 0.15)"}}/>
-                        </span>
-                    </li>
-                    <li className={s.countElement}>
-                        <span className={s.key}>Afficher le nombre d'éléments</span>
-                        <span className={s.value}>
-                            <button onClick={() => setListCountElement(true)} className={withClass(listCountElement && s.active)}>Oui</button>
-                            <button onClick={() => setListCountElement(false)} className={withClass(!listCountElement && s.active)}>Non</button>
-                        </span>
-                    </li>
-                </ul>
-                <div className={s.footer}>
-                    <Confirmation 
-                        onClick={handleDeleteList} 
-                        content={
-                            <div>
-                                <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette liste ?</span>
-                                <div>Tout ce que contient la liste sera définitivement perdu.</div>
-                            </div>
-                        }
+        <>
+            <Overlay onClose={() => props.setSelectedListOptions(null)}>
+                {(isClosing) => (
+                    <div
+                        className={withClass(s.container, isClosing && s.closing)}
                     >
-                        <button className={s.delete}>Supprimer la liste</button>
-                    </Confirmation>
-                    <button onClick={handleSave} className={s.save}>Enregister</button>
-                </div>
-            </div>
-        </div>
+                        
+                        <div className={s.card}>
+                            <div className={s.header}>
+                                <span>
+                                    Paramètres de liste
+                                </span>
+                                <button onClick={handleToggleFavorite}>
+                                    <StarIcon animate active={listFavorite} size={24}/>
+                                </button>
+                            </div>
+                            <ul className={s.options}>
+                                <li className={s.title}>
+                                    <span className={s.key}>Nom</span>
+                                    <span className={s.value}>
+                                        <input ref={listTitleInputRef} onChange={(e) => setListTitle(e.target.value)} className={withClass(onEditTitle && s.active)} type="text" value={listTitle} />
+                                        <button className={withClass(onEditTitle && s.active)} onClick={() => setOnEditTitle(current => !current)}>
+                                            <EditIcon/>
+                                        </button>
+                                    </span>
+                                </li>
+                                <li className={s.color}>
+                                    <span className={s.key}>Couleur</span>
+                                    <span className={s.value}>
+                                        <button style={{backgroundColor:listColor, boxShadow:"inset 0 0 0 1px rgba(0, 0, 0, 0.15)"}}/>
+                                    </span>
+                                </li>
+                                <li className={s.countElement}>
+                                    <span className={s.key}>Afficher le nombre d'éléments</span>
+                                    <span className={s.value}>
+                                        <button onClick={() => setListCountElement(true)} className={withClass(listCountElement && s.active)}>Oui</button>
+                                        <button onClick={() => setListCountElement(false)} className={withClass(!listCountElement && s.active)}>Non</button>
+                                    </span>
+                                </li>
+                            </ul>
+                            <div className={s.footer}>
+                                <Confirmation 
+                                    onClick={handleDeleteList} 
+                                    content={
+                                        <div>
+                                            <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette liste ?</span>
+                                            <div>Tout ce que contient la liste sera définitivement perdu.</div>
+                                        </div>
+                                    }
+                                >
+                                    <button className={s.delete}>Supprimer la liste</button>
+                                </Confirmation>
+                                <button onClick={handleSave} className={s.save}>Enregister</button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </Overlay>
+        </>
+        
     )
 }

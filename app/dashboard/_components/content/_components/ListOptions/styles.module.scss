@@ -1,22 +1,19 @@
 .container{
-    position: fixed;
-    inset:0;
-    width: 100vw;
-    height: 100vh;
+    position: absolute;
+    inset: 0;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
     z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: v.$dark-primary-10;
+    width: fit-content;
+    height: fit-content;
+    width: 30%;
+    min-width: 30rem;
     font-family: var(--font-mulish);
-    animation: opacityIn 0.075s linear forwards;
-    &.closing{
-        animation: opacityOut 0.075s linear forwards;
-    }
+    @include m.overlayMixin;
 
     .card{
-        width: 30%;
-        min-width: 30rem;
+        width: 100%;
         height: auto;
         padding: 1rem 1.5rem 1.5rem 1.5rem;
         border-radius: 8px;

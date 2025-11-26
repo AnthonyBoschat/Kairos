@@ -10,3 +10,10 @@
     @warn "Le breakpoint `#{$breakpoint}` n'est pas défini dans la map $breakpoints.";
   }
 }
+
+@mixin overlayMixin {
+    animation: opacityIn 0.075s linear forwards;
+    &.closing {
+        animation: opacityOut 0.075s linear forwards;
+    }
+}

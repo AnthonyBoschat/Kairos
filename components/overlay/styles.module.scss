@@ -1,0 +1,9 @@
+.container{
+    position: fixed;
+    inset:0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 500;
+    background-color: v.$dark-primary-10;
+    @include m.overlayMixin;
+}
