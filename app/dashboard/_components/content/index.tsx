@@ -13,8 +13,11 @@ export default function Content() {
     return (
         <div className={s.container}>
             <div className={s.content}>
-                <ListsActions/>
-                {selectedFolderID && <Lists selectedFolderID={selectedFolderID}/>}
+                {selectedFolderID && 
+                <>
+                    <ListsActions selectedFolderID={selectedFolderID}/>
+                    <Lists selectedFolderID={selectedFolderID}/>
+                </>}
             </div>
         </div>
     )

@@ -1,3 +1,70 @@
 .container{
+    // background-color: red;
+    display: grid;
+    align-items: end;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
     
+    .buttonContainer{
+        position: relative;
+        button{
+            position: relative;
+            width: 100%;
+            border: none;
+            background-color: v.$light-primary;
+            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+            padding: 0.75rem 0;
+            border-radius: 4px;
+            transition: all 0.1s linear;
+            opacity: 0.8;
+            cursor: pointer;
+            z-index: 1;
+            &:hover{
+                opacity: 1;
+                box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.30);
+            }
+            &.active{
+                opacity: 1;
+                z-index: 1000;
+                box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
+            }
+        }
+        form.addListForm{
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 80%;
+            bottom: calc(-80% - 0.25rem);
+            background-color: v.$light-primary;
+            z-index: 1000;
+            @include m.overlayMixin;
+            animation: addListIn 0.2s ease-in-out forwards;
+            &.closing{
+                animation: addListOut 0.2s ease-in-out forwards;
+            }
+            
+            input{
+                border: none;
+                border-radius: 4px;
+                width: 100%;
+                height: 100%;
+                padding-left: 0.5rem;
+                box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+            }
+            button{
+                all:unset;
+                position: absolute;
+                right: 0.3rem;
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                align-items: center;
+                padding: 0.2rem;
+                opacity: 0.7;
+                transition: opacity 0.05s linear;
+                cursor: pointer;
+                &:hover{opacity: 1;}
+            }
+        }
+    }
 }
