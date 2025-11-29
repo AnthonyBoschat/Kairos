@@ -47,7 +47,7 @@ export default function FolderItem(props:FolderItemProps){
 
     const handleClick = useCallback(() => {
         dispatch(setSelectedFolderID(isSelected ? null : props.folder?.id))
-    }, [isSelected])
+    }, [isSelected, props.folder])
 
     const handleClickOptions = useCallback((event:React.MouseEvent) => {
         if(props.folder){
