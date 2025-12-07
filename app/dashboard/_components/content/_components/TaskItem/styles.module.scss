@@ -1,0 +1,22 @@
+.container{
+    display: flex;
+    justify-content: end;
+    opacity: 0.8;
+    transition: all 0.1s linear;
+    cursor: pointer;
+    border-radius: 0.25rem 0.5rem 0.5rem 0.25rem;
+    // outline: 1px solid red;
+    &:hover{
+        opacity: 1;
+        .content{
+            background-color: rgb(250, 248, 245, 0.95) !important;
+        }
+    }
+    .content{
+        padding: 0.5rem;
+        height: 100%;
+        width: calc(100% - 0.5rem);
+        border-radius: 0 0.25rem 0.25rem 0;
+        background-color: rgb(250, 248, 245);
+    }
+}

@@ -10,6 +10,9 @@ import { togglerListFavorite } from "@/app/actions/list"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import { ListWithTaskAndFolder } from "@/types/list"
+import AddTaskButton from "../AddTaskButton"
+import TaskItem from "../TaskItem"
+import TaskList from "../TaskList"
 
 interface ListItemProps{
     list: ListWithTaskAndFolder
@@ -57,19 +60,9 @@ export default function ListItem(props:ListItemProps){
                 </div>
             </div>
 
-            <div className={s.listContent}>
-                <button className={s.addElement}>Ajouter un élément</button>
-                <Divider width="15%" style={{marginTop:"0.75rem"}}/>
-            </div>
-            <ul className={s.taskContainer}>
-                {props.list.tasks.map(task => (
-                    <li style={{backgroundColor:listColor}} className={s.task} key={task.id}>
-                        <div className={s.content}>
-                            {task.title}
-                        </div>
-                    </li>
-                ))}
-            </ul>
+            <AddTaskButton/>
+
+            <TaskList listColor={listColor} tasks={props.list.tasks}/>
         </li>
     )
 }
