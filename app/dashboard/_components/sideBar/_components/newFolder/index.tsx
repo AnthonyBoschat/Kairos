@@ -2,7 +2,7 @@
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
 import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react"
-import { addFolder, getNextColorIndexForCurrentUser } from "@/app/actions/folder"
+import { addFolder, getNextFolderColorIndexForCurrentUser } from "@/app/actions/folder"
 import FOLDER_COLORS from "@/constants/folderColor"
 import handleResponse from "@/utils/handleResponse"
 import { toast } from "react-toastify"
@@ -21,7 +21,7 @@ export default function AddFolderButton(props:FolderProps){
     const [title, setTitle] = useState("")
 
     const fetchFolderColor = async() => {
-        const color = await getNextColorIndexForCurrentUser()
+        const color = await getNextFolderColorIndexForCurrentUser()
         setFolderColor(color)
     }
 

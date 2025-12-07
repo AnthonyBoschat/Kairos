@@ -15,10 +15,11 @@ export async function getLists(id:string){
                 select:{
                     title: true
                 }
-            }
+            },
+            tasks:true
         }
     })
-
+    
     return {success:true, lists:lists}
 }
 

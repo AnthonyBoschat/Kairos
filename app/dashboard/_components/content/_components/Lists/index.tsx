@@ -1,21 +1,12 @@
 "use client"
 import { getLists } from "@/app/actions/list"
-import { List, Prisma } from "@prisma/client"
+import { List } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
 import ListItem from "../ListItem"
 import s from "./styles.module.scss"
 import ListOptions from "../ListOptions"
-
-type ListWithFolder = Prisma.ListGetPayload<{
-    include: {
-        folder: {
-            select: {
-                title: true
-            }
-        }
-    }
-}>
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface ListsProps{
     selectedFolderID:string
@@ -30,7 +21,7 @@ export default function Lists(props:ListsProps){
         queryFn: async () => {
             const result = await getLists(props.selectedFolderID!)
             if (!result.success) throw new Error('Erreur chargement')
-            return result.lists as ListWithFolder[]
+            return result.lists as ListWithTaskAndFolder[]
         },
         enabled: !!props.selectedFolderID,
     })
