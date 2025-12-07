@@ -1,14 +1,14 @@
 'use server'
 
 import { getCurrentUser } from "@/lib/auth"
-import { getNextAvailableColorIndex } from "@/lib/folder-colors"
+import { getNextAvailableFolderColorIndex } from "@/lib/folder-colors"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
-export async function getNextColorIndexForCurrentUser(){
+export async function getNextFolderColorIndexForCurrentUser(){
     const user = await getCurrentUser();
     if (!user?.id) throw new Error("Non autorisé");
-    const colorIndex = await getNextAvailableColorIndex(user.id);
+    const colorIndex = await getNextAvailableFolderColorIndex(user.id);
     return colorIndex;
 }
 
@@ -42,7 +42,7 @@ export async function addFolder({title}:{title:string}) {
     const createdFolder = await prisma.folder.create({
         data:{
             title: title,
-            defaultColor: await getNextAvailableColorIndex(user.id),
+            defaultColor: await getNextAvailableFolderColorIndex(user.id),
             order:(maxOrder._max.order ?? -1) + 1,
             userId:user.id
         }

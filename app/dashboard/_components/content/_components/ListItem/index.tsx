@@ -4,37 +4,42 @@ import LIST_COLOR from "@/constants/listColor"
 import StarIcon from "@/components/ui/icons/Star"
 import OptionsIcon from "@/components/ui/icons/Options"
 import Divider from "@/components/divider"
-import { Dispatch } from "react"
+import { Dispatch, useMemo } from "react"
 import handleResponse from "@/utils/handleResponse"
 import { togglerListFavorite } from "@/app/actions/list"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface ListItemProps{
-    list: List
+    list: ListWithTaskAndFolder
     setSelectedListOptions: Dispatch<null|List>
 }
 
 
 export default function ListItem(props:ListItemProps){
 
-        const queryClient = useQueryClient()
+    const queryClient = useQueryClient()
 
-        const handleToggleFavorite = async() => {
-            if(props.list?.id){
-                const listID = props.list.id
-                handleResponse(async () => {
-                    const response = await togglerListFavorite(listID)
-                    queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
-                    toast.success(response.message)
-                })
-            }
+    const listColor = useMemo(() => {
+        return props.list.customColor || LIST_COLOR[props.list.defaultColor ?? 0]
+    }, [props])
+
+    const handleToggleFavorite = async() => {
+        if(props.list?.id){
+            const listID = props.list.id
+            handleResponse(async () => {
+                const response = await togglerListFavorite(listID)
+                queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
+                toast.success(response.message)
+            })
         }
+    }
     
 
     return(
         <li className={s.container}>
-            <div style={{backgroundColor: props.list.customColor || LIST_COLOR[props.list.defaultColor ?? 0]}} className={s.color}/>
+            <div style={{backgroundColor: listColor}} className={s.color}/>
             <div className={s.header}>
                 <div className={s.left}>
                     <span className={s.title}>{props.list.title}</span>
@@ -56,7 +61,15 @@ export default function ListItem(props:ListItemProps){
                 <button className={s.addElement}>Ajouter un élément</button>
                 <Divider width="15%" style={{marginTop:"0.75rem"}}/>
             </div>
-
+            <ul className={s.taskContainer}>
+                {props.list.tasks.map(task => (
+                    <li style={{backgroundColor:listColor}} className={s.task} key={task.id}>
+                        <div className={s.content}>
+                            {task.title}
+                        </div>
+                    </li>
+                ))}
+            </ul>
         </li>
     )
 }

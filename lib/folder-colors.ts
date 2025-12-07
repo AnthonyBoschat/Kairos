@@ -1,7 +1,7 @@
 import FOLDER_COLORS from "@/constants/folderColor"
 import { prisma } from "./prisma"
 
-export async function getNextAvailableColorIndex(userId: string) {
+export async function getNextAvailableFolderColorIndex(userId: string) {
     const folders = await prisma.folder.findMany({
         where: { 
         userId,
