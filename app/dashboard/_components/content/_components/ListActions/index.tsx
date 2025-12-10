@@ -7,6 +7,7 @@ import { addList } from "@/app/actions/list"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import AddListIcon from "@/components/ui/icons/addList"
+import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 
 
 interface ListsActionsProps{
@@ -22,29 +23,28 @@ export default function ListsActions(props:ListsActionsProps){
 
     const isEnter = (e: React.KeyboardEvent) => e.key === "Enter";
 
-    const handleSubmitAddList = useCallback((event:React.KeyboardEvent  | React.MouseEvent) => {
-        if(newListTitle){
-            event.preventDefault()
-            handleAddList(newListTitle)
-        }
-    }, [newListTitle])
-    
-    
-    const handleAddList = (newListTitle:string) => {
-        handleResponse(async() => {
-            if(props.selectedFolderID){
-                const response = await addList({title:newListTitle, folderID:props.selectedFolderID})
-                setIsAddingList(false)
-                setNewListTitle("")
-                toast.success(response.message)
-                queryClient.invalidateQueries({ queryKey: ['lists', props.selectedFolderID] })
-            }
-        })
+    const resetNewList = () => {
+        setNewListTitle("")
+        setIsAddingList(false)
     }
-
+    
     const handleClickAddList = () => {
         setIsAddingList(true)
     }
+    
+    const handleAddList = useCallback(() => {
+        if(newListTitle.trim()){
+            handleResponse(async() => {
+                if(props.selectedFolderID){
+                    const response = await addList({title:newListTitle, folderID:props.selectedFolderID})
+                    setNewListTitle("")
+                    toast.success(response.message)
+                    queryClient.invalidateQueries({ queryKey: ['lists', props.selectedFolderID] })
+                }
+            })
+        }
+        setIsAddingList(false)
+    }, [newListTitle])
 
     useEffect(() => {
         if(newListInputRef.current){
@@ -52,6 +52,8 @@ export default function ListsActions(props:ListsActionsProps){
             else newListInputRef.current.blur()
         }
     }, [isAddingList, newListInputRef])
+
+    useCallbackOnClickOutside(newListInputRef, resetNewList)
 
     return(
         <div className={s.container}>
@@ -63,8 +65,8 @@ export default function ListsActions(props:ListsActionsProps){
                     <Overlay onClose={() => setIsAddingList(false)}>
                         {(isClosing) => (
                             <form className={withClass(s.addListForm, isClosing && s.closing)}>
-                                <input ref={newListInputRef} onKeyDown={(e) => isEnter(e) && handleSubmitAddList(e)} onChange={(e) => setNewListTitle(e.currentTarget.value)} type="text" value={newListTitle} />
-                                <button title="Ajouter une nouvelle liste au dossier" onClick={handleSubmitAddList}>
+                                <input ref={newListInputRef} onKeyDown={(e) => isEnter(e) && handleAddList()} onChange={(e) => setNewListTitle(e.currentTarget.value)} type="text" value={newListTitle} />
+                                <button title="Ajouter une nouvelle liste au dossier" onClick={handleAddList}>
                                     <AddListIcon/>
                                 </button>
                             </form>

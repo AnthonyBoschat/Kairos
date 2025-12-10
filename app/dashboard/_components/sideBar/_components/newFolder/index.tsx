@@ -6,6 +6,7 @@ import { addFolder, getNextFolderColorIndexForCurrentUser } from "@/app/actions/
 import FOLDER_COLORS from "@/constants/folderColor"
 import handleResponse from "@/utils/handleResponse"
 import { toast } from "react-toastify"
+import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 
 interface FolderProps{
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
@@ -19,6 +20,9 @@ export default function AddFolderButton(props:FolderProps){
 
     const [folderColor, setFolderColor] = useState<number | null>(null);
     const [title, setTitle] = useState("")
+
+    const isEnter = (e: React.KeyboardEvent) => e.key === "Enter";
+    
 
     const fetchFolderColor = async() => {
         const color = await getNextFolderColorIndexForCurrentUser()
@@ -34,40 +38,22 @@ export default function AddFolderButton(props:FolderProps){
         }
         props.setIsAddingFolder(false)
     }, [title])
-
-    const handleClickOutside = async (event: MouseEvent) => {
-        if(containerRef.current && !containerRef.current.contains(event.target as Node)){
-            await handleAddFolder()
-        }
-    }
-    const handleKeyPress = async (event:KeyboardEvent) => {
-        if(event.key === "Enter"){
-            await handleAddFolder()
-        }
-    }   
-
+    
     useEffect(() => {
         fetchFolderColor()
         titleRef.current?.focus();
     }, [])
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside)
-        document.addEventListener("keydown", handleKeyPress)
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside)
-            document.removeEventListener("keydown", handleKeyPress)
-        }
-    }, [handleAddFolder])
     
-
+    
+    
+    useCallbackOnClickOutside(containerRef, handleAddFolder)
 
     return(
         
         <button ref={containerRef} title="Création d'un nouveau dossier" className={s.container}>
             <FolderSolidIcon color={folderColor !== null ? FOLDER_COLORS[folderColor] : 'transparent'}  size={18} />
 
-            <input ref={titleRef} value={title} onChange={(e) => setTitle(e.currentTarget.value)} type="text"/>
+            <input onKeyDown={(e) => isEnter(e) && handleAddFolder()} ref={titleRef} value={title} onChange={(e) => setTitle(e.currentTarget.value)} type="text"/>
         </button>
     )
 }
