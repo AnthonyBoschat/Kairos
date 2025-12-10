@@ -16,12 +16,9 @@ export default function TaskItem(props:TaskItemProps){
     const [isHover, setIsHover] = useState(false)
 
     return(
-        <li onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} style={{backgroundColor:props.listColor}} className={s.container} key={props.task.id}>
+        <li onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} style={{backgroundColor:props.listColor}} className={s.container}>
             <div className={s.content}>
                 {props.task.title}
-            </div>
-            <div className={withClass(s.indicator, (isHover) && s.active)}>
-                {isHover && <ArrowLeftIcon size={16}/>}
             </div>
         </li>
     )
