@@ -69,7 +69,7 @@ export async function addList({title, folderID}:{title:string, folderID:string})
     return {success:true, message:`La liste ${createdList.title} a été ajouter`}
 }
 
-export async function togglerListFavorite(listID: string){
+export async function toggleListFavorite(listID: string){
     const user = await getCurrentUser()
     if (!user?.id) throw new Error("Non autorisé")
 

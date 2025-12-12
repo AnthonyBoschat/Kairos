@@ -17,7 +17,12 @@ interface TaskListProps{
 export default function TaskList(props:TaskListProps){
 
 
-    const sortedTask = props.tasks.sort((a,b) => b.order - a.order)
+    const sortedTask = props.tasks.sort((a,b) => {
+        if (a.favorite !== b.favorite) {
+            return b.favorite ? 1 : -1;
+        }
+        return b.order - a.order;
+    })
 
     return(
         <ul className={s.container}>

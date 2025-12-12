@@ -19,17 +19,17 @@
         width: calc(100% - 0.5rem);
         border-radius: 0 0.25rem 0.25rem 0;
         background-color: rgb(250, 248, 245);
-    }
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.5rem;
 
-    .indicator{
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        right: -1.6rem;
-        opacity: 0;
-        transition: opacity 0.05s linear;
-        &.active{
-            opacity: 0.8;
+        button.favorite{
+            all:unset;
+            padding: 0.1rem;
+            height: fit-content;
+            display: flex;
+            align-items: start;
         }
     }
 }

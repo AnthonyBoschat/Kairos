@@ -1,7 +1,7 @@
 "use client"
 import { List } from "@prisma/client"
 import s from "./styles.module.scss"
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
+import { Dispatch, useEffect, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import { toast } from "react-toastify"
@@ -10,7 +10,7 @@ import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import StarIcon from "@/components/ui/icons/Star"
 import LIST_COLOR from "@/constants/listColor"
-import { deleteList, togglerListFavorite, updateList } from "@/app/actions/list"
+import { deleteList, toggleListFavorite, updateList } from "@/app/actions/list"
 import { useQueryClient } from "@tanstack/react-query"
 import Overlay from "@/components/overlay"
 
@@ -52,7 +52,7 @@ export default function ListOptions(props:ListOptionsProps){
         if(props.list?.id){
             const listID = props.list.id
             handleResponse(async () => {
-                const response = await togglerListFavorite(listID)
+                const response = await toggleListFavorite(listID)
                 setListFavorite(current => !current)
                 refetch()
                 toast.success(response.message)
