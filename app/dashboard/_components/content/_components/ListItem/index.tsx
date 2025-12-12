@@ -5,7 +5,7 @@ import StarIcon from "@/components/ui/icons/Star"
 import OptionsIcon from "@/components/ui/icons/Options"
 import { Dispatch, useMemo, useState } from "react"
 import handleResponse from "@/utils/handleResponse"
-import { togglerListFavorite } from "@/app/actions/list"
+import { toggleListFavorite } from "@/app/actions/list"
 import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import { ListWithTaskAndFolder } from "@/types/list"
@@ -32,7 +32,7 @@ export default function ListItem(props:ListItemProps){
         if(props.list?.id){
             const listID = props.list.id
             handleResponse(async () => {
-                const response = await togglerListFavorite(listID)
+                const response = await toggleListFavorite(listID)
                 queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
                 toast.success(response.message)
             })

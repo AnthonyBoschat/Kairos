@@ -42,3 +42,28 @@ export async function addTask({title, listID}: addTaskProps){
     revalidatePath("/dashboard")
     return {success:true, message:"Tâche ajouter"}
 }
+
+interface toggleTaskFavoriteProps{
+    taskID:string
+}
+export async function toggleTaskFavorite({taskID}: toggleTaskFavoriteProps){
+    const user = await getCurrentUser()
+    if(!user?.id) throw new Error("Non autorisé")
+
+    const task = await prisma.task.findUnique({
+        where:{id:taskID}
+    })
+
+    if(!task) throw new Error("Tâche non trouvé")
+
+    const newFavoriteState = !task.favorite
+    await prisma.task.update({
+        where:{id:taskID},
+        data:{
+            favorite:newFavoriteState
+        }
+    })
+
+    revalidatePath("/dashboard")
+    return {success:true, message:"Tâche ajouté aux favoris"}
+}
