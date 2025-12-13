@@ -13,10 +13,12 @@ import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
 import { toggleFolderFavorite } from "@/app/actions/folder"
 import { toast } from "react-toastify"
+import StorageService from "@/services/StorageService"
+import { FolderWithList } from "@/types/list"
 
 interface FolderItemProps{
-    folder: Folder
-    setSelectedFolderOptions: Dispatch<null|Folder>
+    folder: FolderWithList
+    setSelectedFolderOptions: Dispatch<null|FolderWithList>
 }
 
 
@@ -47,6 +49,7 @@ export default function FolderItem(props:FolderItemProps){
 
     const handleClick = useCallback(() => {
         dispatch(setSelectedFolderID(isSelected ? null : props.folder?.id))
+        StorageService.set("selectedFolderID", isSelected ? null : props.folder?.id)
     }, [isSelected, props.folder])
 
     const handleClickOptions = useCallback((event:React.MouseEvent) => {
