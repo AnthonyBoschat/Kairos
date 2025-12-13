@@ -23,6 +23,7 @@ export default function ListItem(props:ListItemProps){
     const queryClient = useQueryClient()
 
     const [isAddingTask, setIsAddingTask] = useState(false)
+    const taskNumber = props.list.tasks.length
 
     const listColor = useMemo(() => {
         return props.list.customColor || LIST_COLOR[props.list.defaultColor ?? 0]
@@ -47,7 +48,7 @@ export default function ListItem(props:ListItemProps){
                 <div className={s.left}>
                     <span className={s.title}>{props.list.title}</span>
                     {props.list.countElement && (
-                        <span className={s.tasksCount}>3</span>
+                        <span className={s.tasksCount}>{taskNumber}</span>
                     )}
                 </div>
                 <div className={s.right}>

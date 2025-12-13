@@ -67,3 +67,23 @@ export async function toggleTaskFavorite({taskID}: toggleTaskFavoriteProps){
     revalidatePath("/dashboard")
     return {success:true, message:"Tâche ajouté aux favoris"}
 }
+
+interface deleteTaskProps{
+    taskID:string
+}
+export async function deleteTask({taskID}: deleteTaskProps){
+    const user = await getCurrentUser()
+    if(!user.id) throw new Error("Non autorisé")
+
+    const task = await prisma.task.findUnique({
+        where:{id:taskID}
+    })
+
+    if(!task) throw new Error("Tâche non trouvé")
+
+    await prisma.task.delete({
+        where:{id:taskID}
+    })
+
+    return{success:true, message:"Tâche supprimé"}
+}
