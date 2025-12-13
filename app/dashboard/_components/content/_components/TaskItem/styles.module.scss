@@ -1,14 +1,15 @@
 .container{
     display: flex;
     justify-content: end;
-    opacity: 0.8;
     transition: all 0.1s linear;
     cursor: pointer;
     border-radius: 0.25rem 0.5rem 0.5rem 0.25rem;
     position: relative;
     // outline: 1px solid red;
     &:hover{
-        opacity: 1;
+        .content{
+            opacity: 1;
+        }
         .content{
             background-color: rgb(250, 248, 245, 0.95) !important;
         }
@@ -33,24 +34,33 @@
             align-self: flex-start;
         }
         .title{
+            opacity: 0.8;
+
             display: flex;
             justify-content: flex-start;
             width: 100%;
         }
         
-        button{
+        .button{
             all:unset;
             padding: 0.1rem;
             height: fit-content;
             display: flex;
-            align-items: start;
+            // align-items: center;
             padding: 0;
             transition: opacity 0.15s linear;
             visibility: hidden;
+            align-self: flex-start;
             &.visible{
                 visibility:visible;
             }
+            &.active{
+                opacity: 1;
+                visibility:visible;
+            }
             &.delete{
+                margin-top: 0.1rem;
+                align-self: flex-start;
                 color: v.$state-error-dark;
                 opacity: 0.2;
                 &:hover{
@@ -58,14 +68,12 @@
                 }
             }
             &.favorite{
+                margin-top: 0.1rem;
+                align-self: flex-start;
                 opacity: 0.8;
                 &:hover{
                     opacity: 1;
                 }
-            }
-            &.active{
-                opacity: 1;
-                visibility:visible;
             }
         }
     }
