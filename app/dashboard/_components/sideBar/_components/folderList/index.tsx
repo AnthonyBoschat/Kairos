@@ -2,21 +2,32 @@
 import s from "./styles.module.scss"
 import { Folder } from "@prisma/client"
 import AddFolderButton from "../newFolder"
-import { Dispatch, SetStateAction, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import FolderItem from "../folderItem"
 import FolderOptions from "../folderOptions"
+import { FolderWithList } from "@/types/list"
+import { useAppDispatch } from "@/store/hooks"
+import StorageService from "@/services/StorageService"
+import { setSelectedFolderID } from "@/store/slices/folderSlice"
 
 interface DefaultProps{
     isAddingFolder:boolean
-    folders: Folder[]
+    folders: FolderWithList[]
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
 }
 
 
 export default function FolderList(props:DefaultProps){
 
-    const [selectedFolderOptions, setSelectedFolderOptions] = useState<null|Folder>(null)
-    
+    const [selectedFolderOptions, setSelectedFolderOptions] = useState<null|FolderWithList>(null)
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        const storedSelectedFolderID = StorageService.get("selectedFolderID")
+        if(storedSelectedFolderID){
+            dispatch(setSelectedFolderID(storedSelectedFolderID))
+        }
+    }, [])
 
     return(
         <>

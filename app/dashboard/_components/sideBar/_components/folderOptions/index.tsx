@@ -16,10 +16,11 @@ import Overlay from "@/components/overlay"
 import { useAppDispatch } from "@/store/hooks"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { FolderWithList } from "@/types/list"
+import StorageService from "@/services/StorageService"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
-    setSelectedFolderOptions: Dispatch<SetStateAction<null|Folder>>
+    setSelectedFolderOptions: Dispatch<SetStateAction<null|FolderWithList>>
 }
 
 
@@ -43,6 +44,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                 toast.success(response.message)
                 props.setSelectedFolderOptions(null)
                 dispatch(setSelectedFolderID(null))
+                StorageService.remove("selectedFolderID")
             })
         }
     }
