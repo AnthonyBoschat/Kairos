@@ -13,6 +13,8 @@ import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import StarIcon from "@/components/ui/icons/Star"
 import Overlay from "@/components/overlay"
+import { useAppDispatch } from "@/store/hooks"
+import { setSelectedFolderID } from "@/store/slices/folderSlice"
 
 interface FolderOptionsProps{
     folder: null|Folder,
@@ -22,7 +24,7 @@ interface FolderOptionsProps{
 
 export default function FolderOptions(props:FolderOptionsProps){
     
-
+    const dispatch = useAppDispatch()
     const [folderTitle, setFolderTitle] = useState(props.folder?.title)
     const [folderColor, setFolderColor] = useState(props.folder?.customColor ? props.folder.customColor : FOLDER_COLORS[props.folder?.defaultColor ?? 0])
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
@@ -40,6 +42,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                 const response = await deleteFolder(folderID)
                 toast.success(response.message)
                 props.setSelectedFolderOptions(null)
+                dispatch(setSelectedFolderID(null))
             })
         }
     }

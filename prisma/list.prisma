@@ -8,7 +8,7 @@ model List {
   order             Int      
 
   folderId          String
-  folder            Folder   @relation(fields: [folderId], references: [id])
+  folder            Folder   @relation(fields: [folderId], references: [id], onDelete:Cascade)
 
   tasks             Task[]
 

@@ -5,7 +5,7 @@ model Task {
   order             Int      
 
   listId            String
-  list              List      @relation(fields: [listId], references: [id])
+  list              List      @relation(fields: [listId], references: [id], onDelete:Cascade)
 
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
