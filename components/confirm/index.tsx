@@ -1,15 +1,16 @@
 "use client"
 
-import { RefObject, useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import s from "./styles.module.scss"
 import withClass from "@/utils/class"
-import WarningIcon from "../ui/icons/Warning"
 
 interface ConfirmationProps{
-    children:React.ReactNode,
+    children: React.ReactNode | ((open: boolean, isClosing:boolean) => React.ReactNode)
     onClick: Function,
     content?: string|React.ReactNode,
-    icon?:React.ReactNode
+    icon?:React.ReactNode,
+    disabled?:boolean,
+    onClose?: Function
 }
 
 export default function Confirmation(props: ConfirmationProps){
@@ -20,12 +21,18 @@ export default function Confirmation(props: ConfirmationProps){
 
     
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        if(props.disabled){
+            return props.onClick()
+        }
         event.preventDefault()
         setOpen(true)
     }
     
     const handleClose = () => {
         setIsClosing(true)
+        if(props.onClose){
+            props.onClose()
+        }
         setTimeout(() => {
             setOpen(false)
             setIsClosing(false)
@@ -51,12 +58,11 @@ export default function Confirmation(props: ConfirmationProps){
         }
     }, [open])
 
-    
     return(
         
         <div ref={containerRef} className={s.container}>
             <div className={s.children_container} onClick={handleClick}>
-                {props.children}
+                {typeof props.children === "function" ? props.children(open,isClosing) : props.children}
             </div>
             {open && (
                 <div className={withClass(s.confirm_container, isClosing && s.closing)}>

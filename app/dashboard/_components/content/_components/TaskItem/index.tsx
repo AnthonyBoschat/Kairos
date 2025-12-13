@@ -10,6 +10,8 @@ import { useAppSelector } from "@/store/hooks"
 import { toast } from "react-toastify"
 import withClass from "@/utils/class"
 import DeleteIcon from "@/components/ui/icons/delete"
+import Confirmation from "@/components/confirm"
+import COLOR from "@/constants/color"
 
 interface TaskItemProps{
     listColor:string
@@ -23,6 +25,7 @@ export default function TaskItem(props:TaskItemProps){
     const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
     const queryClient = useQueryClient()
     const isFavorite = props.task.favorite
+    const canDeleteWithoutConfirmation = props.task.content === null
 
     const handleAddTaskToFavorite = () => {
         handleResponse(async() => {
@@ -45,7 +48,7 @@ export default function TaskItem(props:TaskItemProps){
     return(
         <li onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} style={{backgroundColor:props.listColor}} className={s.container}>
             <div className={s.content}>
-                <button className={withClass(s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
+                <button className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
                     <StarIcon animate active={props.task.favorite} size={18}/>
                 </button>
 
@@ -53,9 +56,23 @@ export default function TaskItem(props:TaskItemProps){
                     {props.task.title}
                 </span>
                 
-                <button className={withClass(s.delete, isHover && s.visible)} onClick={handleDeleteTask}>
-                    <DeleteIcon size={20}/>
-                </button>
+                <Confirmation 
+                    disabled={canDeleteWithoutConfirmation}
+                    onClose={() => setIsHover(false)}
+                    onClick={handleDeleteTask} 
+                    content={
+                        <div>
+                            <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette tâche ?</span>
+                            <div>Son contenu sera définitivement perdu.</div>
+                        </div>
+                    }
+                >
+                    {(open, isClosing) => (
+                        <button className={withClass(s.button, s.delete, isHover && s.visible, (open && !isClosing) && s.active)}>
+                            <DeleteIcon size={20}/>
+                        </button>
+                    )}
+                </Confirmation>
             </div>
         </li>
     )

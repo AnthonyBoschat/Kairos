@@ -5,10 +5,10 @@ import AddFolderButton from "./_components/addFolderButton"
 import FolderList from "./_components/folderList"
 import Logout from "./_components/logout"
 import { useState } from "react"
-import { Folder } from "@prisma/client"
+import { FolderWithList } from "@/types/list"
 
 interface SideBarProps{
-    folders: Folder[]
+    folders: FolderWithList[]
 }
 
 

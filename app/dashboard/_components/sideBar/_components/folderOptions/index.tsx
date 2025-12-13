@@ -15,9 +15,10 @@ import StarIcon from "@/components/ui/icons/Star"
 import Overlay from "@/components/overlay"
 import { useAppDispatch } from "@/store/hooks"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
+import { FolderWithList } from "@/types/list"
 
 interface FolderOptionsProps{
-    folder: null|Folder,
+    folder: FolderWithList,
     setSelectedFolderOptions: Dispatch<SetStateAction<null|Folder>>
 }
 
@@ -31,8 +32,7 @@ export default function FolderOptions(props:FolderOptionsProps){
     const [folderFavorite, setFolderFavorite] = useState(props.folder?.favorite)
     const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
     const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
-
-
+    const canDeleteWithoutConfirmation = props.folder.lists.length === 0
  
     
     const handleDeleteFolder = async() => {
@@ -123,6 +123,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                         </ul>
                         <div className={s.footer}>
                             <Confirmation 
+                                disabled={canDeleteWithoutConfirmation}
                                 onClick={handleDeleteFolder} 
                                 content={
                                     <div>

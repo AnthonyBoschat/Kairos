@@ -14,7 +14,7 @@ import TaskList from "../TaskList"
 
 interface ListItemProps{
     list: ListWithTaskAndFolder
-    setSelectedListOptions: Dispatch<null|List>
+    setSelectedListOptions: Dispatch<null|ListWithTaskAndFolder>
 }
 
 
@@ -44,6 +44,7 @@ export default function ListItem(props:ListItemProps){
     return(
         <li className={s.container}>
             <div style={{backgroundColor: listColor}} className={s.color}/>
+            
             <div className={s.header}>
                 <div className={s.left}>
                     <span className={s.title}>{props.list.title}</span>

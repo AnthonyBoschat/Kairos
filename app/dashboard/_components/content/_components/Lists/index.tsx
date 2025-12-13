@@ -14,7 +14,7 @@ interface ListsProps{
 
 export default function Lists(props:ListsProps){
 
-    const [selectedListOptions, setSelectedListOptions] = useState<null|List>(null)
+    const [selectedListOptions, setSelectedListOptions] = useState<null|ListWithTaskAndFolder>(null)
 
     const { data: lists = [], isLoading, error } = useQuery({
         queryKey: ['lists', props.selectedFolderID],

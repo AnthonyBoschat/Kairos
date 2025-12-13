@@ -1,6 +1,7 @@
 model Task {
   id                String    @id @default(cuid())
-  title             String   
+  title             String    @db.VarChar(255)
+  content           String?   @db.Text
   favorite          Boolean   @default(false)
   order             Int      
 

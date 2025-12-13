@@ -10,3 +10,9 @@ export type ListWithTaskAndFolder = Prisma.ListGetPayload<{
         tasks: true
     }
 }>
+
+export type FolderWithList = Prisma.FolderGetPayload<{
+    include: {
+        lists:true
+    }
+}>

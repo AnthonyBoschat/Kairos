@@ -13,10 +13,11 @@ import LIST_COLOR from "@/constants/listColor"
 import { deleteList, toggleListFavorite, updateList } from "@/app/actions/list"
 import { useQueryClient } from "@tanstack/react-query"
 import Overlay from "@/components/overlay"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface ListOptionsProps{
-    list: null|List
-    setSelectedListOptions: Dispatch<null|List>
+    list: ListWithTaskAndFolder
+    setSelectedListOptions: Dispatch<null|ListWithTaskAndFolder>
 }
 
 
@@ -29,6 +30,7 @@ export default function ListOptions(props:ListOptionsProps){
     const [listCountElement, setListCountElement] = useState(props.list?.countElement)
     const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
+    const canDeleteWithoutConfirmation = props.list.tasks.length === 0
 
     const refetch = () => {
         queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
@@ -125,6 +127,7 @@ export default function ListOptions(props:ListOptionsProps){
                             </ul>
                             <div className={s.footer}>
                                 <Confirmation 
+                                    disabled={canDeleteWithoutConfirmation}
                                     onClick={handleDeleteList} 
                                     content={
                                         <div>

@@ -8,7 +8,7 @@ name ?= init
 # Créer et appliquer une migration
 # Usage: make migrate name=ajout_user_age
 migrate:
-	npx dotenv -e $(PRISMA_ENV) -- prisma migrate dev --name "$(name)"
+	npx dotenv -e $(PRISMA_ENV) -- prisma migrate dev --name "$(word 2,$(MAKECMDGOALS))"
 
 # Réinitialiser complètement la base de données
 # ⚠️ ATTENTION: Supprime toutes les données !
@@ -98,5 +98,12 @@ setup:
 
 # Redémarrage propre
 restart: clean dev
+
+# Lance les scripts
+script:
+	npx dotenv -e .env.local -- tsx _scripts/$(word 2,$(MAKECMDGOALS)).ts
+
+%:
+	@:
 
 .PHONY: migrate reset generate studio seed push dev build start lint install clean setup restart
