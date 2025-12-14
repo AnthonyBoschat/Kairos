@@ -16,7 +16,7 @@ export default function AddTaskButton(props:AddTaskButtonProps){
 
     return(
         <div className={s.container}>
-            <button onClick={handleClick} className={s.button}>Ajouter un élément</button>
+            <button title="Ajouter un nouvel élément à la liste" onClick={handleClick} className={s.button}>Ajouter un élément</button>
             <Divider width="15%" style={{marginTop:"0.75rem"}}/>
         </div>
     )

@@ -21,6 +21,7 @@ export default function Confirmation(props: ConfirmationProps){
 
     
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
+        event.stopPropagation();
         if(props.disabled){
             return props.onClick()
         }
@@ -28,7 +29,8 @@ export default function Confirmation(props: ConfirmationProps){
         setOpen(true)
     }
     
-    const handleClose = () => {
+    const handleClose = (event?: React.MouseEvent) => {
+        event?.stopPropagation();
         setIsClosing(true)
         if(props.onClose){
             props.onClose()
@@ -39,7 +41,8 @@ export default function Confirmation(props: ConfirmationProps){
         }, 150)
     }
 
-    const handleConfirm = () => {
+    const handleConfirm = (event: React.MouseEvent) => {
+        event.stopPropagation();
         handleClose()
         props.onClick()
     }
