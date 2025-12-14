@@ -44,6 +44,41 @@ async function main() {
                 {
                   title: "Implémenter les attributs ARIA (role, aria-label, aria-describedby)", 
                   order: 2,
+                  favorite:true,
+                  content:`Penser à réserver les billets pour la soirée Halloween directement sur le site de Disneyland Paris, les places partent vite.
+
+Il faudra aussi vérifier les horaires d'ouverture, car la soirée commence souvent en fin d'après-midi et se prolonge tard dans la nuit.
+
+Prévoir le transport : train ou voiture, selon ce qui sera le plus pratique.
+
+À penser avant de partir :
+Charger le téléphone pour les billets numériques et les photos
+Vérifier la météo et prendre un imperméable si besoin
+Arriver tôt pour profiter du parc avant la nuit`
+                },
+                {
+                  title: "Une entrée à Disneyland Paris un soir d'Halloween", 
+                  order: 2,
+                  favorite:true,
+                  content:`Penser à réserver les billets pour la soirée Halloween directement sur le site de Disneyland Paris, les places partent vite.
+
+Il faudra aussi vérifier les horaires d'ouverture, car la soirée commence souvent en fin d'après-midi et se prolonge tard dans la nuit.
+
+Prévoir le transport : train ou voiture, selon ce qui sera le plus pratique.
+
+À penser avant de partir :
+Charger le téléphone pour les billets numériques et les photos
+Vérifier la météo et prendre un imperméable si besoin
+Arriver tôt pour profiter du parc avant la nuit
+
+Il faudra aussi vérifier les horaires d'ouverture, car la soirée commence souvent en fin d'après-midi et se prolonge tard dans la nuit.
+
+Prévoir le transport : train ou voiture, selon ce qui sera le plus pratique.
+
+À penser avant de partir :
+Charger le téléphone pour les billets numériques et les photos
+Vérifier la météo et prendre un imperméable si besoin
+Arriver tôt pour profiter du parc avant la nuit`
                 },
               ]
             } 

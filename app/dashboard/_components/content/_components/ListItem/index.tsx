@@ -24,6 +24,7 @@ export default function ListItem(props:ListItemProps){
 
     const [isAddingTask, setIsAddingTask] = useState(false)
     const taskNumber = props.list.tasks.length
+    const isFavorite = props.list.favorite
 
     const listColor = useMemo(() => {
         return props.list.customColor || LIST_COLOR[props.list.defaultColor ?? 0]
@@ -53,10 +54,10 @@ export default function ListItem(props:ListItemProps){
                     )}
                 </div>
                 <div className={s.right}>
-                    <button className={s.favorite} onClick={handleToggleFavorite}>
-                        <StarIcon animate active={props.list.favorite} size={18}/>
+                    <button title={isFavorite ? "Retirer la liste des favoris" : "Ajouter la liste aux favoris"} className={s.favorite} onClick={handleToggleFavorite}>
+                        <StarIcon animate active={isFavorite} size={18}/>
                     </button>
-                    <button className={s.options} onClick={() => props.setSelectedListOptions(props.list)}>
+                    <button title="Afficher les options de la liste" className={s.options} onClick={() => props.setSelectedListOptions(props.list)}>
                         <OptionsIcon size={20}/>
                     </button>
                 </div>
