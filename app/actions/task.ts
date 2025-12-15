@@ -87,3 +87,28 @@ export async function deleteTask({taskID}: deleteTaskProps){
 
     return{success:true, message:"Tâche supprimé"}
 }
+
+type updateTaskContentProps = {
+    taskID:string
+    content:string
+}
+export async function updateTaskContent({taskID, content}: updateTaskContentProps){
+    const user = await getCurrentUser()
+    if(!user.id) throw new Error("Non autorisé")
+
+    const task = await prisma.task.findUnique({
+        where:{id:taskID}
+    })
+
+    if(!task) throw new Error("Tâche non trouvé")
+
+    const nullContent = content.trim() === "" 
+    await prisma.task.update({
+        where:{id:taskID},
+        data:{
+            content:nullContent ? null : content
+        }
+    })
+
+    return {success:true}
+}
