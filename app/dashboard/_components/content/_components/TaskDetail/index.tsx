@@ -2,9 +2,15 @@
 import { Task } from "@prisma/client"
 import s from "./styles.module.scss"
 import Overlay from "@/components/overlay"
-import { Dispatch, SetStateAction, useState } from "react"
-import Divider from "@/components/divider"
+import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
 import withClass from "@/utils/class"
+import handleResponse from "@/utils/handleResponse"
+import { updateTaskContent } from "@/app/actions/task"
+import useDebouncedValue from "@/hooks/useDebouncedValue"
+import { useAppSelector } from "@/store/hooks"
+import { useQueryClient } from "@tanstack/react-query"
+import LoadingIcon from "@/components/ui/icons/Loading"
+import SuccessIcon from "@/components/ui/icons/Success"
 
 interface TaskDetailProps{
     listColor:string
@@ -15,8 +21,28 @@ interface TaskDetailProps{
 
 export default function TaskDetail(props:TaskDetailProps){
 
+    const queryClient = useQueryClient()
+    const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
     const hasContent = props.task.content !== null
     const [content, setContent] = useState(props.task.content || "")
+    const [isSyncContent, setIsSyncContent] = useState(true)
+    const debouncedContent = useDebouncedValue(content)
+
+
+    const handleUpdateTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setContent(event.target.value)
+        if(isSyncContent){
+            setIsSyncContent(false)
+        }
+    }, [isSyncContent])
+
+    useEffect(() => {
+        handleResponse(async () => {
+            const response = await updateTaskContent({taskID:props.task.id, content: debouncedContent})
+            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+            setIsSyncContent(true)
+        })
+    }, [debouncedContent])
 
     return(
         <Overlay onClose={() => props.setTaskDetail(null)}>
@@ -27,12 +53,20 @@ export default function TaskDetail(props:TaskDetailProps){
                         <div className={s.header}>
                             <span>
                                 {props.task.title}
+                                
                             </span>
                         </div>
                         <div className={s.content}>
-                            <textarea placeholder="Commencer à rédiger du contenu" onChange={(e) => setContent(e.target.value)} value={content} className={s.textarea} />
+                            <textarea placeholder="Commencer à rédiger du contenu" onChange={handleUpdateTaskContent} value={content} className={s.textarea} />
+                        </div>
+
+
+                        <div className={s.sync}>
+                            {isSyncContent && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
+                            {!isSyncContent && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
                         </div>
                     </div>
+
                 </div>
             )}
         </Overlay>
