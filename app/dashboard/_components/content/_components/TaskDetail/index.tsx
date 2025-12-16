@@ -23,52 +23,58 @@ export default function TaskDetail(props:TaskDetailProps){
 
     const queryClient = useQueryClient()
     const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
-    const hasContent = props.task.content !== null
     const [content, setContent] = useState(props.task.content || "")
     const [isSyncContent, setIsSyncContent] = useState(true)
     const debouncedContent = useDebouncedValue(content)
 
 
-    const handleUpdateTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const handleChangeTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(event.target.value)
-        if(isSyncContent){
-            setIsSyncContent(false)
-        }
+        if(isSyncContent) setIsSyncContent(false)
     }, [isSyncContent])
 
-    useEffect(() => {
+    const handleUpdateTaskContent = (currentContent:string) => {
         handleResponse(async () => {
-            const response = await updateTaskContent({taskID:props.task.id, content: debouncedContent})
+            await updateTaskContent({taskID:props.task.id, content: currentContent})
             queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
-            setIsSyncContent(true)
         })
+    }
+
+    useEffect(() => {
+        handleUpdateTaskContent(debouncedContent)
+        setIsSyncContent(true)
     }, [debouncedContent])
 
     return(
         <Overlay onClose={() => props.setTaskDetail(null)}>
-            {(isClosing) => (
-                <div className={withClass(s.container, isClosing && s.closing)}>
-                    <div className={s.card}>
-                        <div className={s.cardBefore} style={{ backgroundColor: props.listColor }} />
-                        <div className={s.header}>
-                            <span>
-                                {props.task.title}
-                                
-                            </span>
-                        </div>
-                        <div className={s.content}>
-                            <textarea placeholder="Commencer à rédiger du contenu" onChange={handleUpdateTaskContent} value={content} className={s.textarea} />
-                        </div>
+            {(isClosing) => {
+
+                if (isClosing && !isSyncContent) handleUpdateTaskContent(content)
+                    
+                return(
+                    <div className={withClass(s.container, isClosing && s.closing)}>
+                        <div className={s.card}>
+                            <div className={s.cardBefore} style={{ backgroundColor: props.listColor }} />
+                            <div className={s.header}>
+                                <span>
+                                    {props.task.title}
+                                    
+                                </span>
+                            </div>
+                            <div className={s.content}>
+                                <textarea placeholder="Commencer à rédiger du contenu" onChange={handleChangeTaskContent} value={content} className={s.textarea} />
+                            </div>
 
 
-                        <div className={s.sync}>
-                            {isSyncContent && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
-                            {!isSyncContent && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
+                            <div className={s.sync}>
+                                {isSyncContent && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
+                                {!isSyncContent && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
+                            </div>
                         </div>
+
                     </div>
-
-                </div>
-            )}
+                )
+            }}
         </Overlay>
         
     )
