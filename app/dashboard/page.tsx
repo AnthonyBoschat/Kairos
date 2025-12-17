@@ -32,7 +32,7 @@ export default async function Dashboard(){
 
     return(
         <div className={s.page}>
-            <SideBar folders={sortedFolders}/>
+            <SideBar user={user} folders={sortedFolders}/>
             <Content/>
         </div>
     )

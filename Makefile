@@ -38,6 +38,7 @@ push:
 
 # Démarrer le serveur de développement
 dev:
+	sudo service postgresql restart
 	npm run dev
 
 # Build de production

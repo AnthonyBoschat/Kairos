@@ -3,17 +3,18 @@ import Divider from "@/components/divider"
 import s from "./styles.module.scss"
 import AddFolderButton from "./_components/addFolderButton"
 import FolderList from "./_components/folderList"
-import Logout from "./_components/logout"
+import UserMenu from "./_components/userMenu"
 import { useState } from "react"
 import { FolderWithList } from "@/types/list"
+import { userType } from "@/types/user"
 
 interface SideBarProps{
     folders: FolderWithList[]
+    user: userType
 }
 
 
 export default function SideBar(props:SideBarProps){
-
     const [isAddingFolder, setIsAddingFolder] = useState(false)
 
     return(
@@ -38,7 +39,9 @@ export default function SideBar(props:SideBarProps){
                 <FolderList setIsAddingFolder={setIsAddingFolder} isAddingFolder={isAddingFolder} folders={props.folders}/>
 
             </div>
-            <Logout/>
+            <div className={s.logout}>
+                <UserMenu user={props.user}/>
+            </div>
         </div>
     )
 }
