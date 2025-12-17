@@ -31,7 +31,8 @@ export default function NewTaskItem(props:NewTaskItemProps){
         setTaskTitle(newValue)
     }
 
-    const handleAddTask = () => {
+    const handleAddTask = (keyboardEvent?:React.KeyboardEvent) => {
+        if(keyboardEvent) keyboardEvent.preventDefault()
         if(taskTitle.trim()){
             handleResponse(async() => {
                 const response = await addTask({title:taskTitle, listID:props.listID})
@@ -39,7 +40,13 @@ export default function NewTaskItem(props:NewTaskItemProps){
                 queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
             })
         }
-        props.setIsAddingTask(false)
+        if(keyboardEvent){
+            setTaskTitle("")
+            props.setIsAddingTask(true)
+            textareaRef.current!.value = ""
+        }else{
+            props.setIsAddingTask(false)
+        }
     }
 
 
@@ -55,8 +62,7 @@ export default function NewTaskItem(props:NewTaskItemProps){
     return(
         <li ref={containerRef} style={{backgroundColor:props.listColor}} className={s.container}>
             <div className={s.content}>
-                <textarea ref={textareaRef} rows={1} onKeyDown={(e) => isEnter(e) && handleAddTask()} value={taskTitle} onChange={handleChangeTaskTitle} autoFocus />
-                {/* {props.task.title} */}
+                <textarea ref={textareaRef} rows={1} onKeyDown={(e) => isEnter(e) && handleAddTask(e)} value={taskTitle} onChange={handleChangeTaskTitle} autoFocus />
             </div>
         </li>
     )
