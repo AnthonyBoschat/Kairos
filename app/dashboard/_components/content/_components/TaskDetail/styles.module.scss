@@ -47,7 +47,7 @@
             font-size: 1.25rem;
             font-weight: 600;
             gap: 0.5rem;
-            button{
+            button.favorite{
                 all:unset;
                 display: flex;
                 align-items: center;
@@ -118,8 +118,8 @@
         .sync{
             // outline: 1px solid red;
             position: absolute;
-            right: 0.5rem;
-            bottom: 0.2rem;
+            right: 0.3rem;
+            bottom: -0.2rem;
             svg{
                 opacity: 0.8;
             }

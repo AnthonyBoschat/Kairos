@@ -5,12 +5,14 @@ import Overlay from "@/components/overlay"
 import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
 import withClass from "@/utils/class"
 import handleResponse from "@/utils/handleResponse"
-import { updateTaskContent } from "@/app/actions/task"
+import { toggleTaskFavorite, updateTaskContent } from "@/app/actions/task"
 import useDebouncedValue from "@/hooks/useDebouncedValue"
 import { useAppSelector } from "@/store/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import LoadingIcon from "@/components/ui/icons/Loading"
 import SuccessIcon from "@/components/ui/icons/Success"
+import StarIcon from "@/components/ui/icons/Star"
+import { toast } from "react-toastify"
 
 interface TaskDetailProps{
     listColor:string
@@ -21,12 +23,13 @@ interface TaskDetailProps{
 
 export default function TaskDetail(props:TaskDetailProps){
 
-    const queryClient = useQueryClient()
-    const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
-    const [content, setContent] = useState(props.task.content || "")
     const [isSyncContent, setIsSyncContent] = useState(true)
-    const debouncedContent = useDebouncedValue(content)
-
+    const [content, setContent]             = useState(props.task.content || "")
+    
+    const queryClient           = useQueryClient()
+    const selectedFolderID      = useAppSelector(store => store.folder.selectedFolderID)
+    const debouncedContent      = useDebouncedValue(content)
+    
 
     const handleChangeTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(event.target.value)
@@ -34,9 +37,19 @@ export default function TaskDetail(props:TaskDetailProps){
     }, [isSyncContent])
 
     const handleUpdateTaskContent = (currentContent:string) => {
-        handleResponse(async () => {
+        handleResponse(async() => {
             await updateTaskContent({taskID:props.task.id, content: currentContent})
             queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+        })
+    }
+
+    const handleToggleFavorite = () => {
+        handleResponse(async() => {
+            const response = await toggleTaskFavorite({taskID:props.task.id})
+            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+            toast.dismiss()
+            toast.success(response.message)
+            props.setTaskDetail(current => (current ? { ...current, favorite: !current.favorite } : null))
         })
     }
 
@@ -58,8 +71,10 @@ export default function TaskDetail(props:TaskDetailProps){
                             <div className={s.header}>
                                 <span>
                                     {props.task.title}
-                                    
                                 </span>
+                                <button onClick={handleToggleFavorite} className={s.favorite}>
+                                    <StarIcon animate active={props.task.favorite}/>
+                                </button>
                             </div>
                             <div className={s.content}>
                                 <textarea placeholder="Commencer à rédiger du contenu" onChange={handleChangeTaskContent} value={content} className={s.textarea} />
