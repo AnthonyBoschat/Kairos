@@ -1,12 +1,11 @@
 "use client"
-import { Folder } from "@prisma/client"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
-import { deleteFolder, toggleFolderFavorite, updateFolder } from "@/app/actions/folder"
+import { deleteFolder, toggleFolderFavorite, updateFolder, updateFolderColor } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
@@ -27,15 +26,15 @@ interface FolderOptionsProps{
 export default function FolderOptions(props:FolderOptionsProps){
     
     const dispatch = useAppDispatch()
-    const [folderTitle, setFolderTitle] = useState(props.folder?.title)
-    const [folderColor, setFolderColor] = useState(props.folder?.customColor ? props.folder.customColor : FOLDER_COLORS[props.folder?.defaultColor ?? 0])
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
-    const [folderFavorite, setFolderFavorite] = useState(props.folder?.favorite)
-    const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
+    const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
+    const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
+    const [folderFavorite, setFolderFavorite]   = useState(props.folder?.favorite)
+    const [onEditTitle, setOnEditTitle]         = useState<Boolean>(false)
+    const [isOpenColorOptions, setIsOpenColorOptions] = useState<Boolean>(false)
     const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.folder.lists.length === 0
- 
-    
+
     const handleDeleteFolder = async() => {
         if(props.folder?.id){
             const folderID = props.folder.id
@@ -72,6 +71,15 @@ export default function FolderOptions(props:FolderOptionsProps){
         })
     }
 
+    const handleUpdateDefaultColor = async(colorIndex:number) => {
+        handleResponse(async() => {
+            const response = await updateFolderColor(props.folder.id, colorIndex)
+            toast.dismiss()
+            toast.success(response.message)
+            setFolderColor(FOLDER_COLORS[colorIndex])
+        })
+    }
+
     useEffect(() => {
         if(folderTitleInputRef.current){
             if(onEditTitle) folderTitleInputRef.current.focus()
@@ -87,7 +95,6 @@ export default function FolderOptions(props:FolderOptionsProps){
                 <div
                     className={withClass(s.container, isClosing && s.closing)}
                 >
-                    
                     <div className={s.card}>
                         <div className={s.header}>
                             <span>
@@ -97,7 +104,11 @@ export default function FolderOptions(props:FolderOptionsProps){
                                 <StarIcon animate active={folderFavorite} size={24}/>
                             </button>
                         </div>
+
+
                         <ul className={s.options}>
+
+
                             <li className={s.title}>
                                 <span className={s.key}>Nom</span>
                                 <span className={s.value}>
@@ -107,14 +118,35 @@ export default function FolderOptions(props:FolderOptionsProps){
                                     </button>
                                 </span>
                             </li>
+
+
                             <li className={s.color}>
                                 <span className={s.key}>Couleur</span>
                                 <span className={s.value}>
-                                    <button>
+                                    <button className={withClass(isOpenColorOptions && s.active)} onClick={() => setIsOpenColorOptions(current => !current)}>
                                         <FolderSolidIcon color={folderColor}/> 
                                     </button>
                                 </span>
+                                {isOpenColorOptions && (
+                                    <div className={s.colorOptions}>
+                                        <ul>
+                                            {FOLDER_COLORS.map((color, index) => (
+                                                <li key={index}>
+                                                    <button
+                                                        title={`Changer la couleur du dossier pour ${color}`} 
+                                                        className={withClass(folderColor === color && s.active)} 
+                                                        style={{backgroundColor:color}}
+                                                        onClick={() => handleUpdateDefaultColor(index)}
+                                                    />
+                                                </li>
+                                            ))}
+                                            
+                                        </ul>
+                                    </div>
+                                )}
                             </li>
+
+
                             <li className={s.progression}>
                                 <span className={s.key}>Afficher la progression</span>
                                 <span className={s.value}>
@@ -123,6 +155,9 @@ export default function FolderOptions(props:FolderOptionsProps){
                                 </span>
                             </li>
                         </ul>
+
+
+
                         <div className={s.footer}>
                             <Confirmation 
                                 disabled={canDeleteWithoutConfirmation}

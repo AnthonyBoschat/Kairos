@@ -1,29 +1,26 @@
 import FOLDER_COLORS from "@/constants/folderColor"
 import { prisma } from "./prisma"
 
+const DEFAULT_COLORS_COUNT = 11
+
 export async function getNextAvailableFolderColorIndex(userId: string) {
     const folders = await prisma.folder.findMany({
         where: { 
-        userId,
-        defaultColor: { not: null } // Uniquement les defaultColor utilisé (Pas les customs)
+            userId
         },
-        select: { defaultColor: true } // On ne sélectionner que le champ defaultColor
+        select: { color: true }
     })
     
-    //   Liste des indexs utilisés
-    const usedIndexes = new Set(folders.map(folder => folder.defaultColor!))
+    const usedIndexes = new Set(folders.map(folder => folder.color!))
     
-    // Si une couleur non utilisé -> On le renvoie directement
-    for (let i = 0; i < FOLDER_COLORS.length; i++) {
+    for (let i = 0; i < DEFAULT_COLORS_COUNT; i++) {
         if (!usedIndexes.has(i)) return i
     }
     
-    // Sinon on compte les occurences
-    const indexCounts = Array.from({ length: FOLDER_COLORS.length }, (_, i) => ({
+    const indexCounts = Array.from({ length: DEFAULT_COLORS_COUNT }, (_, i) => ({
         index: i,
-        count: folders.filter(folder => folder.defaultColor === i).length
+        count: folders.filter(folder => folder.color === i).length
     }))
     
-    // On renvoie l'index de celui qui a le moins d'occurence
     return indexCounts.sort((a, b) => a.count - b.count)[0].index
 }

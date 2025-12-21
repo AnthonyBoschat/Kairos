@@ -22,7 +22,7 @@ async function main() {
     data: {
       title: 'Programmation',
       order: 0,
-      defaultColor: await getNextAvailableFolderColorIndex(user.id),
+      color: await getNextAvailableFolderColorIndex(user.id),
       userId: user.id,
       favorite: true,
       lists: {
@@ -58,7 +58,7 @@ Arriver tôt pour profiter du parc avant la nuit`
                 },
                 {
                   title: "Une entrée à Disneyland Paris un soir d'Halloween", 
-                  order: 2,
+                  order: 3,
                   favorite:true,
                   content:`Penser à réserver les billets pour la soirée Halloween directement sur le site de Disneyland Paris, les places partent vite.
 
@@ -134,7 +134,7 @@ Arriver tôt pour profiter du parc avant la nuit`
     data: {
       title: 'Personnel',
       order: 1,
-      defaultColor: await getNextAvailableFolderColorIndex(user.id),
+      color: await getNextAvailableFolderColorIndex(user.id),
       userId: user.id,
       lists: {
         create: [
@@ -149,8 +149,8 @@ Arriver tôt pour profiter du parc avant la nuit`
   const folder3 = await prisma.folder.create({
     data: {
       title: 'Projets',
-      order: 1,
-      defaultColor: await getNextAvailableFolderColorIndex(user.id),
+      order: 2,
+      color: await getNextAvailableFolderColorIndex(user.id),
       userId: user.id,
       lists: {
         create: [

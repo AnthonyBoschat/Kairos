@@ -5,6 +5,18 @@ import { getNextAvailableFolderColorIndex } from "@/lib/folder-colors"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 
+const checkUser = async() => {
+    const user = await getCurrentUser()
+    if (!user?.id) throw new Error("Non autorisé")
+}
+
+const checkFolderExist = async(folderID:string) => {
+    const folder = await prisma.folder.findUnique({
+        where:{id:folderID}
+    })
+    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+}
+
 export async function getNextFolderColorIndexForCurrentUser(){
     const user = await getCurrentUser();
     if (!user?.id) throw new Error("Non autorisé");
@@ -42,14 +54,15 @@ export async function addFolder({title}:{title:string}) {
     const createdFolder = await prisma.folder.create({
         data:{
             title: title,
-            defaultColor: await getNextAvailableFolderColorIndex(user.id),
+            color: await getNextAvailableFolderColorIndex(user.id),
             order:(maxOrder._max.order ?? -1) + 1,
             userId:user.id
         }
     })
 
     revalidatePath('/dashboard')
-    return {success:true, message:`Le dossier ${createdFolder.title} a été ajouter`}
+    const nextAvailableColor = await getNextAvailableFolderColorIndex(user.id)
+    return {success:true, message:`Le dossier ${createdFolder.title} a été ajouter`, nextAvailableColor:nextAvailableColor}
 }
 
 
@@ -103,5 +116,22 @@ export async function toggleFolderFavorite(folderID: string){
 
     const message = newFavoriteState ? "Dossier ajouter aux favoris" : "Dossier retirer des favoris"
     revalidatePath("/dashboard")
+    return {success:true, message:message}
+}
+
+export async function updateFolderColor(folderID:string, colorIndex:number){
+
+    await checkUser()
+    await checkFolderExist(folderID)
+
+    await prisma.folder.update({
+        where:{id:folderID},
+        data:{
+            color:colorIndex
+        }
+    })
+
+    revalidatePath("/dashboard")
+    const message = "Couleur du dossier modifier avec succès"
     return {success:true, message:message}
 }

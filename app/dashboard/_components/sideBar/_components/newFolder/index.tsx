@@ -39,6 +39,7 @@ export default function AddFolderButton(props:FolderProps){
         if(keyboardEvent){
             setTitle("")
             props.setIsAddingFolder(true)
+            fetchFolderColor()
         }else{
             props.setIsAddingFolder(false)
         }

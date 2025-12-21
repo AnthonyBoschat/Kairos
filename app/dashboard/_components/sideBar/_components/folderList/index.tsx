@@ -1,6 +1,5 @@
 "use client"
 import s from "./styles.module.scss"
-import { Folder } from "@prisma/client"
 import AddFolderButton from "../newFolder"
 import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import FolderItem from "../folderItem"

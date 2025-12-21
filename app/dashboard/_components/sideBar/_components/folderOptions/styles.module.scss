@@ -66,7 +66,6 @@
                 width: 100%;
                 display: flex;
                 justify-content: space-between;
-
                 &.title{
                     .value{
                         display: flex;
@@ -98,6 +97,7 @@
                     }
                 }
                 &.color{
+                    position: relative;
                     .value{
                         button{
                             all:unset;
@@ -107,9 +107,124 @@
                             &:hover{
                                 opacity: 1;
                             }
+                            &.active{
+                                opacity: 1;
+                            }
+                        }
+                    }
+
+                    .colorOptions{
+                        @include m.overlayMixin;
+                        isolation: isolate;
+                        // outline: 1px solid blue;
+                        position: absolute;
+                        top: -0.5rem;
+                        right: calc(-1.5rem + -1.5rem);
+                        transform: translateX(100%);
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.5rem;
+                        padding: 0.5rem 1rem 1rem 1rem;
+                        border-radius: 0px 8px 8px 0px;
+                        background-color: transparent;
+                        z-index: 1000;
+                        // max-width: 25rem;
+                        box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
+
+                        &::before {
+                            content: "";
+                            position: absolute;
+                            inset: 0; 
+                            background-color: v.$light-primary;
+                            border-radius: 0px 8px 8px 0px;
+                            z-index: -1;
+                        }
+                        
+                        &::after {
+                            content: "";
+                            position: absolute;
+                            right: -0.3rem;
+                            top: 0;
+                            width: calc(0.5rem + 12px);
+                            height: 100%;
+                            border-radius: 8px;
+                            background-color: v.$dark-secondary;
+                            box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
+                            z-index: -2;
+                        }
+                        
+                        
+                        ul{
+                            all:unset;
+                            margin-top: 0.5rem;
+                            display: flex;
+                            gap: 0.5rem;
+                            flex-wrap: wrap;
+                            display: grid;
+                            grid-template-columns: repeat(11, 1fr);
+
+                            li{
+                                all:unset;
+                                border-radius: 50%;
+                                height: fit-content;
+                                width: 1.75rem;
+                                height: 1.75rem;
+                                position: relative;
+                                margin-bottom: 0.5rem;
+                                // outline: 1px solid blue;
+                                button{
+                                    all:unset;
+                                    position: relative;
+                                    border-radius: 50%;
+                                    box-shadow:inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+                                    aspect-ratio: 1/1;
+                                    width: 100%;
+                                    height: 100%;
+                                    border-radius: 50%;
+                                    background-color: rgba(109, 109, 109, 0.195);
+                                    opacity: 1;
+                                    cursor: pointer;
+                                    transition: opacity 0.1s linear;
+                                    &:hover:not(.active){
+                                        &::after{
+                                            position: absolute;
+                                            content: "";
+                                            width: 50%;
+                                            height: 1px;
+                                            bottom: -0.3rem;
+                                            left: 50%;
+                                            transform: translateX(-50%);
+                                            background-color: v.$dark-primary-80;
+                                            border-radius: 100%;
+                                            opacity: 0.5;
+                                        }
+                                    }
+                                    
+                                    &.active {
+
+                                        opacity: 1;
+                                        &::after{
+                                            position: absolute;
+                                            content: "";
+                                            width: 50%;
+                                            height: 1px;
+                                            bottom: -0.3rem;
+                                            left: 50%;
+                                            transform: translateX(-50%);
+                                            background-color: v.$dark-primary-80;
+                                            border-radius: 100%;
+                                        }
+                                    }
+                                }
+                                
+                                
+                            }
                         }
                     }
                 }
+
+
+
                 &.progression{
                     .value{
                         display: flex;

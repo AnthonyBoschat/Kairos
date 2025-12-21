@@ -6,7 +6,6 @@ import { Dispatch, useCallback, useMemo, useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
-import { Folder } from "@prisma/client"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import StarIcon from "@/components/ui/icons/Star"
@@ -63,7 +62,7 @@ export default function FolderItem(props:FolderItemProps){
         <>
             <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
                 <div className={s.icons}>
-                    <FolderSolidIcon color={props.folder.customColor ? props.folder.customColor : FOLDER_COLORS[props.folder.defaultColor ?? 0]} size={18} />
+                    <FolderSolidIcon color={FOLDER_COLORS[props.folder.color ?? 0]} size={18} />
                     {isFavorite && (
                         <div onClick={handleToggleFavorite} title="Ce dossier est en favori" className={s.favorite}>
                             <StarIcon animate active size={16}/>
