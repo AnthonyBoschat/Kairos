@@ -27,7 +27,7 @@ export default function ListItem(props:ListItemProps){
     const isFavorite = props.list.favorite
 
     const listColor = useMemo(() => {
-        return props.list.customColor || LIST_COLOR[props.list.defaultColor ?? 0]
+        return LIST_COLOR[props.list.color ?? 0]
     }, [props])
 
     const handleToggleFavorite = async() => {

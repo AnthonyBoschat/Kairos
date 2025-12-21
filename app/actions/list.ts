@@ -1,8 +1,28 @@
 'use server'
 
 import { getCurrentUser } from "@/lib/auth";
+import { getNextAvailableListColorIndexForThisFolder } from "@/lib/list-color";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+
+const checkUser = async() => {
+    const user = await getCurrentUser()
+    if (!user?.id) throw new Error("Non autorisé")
+}
+
+const checkListExist = async(listID:string) => {
+    const list = await prisma.list.findUnique({
+        where:{id:listID}
+    })
+    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+}
+
+export async function getNextFolderColorIndexForThisFolder(folderID:string){
+    const user = await getCurrentUser();
+    if (!user?.id) throw new Error("Non autorisé");
+    const colorIndex = await getNextAvailableListColorIndexForThisFolder(folderID);
+    return colorIndex;
+}
 
 export async function getLists(id:string){
     const user = await getCurrentUser();
@@ -59,7 +79,7 @@ export async function addList({title, folderID}:{title:string, folderID:string})
     const createdList = await prisma.list.create({
         data: {
             title,
-            defaultColor: 0, // TODO - Faire la fonction pour récupérer la prochaine couleur logique
+            color: await getNextFolderColorIndexForThisFolder(folder.id),
             order: (maxOrder._max.order ?? -1) + 1,
             folderId: folder.id
         }
@@ -120,4 +140,21 @@ export async function updateList({
 
     revalidatePath("/dashboard")
     return {success:true, message:`La liste a été correctement modifier`}
+}
+
+export async function updateListColor(listID:string, colorIndex:number){
+
+    await checkUser()
+    await checkListExist(listID)
+
+    await prisma.list.update({
+        where:{id:listID},
+        data:{
+            color:colorIndex
+        }
+    })
+
+    revalidatePath("/dashboard")
+    const message = "Couleur da la liste modifier avec succès"
+    return {success:true, message:message}
 }

@@ -3,8 +3,7 @@ model List {
   title             String   
   favorite          Boolean  @default(false)
   countElement      Boolean  @default(true)
-  defaultColor      Int?
-  customColor       String?  
+  color             Int
   order             Int      
 
   folderId          String

@@ -16,6 +16,7 @@ import { useAppDispatch } from "@/store/hooks"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { FolderWithList } from "@/types/list"
 import StorageService from "@/services/StorageService"
+import ColorOptions from "@/components/colorOptions"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
@@ -71,7 +72,7 @@ export default function FolderOptions(props:FolderOptionsProps){
         })
     }
 
-    const handleUpdateDefaultColor = async(colorIndex:number) => {
+    const handleUpdateColor = async(colorIndex:number) => {
         handleResponse(async() => {
             const response = await updateFolderColor(props.folder.id, colorIndex)
             toast.dismiss()
@@ -127,23 +128,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                                         <FolderSolidIcon color={folderColor}/> 
                                     </button>
                                 </span>
-                                {isOpenColorOptions && (
-                                    <div className={s.colorOptions}>
-                                        <ul>
-                                            {FOLDER_COLORS.map((color, index) => (
-                                                <li key={index}>
-                                                    <button
-                                                        title={`Changer la couleur du dossier pour ${color}`} 
-                                                        className={withClass(folderColor === color && s.active)} 
-                                                        style={{backgroundColor:color}}
-                                                        onClick={() => handleUpdateDefaultColor(index)}
-                                                    />
-                                                </li>
-                                            ))}
-                                            
-                                        </ul>
-                                    </div>
-                                )}
+                                {isOpenColorOptions && <ColorOptions columns={11} currentColor={folderColor}  colorCollection={FOLDER_COLORS} onClick={handleUpdateColor}/>}
                             </li>
 
 

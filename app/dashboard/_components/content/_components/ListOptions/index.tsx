@@ -1,5 +1,4 @@
 "use client"
-import { List } from "@prisma/client"
 import s from "./styles.module.scss"
 import { Dispatch, useEffect, useRef, useState } from "react"
 import withClass from "@/utils/class"
@@ -10,10 +9,11 @@ import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import StarIcon from "@/components/ui/icons/Star"
 import LIST_COLOR from "@/constants/listColor"
-import { deleteList, toggleListFavorite, updateList } from "@/app/actions/list"
+import { deleteList, toggleListFavorite, updateList, updateListColor } from "@/app/actions/list"
 import { useQueryClient } from "@tanstack/react-query"
 import Overlay from "@/components/overlay"
 import { ListWithTaskAndFolder } from "@/types/list"
+import ColorOptions from "@/components/colorOptions"
 
 interface ListOptionsProps{
     list: ListWithTaskAndFolder
@@ -24,11 +24,12 @@ interface ListOptionsProps{
 export default function ListOptions(props:ListOptionsProps){
     
     const queryClient = useQueryClient()
-    const [listTitle, setListTitle] = useState(props.list?.title)
-    const [listColor, setListColor] = useState(props.list?.customColor ? props.list.customColor : LIST_COLOR[props.list?.defaultColor ?? 0])
-    const [listFavorite, setListFavorite] = useState(props.list?.favorite)
-    const [listCountElement, setListCountElement] = useState(props.list?.countElement)
-    const [onEditTitle, setOnEditTitle] = useState<Boolean>(false)
+    const [listTitle, setListTitle]         = useState(props.list?.title)
+    const [listColor, setListColor]         = useState(LIST_COLOR[props.list.color ?? 0])
+    const [listFavorite, setListFavorite]   = useState(props.list?.favorite)
+    const [onEditTitle, setOnEditTitle]     = useState<Boolean>(false)
+    const [listCountElement, setListCountElement]       = useState(props.list?.countElement)
+    const [isOpenColorOptions, setIsOpenColorOptions]   = useState(false)
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.list.tasks.length === 0
 
@@ -75,6 +76,16 @@ export default function ListOptions(props:ListOptionsProps){
         })
     }
 
+    const handleUpdateColor = async(colorIndex:number) => {
+        handleResponse(async() => {
+            const response = await updateListColor(props.list.id, colorIndex)
+            toast.dismiss()
+            toast.success(response.message)
+            setListColor(LIST_COLOR[colorIndex])
+            refetch()
+        })
+    }
+
     useEffect(() => {
         if(listTitleInputRef.current){
             if(onEditTitle) listTitleInputRef.current.focus()
@@ -114,8 +125,9 @@ export default function ListOptions(props:ListOptionsProps){
                                 <li className={s.color}>
                                     <span className={s.key}>Couleur</span>
                                     <span className={s.value}>
-                                        <button style={{backgroundColor:listColor, boxShadow:"inset 0 0 0 1px rgba(0, 0, 0, 0.15)"}}/>
+                                        <button onClick={() => setIsOpenColorOptions(current => !current)} style={{backgroundColor:listColor, boxShadow:"inset 0 0 0 1px rgba(0, 0, 0, 0.15)"}}/>
                                     </span>
+                                    {isOpenColorOptions && <ColorOptions columns={11} currentColor={listColor} colorCollection={LIST_COLOR} onClick={handleUpdateColor}/>}
                                 </li>
                                 <li className={s.countElement}>
                                     <span className={s.key}>Afficher le nombre d'éléments</span>

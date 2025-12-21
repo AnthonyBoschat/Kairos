@@ -30,7 +30,7 @@ async function main() {
           { 
             title: 'HTML', 
             order: 0, 
-            defaultColor: 0,
+            color: 0,
             tasks: {
               create: [
                 {
@@ -86,7 +86,7 @@ Arriver tôt pour profiter du parc avant la nuit`
           { 
             title: 'CSS', 
             order: 1, 
-            defaultColor: 1, 
+            color: 1, 
             tasks: {
               create: [
                 {
@@ -107,7 +107,7 @@ Arriver tôt pour profiter du parc avant la nuit`
           { 
             title: 'Javascript', 
             order: 2, 
-            defaultColor: 2, 
+            color: 2, 
             tasks: {
               create: [
                 {
@@ -138,9 +138,9 @@ Arriver tôt pour profiter du parc avant la nuit`
       userId: user.id,
       lists: {
         create: [
-          { title: 'Courses', order: 0, countElement: true, defaultColor: 0, },
-          { title: 'Films à voir', order: 1, defaultColor: 1, },
-          { title: 'Livres', order: 2, defaultColor: 2, },
+          { title: 'Courses', order: 0, countElement: true, color: 0, },
+          { title: 'Films à voir', order: 1, color: 1, },
+          { title: 'Livres', order: 2, color: 2, },
         ],
       },
     },
@@ -154,9 +154,9 @@ Arriver tôt pour profiter du parc avant la nuit`
       userId: user.id,
       lists: {
         create: [
-          { title: 'Fil Rouge', order: 0, countElement: true, defaultColor: 0, },
-          { title: 'Kairos', order: 1, defaultColor: 1, },
-          { title: 'Orion', order: 2, defaultColor: 2, },
+          { title: 'Fil Rouge', order: 0, countElement: true, color: 0, },
+          { title: 'Kairos', order: 1, color: 1, },
+          { title: 'Orion', order: 2, color: 2, },
         ],
       },
     },
