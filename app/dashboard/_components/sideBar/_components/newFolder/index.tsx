@@ -32,8 +32,7 @@ export default function AddFolderButton(props:FolderProps){
         if(keyboardEvent) keyboardEvent.preventDefault()
         if(title.trim()){
             handleResponse(async () => {
-                const response = await addFolder({title:title})
-                toast.success(response.message)
+                await addFolder({title:title})
             })
         }
         if(keyboardEvent){

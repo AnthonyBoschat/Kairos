@@ -23,12 +23,7 @@ export default async function Dashboard(){
         }
     })
     
-    const sortedFolders = folders.sort((a, b) => {
-        if (a.favorite !== b.favorite) {
-            return b.favorite ? 1 : -1;
-        }
-        return a.order - b.order;
-    });
+    const sortedFolders = folders.sort((a, b) => a.order - b.order);
 
     return(
         <div className={s.page}>

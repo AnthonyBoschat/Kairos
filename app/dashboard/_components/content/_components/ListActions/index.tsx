@@ -38,9 +38,8 @@ export default function ListsActions(props:ListsActionsProps){
         if(title.trim()){
             handleResponse(async() => {
                 if(props.selectedFolderID){
-                    const response = await addList({title:title, folderID:props.selectedFolderID})
+                    await addList({title:title, folderID:props.selectedFolderID})
                     setNewListTitle("")
-                    toast.success(response.message)
                     queryClient.invalidateQueries({ queryKey: ['lists', props.selectedFolderID] })
                 }
             })

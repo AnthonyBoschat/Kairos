@@ -2,7 +2,7 @@
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, useCallback, useMemo, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
@@ -14,14 +14,17 @@ import { toggleFolderFavorite } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import StorageService from "@/services/StorageService"
 import { FolderWithList } from "@/types/list"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities";
 
 interface FolderItemProps{
     folder: FolderWithList
-    setSelectedFolderOptions: Dispatch<null|FolderWithList>
+    setSelectedFolderOptions: Dispatch<SetStateAction<FolderWithList | null>>
 }
 
 
 export default function FolderItem(props:FolderItemProps){
+
 
     const dispatch = useAppDispatch()
     const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
@@ -40,8 +43,7 @@ export default function FolderItem(props:FolderItemProps){
             event.stopPropagation()
             const folderID = props.folder.id
             handleResponse(async () => {
-                const response = await toggleFolderFavorite(folderID)
-                toast.success(response.message)
+                await toggleFolderFavorite(folderID)
             })
         }
     }
@@ -59,31 +61,29 @@ export default function FolderItem(props:FolderItemProps){
     }, [props.folder])
 
     return(
-        <>
-            <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
-                <div className={s.icons}>
-                    <FolderSolidIcon color={FOLDER_COLORS[props.folder.color ?? 0]} size={18} />
-                    {isFavorite && (
-                        <div onClick={handleToggleFavorite} title="Ce dossier est en favori" className={s.favorite}>
-                            <StarIcon animate active size={16}/>
-                        </div>
-                    )}
-                    {(!isFavorite && isHover) && (
-                        <div onClick={handleToggleFavorite} title="Ajouter ce dossier aux favori ?" className={s.favorite}>
-                            <StarIcon size={16}/>
-                        </div>
-                    )}
-                </div>
-                <span className={s.title}>
-                    {props.folder.title}
-                </span>
-                <div className={withClass(s.indicator, (isHover || isSelected) && s.active)}>
-                    {(isHover || isSelected) && <ArrowLeftIcon size={16}/>}
-                </div>
-                <div className={withClass(s.options, isHover && s.active)}>
-                    {isHover && <div title="Accédez aux options du dossier" onClick={(event) => handleClickOptions(event)}><OptionsIcon size={20}/></div>}
-                </div>
-            </button>
-        </>
+        <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
+            <div className={s.icons}>
+                <FolderSolidIcon color={FOLDER_COLORS[props.folder.color ?? 0]} size={18} />
+                {isFavorite && (
+                    <div onClick={handleToggleFavorite} title="Ce dossier est en favori" className={s.favorite}>
+                        <StarIcon animate active size={16}/>
+                    </div>
+                )}
+                {(!isFavorite && isHover) && (
+                    <div onClick={handleToggleFavorite} title="Ajouter ce dossier aux favori ?" className={s.favorite}>
+                        <StarIcon size={16}/>
+                    </div>
+                )}
+            </div>
+            <span className={s.title}>
+                {props.folder.title}
+            </span>
+            <div className={withClass(s.indicator, (isHover || isSelected) && s.active)}>
+                {(isHover || isSelected) && <ArrowLeftIcon size={16}/>}
+            </div>
+            <div className={withClass(s.options, isHover && s.active)}>
+                {isHover && <div title="Accédez aux options du dossier" onClick={(event) => handleClickOptions(event)}><OptionsIcon size={20}/></div>}
+            </div>
+        </button>
     )
 }

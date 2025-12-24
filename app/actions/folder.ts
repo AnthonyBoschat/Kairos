@@ -135,3 +135,23 @@ export async function updateFolderColor(folderID:string, colorIndex:number){
     const message = "Couleur du dossier modifier avec succès"
     return {success:true, message:message}
 }
+
+
+type reorderFoldersType = string[]
+
+export async function reorderFolders(orderedFolderIds:reorderFoldersType) {
+    const user = await getCurrentUser()
+    if (!user?.id) throw new Error("Non autorisé")
+
+    if (orderedFolderIds.length === 0) return { success: true }
+
+    orderedFolderIds.map(async (folderId, index) =>
+        await prisma.folder.update({
+            where: { id: folderId },
+            data: { order: index },
+        })
+    )
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}

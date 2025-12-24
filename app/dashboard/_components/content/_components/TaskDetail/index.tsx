@@ -45,10 +45,9 @@ export default function TaskDetail(props:TaskDetailProps){
 
     const handleToggleFavorite = () => {
         handleResponse(async() => {
-            const response = await toggleTaskFavorite({taskID:props.task.id})
+            await toggleTaskFavorite({taskID:props.task.id})
             queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
             toast.dismiss()
-            toast.success(response.message)
             props.setTaskDetail(current => (current ? { ...current, favorite: !current.favorite } : null))
         })
     }

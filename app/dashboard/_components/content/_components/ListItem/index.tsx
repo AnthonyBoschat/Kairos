@@ -36,7 +36,6 @@ export default function ListItem(props:ListItemProps){
             handleResponse(async () => {
                 const response = await toggleListFavorite(listID)
                 queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
-                toast.success(response.message)
             })
         }
     }

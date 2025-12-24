@@ -43,8 +43,7 @@ export default function ListOptions(props:ListOptionsProps){
         if(props.list?.id){
             const listID = props.list.id
             handleResponse(async () => {
-                const response = await deleteList(listID)
-                toast.success(response.message)
+                await deleteList(listID)
                 refetch()
                 props.setSelectedListOptions(null)
             })
@@ -55,22 +54,20 @@ export default function ListOptions(props:ListOptionsProps){
         if(props.list?.id){
             const listID = props.list.id
             handleResponse(async () => {
-                const response = await toggleListFavorite(listID)
+                await toggleListFavorite(listID)
                 setListFavorite(current => !current)
                 refetch()
-                toast.success(response.message)
             })
         }
     }
 
     const handleSave = async() => {
         handleResponse(async() => {
-            const response = await updateList({
+            await updateList({
                 listID:props.list?.id,
                 title:listTitle,
                 countElement:listCountElement
             })
-            toast.success(response.message)
             refetch()
             setOnEditTitle(false)
         })
@@ -78,9 +75,8 @@ export default function ListOptions(props:ListOptionsProps){
 
     const handleUpdateColor = async(colorIndex:number) => {
         handleResponse(async() => {
-            const response = await updateListColor(props.list.id, colorIndex)
+            await updateListColor(props.list.id, colorIndex)
             toast.dismiss()
-            toast.success(response.message)
             setListColor(LIST_COLOR[colorIndex])
             refetch()
         })
