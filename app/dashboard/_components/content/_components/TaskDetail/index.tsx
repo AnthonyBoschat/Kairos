@@ -2,10 +2,10 @@
 import { Task } from "@prisma/client"
 import s from "./styles.module.scss"
 import Overlay from "@/components/overlay"
-import { Dispatch, SetStateAction, useCallback, useEffect, useState } from "react"
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import handleResponse from "@/utils/handleResponse"
-import { toggleTaskFavorite, updateTaskContent } from "@/app/actions/task"
+import { toggleTaskFavorite, updateTaskContent, updateTaskTitle } from "@/app/actions/task"
 import useDebouncedValue from "@/hooks/useDebouncedValue"
 import { useAppSelector } from "@/store/hooks"
 import { useQueryClient } from "@tanstack/react-query"
@@ -23,18 +23,35 @@ interface TaskDetailProps{
 
 export default function TaskDetail(props:TaskDetailProps){
 
-    const [isSyncContent, setIsSyncContent] = useState(true)
+    const titleRef                          = useRef<HTMLTextAreaElement>(null)
+
+    const [titleMemory, setTitleMemory]     = useState(props.task.content || "")
+    const [isSyncData, setIsSyncData]       = useState(true)
     const [content, setContent]             = useState(props.task.content || "")
+    const [title, setTitle]                 = useState(props.task.title || "")
     
     const queryClient           = useQueryClient()
     const selectedFolderID      = useAppSelector(store => store.folder.selectedFolderID)
     const debouncedContent      = useDebouncedValue(content)
+    const debouncedTitle        = useDebouncedValue(title, 300)
     
 
     const handleChangeTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setContent(event.target.value)
-        if(isSyncContent) setIsSyncContent(false)
-    }, [isSyncContent])
+        if(isSyncData) setIsSyncData(false)
+    }, [isSyncData])
+
+    const handleChangeTaskTitle = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setTitle(event.target.value)
+        if(isSyncData) setIsSyncData(false)
+    }, [isSyncData])
+
+    const handleUpdateTaskTitle = (currentTitle:string) => {
+        handleResponse(async() => {
+            await updateTaskTitle({taskID:props.task.id, title: currentTitle})
+            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+        })
+    }
 
     const handleUpdateTaskContent = (currentContent:string) => {
         handleResponse(async() => {
@@ -48,29 +65,45 @@ export default function TaskDetail(props:TaskDetailProps){
             await toggleTaskFavorite({taskID:props.task.id})
             queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
             toast.dismiss()
-            props.setTaskDetail(current => (current ? { ...current, favorite: !current.favorite } : null))
         })
     }
 
     useEffect(() => {
         handleUpdateTaskContent(debouncedContent)
-        setIsSyncContent(true)
+        setIsSyncData(true)
     }, [debouncedContent])
+
+    useEffect(() => {
+        handleUpdateTaskTitle(debouncedTitle)
+        setIsSyncData(true)
+    }, [debouncedTitle])
+
+    useEffect(() => {
+        if(props.task.title){
+            setTitleMemory(props.task.title)
+        }
+    }, [props.task.title])
+
+    useEffect(() => {
+        if (titleRef.current) {
+            titleRef.current.style.height = "auto"
+            titleRef.current.style.height = titleRef.current.scrollHeight + "px"
+        }
+    }, [title])
 
     return(
         <Overlay onClose={() => props.setTaskDetail(null)}>
             {(isClosing) => {
 
-                if (isClosing && !isSyncContent) handleUpdateTaskContent(content)
+                if (isClosing && !isSyncData) handleUpdateTaskContent(content)
                     
                 return(
                     <div className={withClass(s.container, isClosing && s.closing)}>
                         <div className={s.card}>
                             <div className={s.cardBefore} style={{ backgroundColor: props.listColor }} />
                             <div className={s.header}>
-                                <span>
-                                    {props.task.title}
-                                </span>
+                                <textarea placeholder={titleMemory} rows={1} ref={titleRef} onChange={handleChangeTaskTitle} value={title} className={s.textarea} />
+
                                 <button onClick={handleToggleFavorite} className={s.favorite}>
                                     <StarIcon animate active={props.task.favorite}/>
                                 </button>
@@ -81,8 +114,8 @@ export default function TaskDetail(props:TaskDetailProps){
 
 
                             <div className={s.sync}>
-                                {isSyncContent && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
-                                {!isSyncContent && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
+                                {isSyncData && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
+                                {!isSyncData && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
                             </div>
                         </div>
 

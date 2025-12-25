@@ -31,6 +31,7 @@ interface DragAndDropProps<Item> {
   onReorder: (nextItems: Item[]) => void;
   activationDistance?: number;
   strategy?: SortingStrategy;
+  disabled?: boolean;
 }
 
 export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
@@ -43,8 +44,8 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
   const itemIds = useMemo(() => items.map(getItemId), [items, getItemId]);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: activationDistance } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
+    useSensor(PointerSensor, { activationConstraint: { distance: activationDistance } })
+    // useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
   const handleDragEnd = (event: DragEndEvent) => {
@@ -70,6 +71,7 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
             id={getItemId(item)}
             item={item}
             renderItem={renderItem}
+            disabled={props.disabled}
           />
         ))}
       </SortableContext>
@@ -81,11 +83,13 @@ interface SortableRowProps<Item> {
   id: UniqueIdentifier;
   item: Item;
   renderItem: (params: { item: Item; isDragging: boolean }) => React.ReactNode;
+  disabled?: boolean;
 }
 
 function SortableRow<Item>(props: SortableRowProps<Item>) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: props.id,
+    disabled: props.disabled
   });
 
   const transformWithoutScale = transform ? { ...transform, scaleX: 1, scaleY: 1 } : null;
@@ -96,6 +100,7 @@ function SortableRow<Item>(props: SortableRowProps<Item>) {
     touchAction: "manipulation",
     opacity: isDragging ? 0.4 : undefined,
     width: "100%",
+    
   };
 
   return (

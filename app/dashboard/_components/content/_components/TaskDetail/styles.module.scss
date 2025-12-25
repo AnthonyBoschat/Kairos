@@ -42,17 +42,32 @@
 
             width: 100%;
             display: flex;
-            align-items: center;
+            align-items: start;
             justify-content: space-between;
             font-size: 1.25rem;
             font-weight: 600;
             gap: 0.5rem;
+
+            >textarea{
+                width: 100%;
+                height: fit-content;
+                overflow: hidden;
+                resize: none;
+                border: 0;
+                outline: 0;
+                line-height: 1.4;
+    
+                font-size: 1.25rem;
+                font-weight: 600;
+                user-select: text;
+            }
             button.favorite{
                 all:unset;
                 display: flex;
                 align-items: center;
                 opacity: 0.8;
                 transition: opacity 0.1s linear;
+                margin-top: 0.5rem;
                 cursor: pointer;
                 &:hover{opacity: 1;}
             }

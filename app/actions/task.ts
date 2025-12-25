@@ -113,6 +113,32 @@ export async function updateTaskContent({taskID, content}: updateTaskContentProp
     return {success:true}
 }
 
+type updateTaskTitleProps = {
+    taskID:string
+    title:string
+}
+export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
+    const user = await getCurrentUser()
+    if(!user.id) throw new Error("Non autorisé")
+
+    const task = await prisma.task.findUnique({
+        where:{id:taskID}
+    })
+
+    if(!task) throw new Error("Tâche non trouvé")
+
+    const nullTitle = title.trim() === "" 
+
+    await prisma.task.update({
+        where:{id:taskID},
+        data:{
+            title:nullTitle ? task.title : title
+        }
+    })
+
+    return {success:true}
+}
+
 
 
 
