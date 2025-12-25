@@ -15,6 +15,7 @@ import {
   arrayMove,
   SortableContext,
   sortableKeyboardCoordinates,
+  SortingStrategy,
   useSortable,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
@@ -29,6 +30,7 @@ interface DragAndDropProps<Item> {
   renderItem: (params: { item: Item; isDragging: boolean }) => React.ReactNode;
   onReorder: (nextItems: Item[]) => void;
   activationDistance?: number;
+  strategy?: SortingStrategy;
 }
 
 export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
@@ -36,7 +38,7 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
   const mounted = useMounted()
   
 
-  const { items, getItemId, renderItem, onReorder, activationDistance = 6 } = props;
+  const { items, getItemId, renderItem, onReorder, activationDistance = 6, strategy = verticalListSortingStrategy } = props;
 
   const itemIds = useMemo(() => items.map(getItemId), [items, getItemId]);
 
@@ -61,7 +63,7 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
   if(!mounted) return
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-      <SortableContext items={itemIds} strategy={verticalListSortingStrategy}>
+      <SortableContext items={itemIds} strategy={strategy}>
         {items.map((item) => (
           <SortableRow
             key={String(getItemId(item))}
@@ -86,11 +88,13 @@ function SortableRow<Item>(props: SortableRowProps<Item>) {
     id: props.id,
   });
 
+  const transformWithoutScale = transform ? { ...transform, scaleX: 1, scaleY: 1 } : null;
+
   const style: React.CSSProperties = {
-    transform: CSS.Transform.toString(transform),
+    transform: CSS.Transform.toString(transformWithoutScale),
     transition,
     touchAction: "manipulation",
-    opacity: isDragging ? 0.6 : undefined,
+    opacity: isDragging ? 0.4 : undefined,
     width: "100%",
   };
 

@@ -11,6 +11,7 @@
     background-color: v.$light-primary;
     position: relative;
     transition: box-shadow 0.1s linear;
+    cursor: pointer;
     
     &:hover{
         box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15),

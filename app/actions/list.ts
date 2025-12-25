@@ -158,3 +158,23 @@ export async function updateListColor(listID:string, colorIndex:number){
     const message = "Couleur da la liste modifier avec succès"
     return {success:true, message:message}
 }
+
+
+type reorderListsType = string[]
+
+export async function reorderLists(orderedListsIds:reorderListsType) {
+    const user = await getCurrentUser()
+    if (!user.id) throw new Error("Non autorisé")
+
+    if (orderedListsIds.length === 0) return { success: true }
+
+    orderedListsIds.map(async (listID, index) =>
+        await prisma.list.update({
+            where: { id: listID },
+            data: { order: index },
+        })
+    )
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}
