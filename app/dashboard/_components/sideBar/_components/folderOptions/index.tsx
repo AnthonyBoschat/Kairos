@@ -40,8 +40,7 @@ export default function FolderOptions(props:FolderOptionsProps){
         if(props.folder?.id){
             const folderID = props.folder.id
             handleResponse(async () => {
-                const response = await deleteFolder(folderID)
-                toast.success(response.message)
+                await deleteFolder(folderID)
                 props.setSelectedFolderOptions(null)
                 dispatch(setSelectedFolderID(null))
                 StorageService.remove("selectedFolderID")
@@ -53,30 +52,27 @@ export default function FolderOptions(props:FolderOptionsProps){
         if(props.folder?.id){
             const folderID = props.folder.id
             handleResponse(async () => {
-                const response = await toggleFolderFavorite(folderID)
+                await toggleFolderFavorite(folderID)
                 setFolderFavorite(current => !current)
-                toast.success(response.message)
             })
         }
     }
 
     const handleSave = async() => {
         handleResponse(async() => {
-            const response = await updateFolder({
+            await updateFolder({
                 folderID:props.folder?.id,
                 title:folderTitle,
                 showProgression:folderShowProgression
             })
-            toast.success(response.message)
             setOnEditTitle(false)
         })
     }
 
     const handleUpdateColor = async(colorIndex:number) => {
         handleResponse(async() => {
-            const response = await updateFolderColor(props.folder.id, colorIndex)
+            await updateFolderColor(props.folder.id, colorIndex)
             toast.dismiss()
-            toast.success(response.message)
             setFolderColor(FOLDER_COLORS[colorIndex])
         })
     }

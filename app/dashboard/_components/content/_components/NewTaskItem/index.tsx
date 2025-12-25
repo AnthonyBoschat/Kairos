@@ -35,8 +35,7 @@ export default function NewTaskItem(props:NewTaskItemProps){
         if(keyboardEvent) keyboardEvent.preventDefault()
         if(taskTitle.trim()){
             handleResponse(async() => {
-                const response = await addTask({title:taskTitle, listID:props.listID})
-                toast.success(response.message)
+                await addTask({title:taskTitle, listID:props.listID})
                 queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
             })
         }

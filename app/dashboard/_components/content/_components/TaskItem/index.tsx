@@ -36,19 +36,17 @@ export default function TaskItem(props:TaskItemProps){
 
     const handleAddTaskToFavorite = () => {
         handleResponse(async() => {
-            const response = await toggleTaskFavorite({taskID:props.task.id})
+            await toggleTaskFavorite({taskID:props.task.id})
             queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
             toast.dismiss()
-            toast.success(response.message)
         })
     }
 
     const handleDeleteTask = () => {
         handleResponse(async() => {
-            const response = await deleteTask({taskID:props.task.id})
+            await deleteTask({taskID:props.task.id})
             queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
             toast.dismiss()
-            toast.success(response.message)
         })
     }
 
