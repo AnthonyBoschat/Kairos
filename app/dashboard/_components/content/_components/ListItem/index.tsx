@@ -34,7 +34,7 @@ export default function ListItem(props:ListItemProps){
         if(props.list?.id){
             const listID = props.list.id
             handleResponse(async () => {
-                const response = await toggleListFavorite(listID)
+                await toggleListFavorite(listID)
                 queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
             })
         }
