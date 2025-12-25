@@ -112,3 +112,25 @@ export async function updateTaskContent({taskID, content}: updateTaskContentProp
 
     return {success:true}
 }
+
+
+
+
+type reorderTasksType = string[]
+
+export async function reorderTasks(orderedTasksIds:reorderTasksType) {
+    const user = await getCurrentUser()
+    if (!user.id) throw new Error("Non autorisé")
+
+    if (orderedTasksIds.length === 0) return { success: true }
+
+    orderedTasksIds.map(async (taskID, index) =>
+        await prisma.task.update({
+            where: { id: taskID },
+            data: { order: index },
+        })
+    )
+
+    revalidatePath("/dashboard")
+    return { success: true }
+}

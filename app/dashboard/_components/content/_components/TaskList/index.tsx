@@ -2,8 +2,11 @@
 import { Task } from "@prisma/client"
 import s from "./styles.module.scss"
 import TaskItem from "../TaskItem"
-import { Dispatch, SetStateAction } from "react"
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
 import NewTaskItem from "../NewTaskItem"
+import DragAndDrop from "@/components/dragAndDrop"
+import handleResponse from "@/utils/handleResponse"
+import { reorderTasks } from "@/app/actions/task"
 
 interface TaskListProps{
     listColor:string
@@ -17,21 +20,36 @@ interface TaskListProps{
 export default function TaskList(props:TaskListProps){
 
 
-    const sortedTask = props.tasks.sort((a,b) => {
-        if (a.favorite !== b.favorite) {
-            return b.favorite ? 1 : -1;
-        }
-        return b.order - a.order;
-    })
+    const sortedTasks = useMemo(() => {
+        return props.tasks.sort((a,b) => b.order - a.order)
+    }, [props.tasks])
+
+    const [orderedTasks, setOrderedTasks] = useState(sortedTasks)
+
+    useEffect(() => setOrderedTasks(sortedTasks) ,[sortedTasks])
+
+    const handleReorderTasks = async(newTasks:Task[]) => {
+        handleResponse(() => {
+            setOrderedTasks(newTasks)
+            const orderedTasksIds = newTasks.map(task => task.id)
+            reorderTasks(orderedTasksIds)
+        })
+    }
 
     return(
         <ul className={s.container}>
             {props.isAddingTask && (
                 <NewTaskItem setIsAddingTask={props.setIsAddingTask} listID={props.listID} listColor={props.listColor} />
             )}
-            {sortedTask.map(task => (
-                <TaskItem key={task.id} listColor={props.listColor} task={task}/>
-            ))}
+            <DragAndDrop
+                items={orderedTasks}
+                getItemId={(task) => task.id}
+                onReorder={handleReorderTasks}
+                renderItem={({item: task}) => (
+                    <TaskItem key={task.id} listColor={props.listColor} task={task}/>
+                )}
+            
+            />
         </ul>
     )
 }

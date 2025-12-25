@@ -10,8 +10,7 @@ import StorageService from "@/services/StorageService"
 import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { reorderFolders } from "@/app/actions/folder"
 import DragAndDrop from "@/components/dragAndDrop"
-import useMounted from "@/hooks/useMounted"
-import { cp } from "fs"
+import handleResponse from "@/utils/handleResponse"
 
 interface FolderListProps{
     isAddingFolder:boolean
@@ -36,9 +35,11 @@ export default function FolderList(props:FolderListProps){
     }, [])
 
     const handleReorderFolders = async (newFolders: FolderWithList[]) => {
-        setOrderedFolders(newFolders);
-        const orderedFolderIds = newFolders.map(folder => folder.id)
-        reorderFolders(orderedFolderIds);
+        handleResponse(() => {
+            setOrderedFolders(newFolders);
+            const orderedFolderIds = newFolders.map(folder => folder.id)
+            reorderFolders(orderedFolderIds);
+        })
     }
 
     return(
