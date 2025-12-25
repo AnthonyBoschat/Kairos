@@ -1,7 +1,7 @@
 "use client";
 
 import { getLists, reorderLists } from "@/app/actions/list";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import ListItem from "../ListItem";
 import s from "./styles.module.scss";
@@ -10,6 +10,7 @@ import { ListWithTaskAndFolder } from "@/types/list";
 import DragAndDrop from "@/components/dragAndDrop";
 import handleResponse from "@/utils/handleResponse";
 import { rectSortingStrategy } from "@dnd-kit/sortable";
+import { useDashboardContext } from "@/context/DashboardContext";
 
 interface ListsProps {
   selectedFolderID: string
@@ -24,6 +25,8 @@ export default function Lists(props: ListsProps) {
 
     const [orderedLists, setOrderedLists] = useState<ListWithTaskAndFolder[]>([])
 
+    const {taskDetail} = useDashboardContext()
+
     const { data, isLoading, error } = useQuery({
         queryKey: ["lists", props.selectedFolderID],
         queryFn: async () => {
@@ -33,7 +36,7 @@ export default function Lists(props: ListsProps) {
         },
         enabled: !!props.selectedFolderID,
     })
-
+    
     const lists = data ?? EMPTY_LISTS
 
     const sortedLists = useMemo(() => [...lists].sort((a, b) => a.order - b.order), [lists])
@@ -67,6 +70,7 @@ export default function Lists(props: ListsProps) {
                 getItemId={(list) => list.id}
                 onReorder={handleReorderList}
                 strategy={rectSortingStrategy}
+                disabled={taskDetail !== null}
                 renderItem={({ item: list }) => (
                     <ListItem
                         setSelectedListOptions={setSelectedListOptions}

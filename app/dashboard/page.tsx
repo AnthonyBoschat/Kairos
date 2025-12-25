@@ -4,6 +4,7 @@ import Content from "./_components/content";
 import { Metadata } from "next";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { DashboardProvider } from "@/context/DashboardContext";
 
 export const metadata: Metadata = {
   title: 'Kairos - Dashboard',
@@ -26,9 +27,11 @@ export default async function Dashboard(){
     const sortedFolders = folders.sort((a, b) => a.order - b.order);
 
     return(
-        <div className={s.page}>
-            <SideBar user={user} folders={sortedFolders}/>
-            <Content/>
-        </div>
+        <DashboardProvider>
+            <div className={s.page}>
+                <SideBar user={user} folders={sortedFolders}/>
+                <Content/>
+            </div>
+        </DashboardProvider>
     )
 }

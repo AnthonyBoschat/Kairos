@@ -14,6 +14,7 @@ import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import TaskDetail from "../TaskDetail"
 import ListIcon from "@/components/ui/icons/list"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface TaskItemProps{
     listColor:string
@@ -23,7 +24,7 @@ interface TaskItemProps{
 
 export default function TaskItem(props:TaskItemProps){
 
-    const [taskDetail, setTaskDetail] = useState<null|Task>(null)
+    const {taskDetail, setTaskDetail} = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
     const selectedFolderID      = useAppSelector(store => store.folder.selectedFolderID)
     const queryClient           = useQueryClient()
@@ -31,6 +32,7 @@ export default function TaskItem(props:TaskItemProps){
     const hasContent            = props.task.content !== null
     const favoriteButtonRef     = useRef<HTMLButtonElement>(null)
     const deleteButtonRef       = useRef<HTMLButtonElement>(null)
+
 
     const canDeleteWithoutConfirmation = props.task.content === null
 
@@ -92,7 +94,9 @@ export default function TaskItem(props:TaskItemProps){
                     </Confirmation>
                 </div>
             </li>
-            {taskDetail && <TaskDetail listColor={props.listColor} setTaskDetail={setTaskDetail} task={taskDetail}/>}
+            {taskDetail?.id === props.task.id && (
+                <TaskDetail listColor={props.listColor} setTaskDetail={setTaskDetail} task={props.task}/>
+            )}
         </>
     )
 }

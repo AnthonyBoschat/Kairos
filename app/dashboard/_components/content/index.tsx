@@ -9,7 +9,6 @@ export default function Content() {
 
     const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
 
-
     return (
         <div className={s.container}>
             <div className={s.content}>

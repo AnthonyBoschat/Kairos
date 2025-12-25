@@ -1,4 +1,3 @@
-import { List } from "@prisma/client"
 import s from "./styles.module.scss"
 import LIST_COLOR from "@/constants/listColor"
 import StarIcon from "@/components/ui/icons/Star"
@@ -64,7 +63,13 @@ export default function ListItem(props:ListItemProps){
 
             <AddTaskButton setIsAddingTask={setIsAddingTask}/>
 
-            <TaskList listID={props.list.id} isAddingTask={isAddingTask} setIsAddingTask={setIsAddingTask} listColor={listColor} tasks={props.list.tasks}/>
+            <TaskList  
+                listID={props.list.id} 
+                isAddingTask={isAddingTask} 
+                setIsAddingTask={setIsAddingTask} 
+                listColor={listColor} 
+                tasks={props.list.tasks}
+            />
         </li>
     )
 }
