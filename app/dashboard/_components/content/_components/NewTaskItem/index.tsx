@@ -3,10 +3,9 @@ import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "re
 import s from "./styles.module.scss"
 import handleResponse from "@/utils/handleResponse"
 import { addTask } from "@/app/actions/task"
-import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
-import { useAppSelector } from "@/store/hooks"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface NewTaskItemProps{
     listColor:string
@@ -18,7 +17,7 @@ interface NewTaskItemProps{
 export default function NewTaskItem(props:NewTaskItemProps){
 
     const queryClient = useQueryClient()
-    const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
+    const {selectedFolderID} = useDashboardContext()
     const [taskTitle, setTaskTitle] = useState("")
     const textareaRef = useRef<HTMLTextAreaElement>(null)
     const containerRef = useRef<HTMLLIElement>(null);

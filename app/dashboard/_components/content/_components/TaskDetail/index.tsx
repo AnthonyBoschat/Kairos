@@ -7,12 +7,12 @@ import withClass from "@/utils/class"
 import handleResponse from "@/utils/handleResponse"
 import { toggleTaskFavorite, updateTaskContent, updateTaskTitle } from "@/app/actions/task"
 import useDebouncedValue from "@/hooks/useDebouncedValue"
-import { useAppSelector } from "@/store/hooks"
 import { useQueryClient } from "@tanstack/react-query"
 import LoadingIcon from "@/components/ui/icons/Loading"
 import SuccessIcon from "@/components/ui/icons/Success"
 import StarIcon from "@/components/ui/icons/Star"
 import { toast } from "react-toastify"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface TaskDetailProps{
     listColor:string
@@ -31,7 +31,7 @@ export default function TaskDetail(props:TaskDetailProps){
     const [title, setTitle]                 = useState(props.task.title || "")
     
     const queryClient           = useQueryClient()
-    const selectedFolderID      = useAppSelector(store => store.folder.selectedFolderID)
+    const {selectedFolderID}    = useDashboardContext()
     const debouncedContent      = useDebouncedValue(content)
     const debouncedTitle        = useDebouncedValue(title, 300)
     

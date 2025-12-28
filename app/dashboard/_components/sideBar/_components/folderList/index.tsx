@@ -1,16 +1,15 @@
 "use client"
 import s from "./styles.module.scss"
 import AddFolderButton from "../newFolder"
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import FolderItem from "../folderItem"
 import FolderOptions from "../folderOptions"
 import { FolderWithList } from "@/types/list"
-import { useAppDispatch } from "@/store/hooks"
 import StorageService from "@/services/StorageService"
-import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { reorderFolders } from "@/app/actions/folder"
 import DragAndDrop from "@/components/dragAndDrop"
 import handleResponse from "@/utils/handleResponse"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderListProps{
     isAddingFolder:boolean
@@ -21,16 +20,16 @@ interface FolderListProps{
 
 export default function FolderList(props:FolderListProps){
 
+    const {setSelectedFolderID} = useDashboardContext()
     const [selectedFolderOptions, setSelectedFolderOptions] = useState<null|FolderWithList>(null)
     const [orderedFolders, setOrderedFolders]               = useState<FolderWithList[]>(props.folders);
-    const dispatch                                          = useAppDispatch()
 
     useEffect(() => setOrderedFolders(props.folders), [props.folders]);
 
     useEffect(() => {
         const storedSelectedFolderID = StorageService.get("selectedFolderID")
         if(storedSelectedFolderID){
-            dispatch(setSelectedFolderID(storedSelectedFolderID))
+            setSelectedFolderID(storedSelectedFolderID)
         }
     }, [])
 

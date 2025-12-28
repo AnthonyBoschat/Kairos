@@ -20,9 +20,7 @@ const EMPTY_LISTS: ListWithTaskAndFolder[] = []
 
 export default function Lists(props: ListsProps) {
 
-    const [selectedListOptions, setSelectedListOptions] =
-        useState<ListWithTaskAndFolder | null>(null)
-
+    const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
     const [orderedLists, setOrderedLists] = useState<ListWithTaskAndFolder[]>([])
 
     const {taskDetail} = useDashboardContext()
@@ -54,8 +52,8 @@ export default function Lists(props: ListsProps) {
         })
     }
 
-    if (!hasLists) return <span>Ce dossier ne contient aucune liste</span>
 
+    if (!hasLists && !isLoading) return <div className={s.noLists}>Ce dossier ne contient aucune liste</div>
     return (
         <div className={s.container}>
             {selectedListOptions && (

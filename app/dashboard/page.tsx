@@ -14,8 +14,8 @@ export const metadata: Metadata = {
 
 export default async function Dashboard(){
 
-    const user = await getCurrentUser()
-    const folders = await prisma.folder.findMany({
+    const user      = await getCurrentUser()
+    const folders   = await prisma.folder.findMany({
         where:{
             userId: user?.id
         },

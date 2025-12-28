@@ -12,11 +12,10 @@ import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import StarIcon from "@/components/ui/icons/Star"
 import Overlay from "@/components/overlay"
-import { useAppDispatch } from "@/store/hooks"
-import { setSelectedFolderID } from "@/store/slices/folderSlice"
 import { FolderWithList } from "@/types/list"
 import StorageService from "@/services/StorageService"
 import ColorOptions from "@/components/colorOptions"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
@@ -26,7 +25,7 @@ interface FolderOptionsProps{
 
 export default function FolderOptions(props:FolderOptionsProps){
     
-    const dispatch = useAppDispatch()
+    const {setSelectedFolderID} = useDashboardContext()
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
     const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
     const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
@@ -42,7 +41,7 @@ export default function FolderOptions(props:FolderOptionsProps){
             handleResponse(async () => {
                 await deleteFolder(folderID)
                 props.setSelectedFolderOptions(null)
-                dispatch(setSelectedFolderID(null))
+                setSelectedFolderID(null)
                 StorageService.remove("selectedFolderID")
             })
         }

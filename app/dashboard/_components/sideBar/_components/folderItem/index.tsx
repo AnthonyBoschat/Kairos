@@ -6,16 +6,13 @@ import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
-import { setSelectedFolderID } from "@/store/slices/folderSlice"
-import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
 import { toggleFolderFavorite } from "@/app/actions/folder"
-import { toast } from "react-toastify"
 import StorageService from "@/services/StorageService"
 import { FolderWithList } from "@/types/list"
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities";
+import Highlight from "@/components/highlight"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderItemProps{
     folder: FolderWithList
@@ -26,8 +23,7 @@ interface FolderItemProps{
 export default function FolderItem(props:FolderItemProps){
 
 
-    const dispatch = useAppDispatch()
-    const selectedFolderID = useAppSelector(store => store.folder.selectedFolderID)
+    const {selectedFolderID, setSelectedFolderID, searchContextValue}    = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
 
     const isFavorite = useMemo(() => {
@@ -49,7 +45,7 @@ export default function FolderItem(props:FolderItemProps){
     }
 
     const handleClick = useCallback(() => {
-        dispatch(setSelectedFolderID(isSelected ? null : props.folder?.id))
+        setSelectedFolderID(isSelected ? null : props.folder?.id)
         StorageService.set("selectedFolderID", isSelected ? null : props.folder?.id)
     }, [isSelected, props.folder])
 
@@ -76,7 +72,11 @@ export default function FolderItem(props:FolderItemProps){
                 )}
             </div>
             <span className={s.title}>
-                {props.folder.title}
+                {searchContextValue 
+                    ? <Highlight text={props.folder.title} search={searchContextValue}/>
+                    : props.folder.title
+                
+                }
             </span>
             <div className={withClass(s.indicator, (isHover || isSelected) && s.active)}>
                 {(isHover || isSelected) && <ArrowLeftIcon size={16}/>}
