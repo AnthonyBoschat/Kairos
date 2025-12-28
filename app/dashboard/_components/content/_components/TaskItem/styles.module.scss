@@ -6,6 +6,14 @@
     border-radius: 0.25rem 0.5rem 0.5rem 0.25rem;
     position: relative;
     // outline: 1px solid red;
+    scroll-margin-bottom: 1rem;
+    transition: opacity 0.2s linear;
+    &.onSelect{
+        opacity: 0.3;
+        &.select{
+            opacity: 1;
+        }
+    }
     &:hover{
         .content{
             opacity: 1;

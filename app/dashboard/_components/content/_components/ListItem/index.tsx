@@ -2,14 +2,16 @@ import s from "./styles.module.scss"
 import LIST_COLOR from "@/constants/listColor"
 import StarIcon from "@/components/ui/icons/Star"
 import OptionsIcon from "@/components/ui/icons/Options"
-import { Dispatch, useMemo, useState } from "react"
+import { Dispatch, useEffect, useMemo, useState } from "react"
 import handleResponse from "@/utils/handleResponse"
 import { toggleListFavorite } from "@/app/actions/list"
-import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import { ListWithTaskAndFolder } from "@/types/list"
 import AddTaskButton from "../AddTaskButton"
 import TaskList from "../TaskList"
+import Highlight from "@/components/highlight"
+import withClass from "@/utils/class"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface ListItemProps{
     list: ListWithTaskAndFolder
@@ -19,7 +21,8 @@ interface ListItemProps{
 
 export default function ListItem(props:ListItemProps){
 
-    const queryClient = useQueryClient()
+    const {selectedListID, selectedTaskID, setSelectedListID, searchContextValue}  = useDashboardContext()
+    const queryClient       = useQueryClient()
 
     const [isAddingTask, setIsAddingTask] = useState(false)
     const taskNumber = props.list.tasks.length
@@ -38,15 +41,53 @@ export default function ListItem(props:ListItemProps){
             })
         }
     }
+
+    useEffect(() => {
+        if (selectedListID && props.list.id === selectedListID) {
+            requestAnimationFrame(() => {
+                const selectedList = document.getElementById(selectedListID)
+                if (selectedList) {
+                    selectedList.scrollIntoView({ block: "end", behavior: "smooth" })
+                }
+            })
+        }
+    }, [selectedListID, props.list.id])
+
+    useEffect(() => {
+        if (selectedListID && props.list.id === selectedListID) {
+            const handleClick = () => {
+                setSelectedListID(null)
+            }
+
+            document.addEventListener('click', handleClick, { once: true })
+
+            return () => {
+                document.removeEventListener('click', handleClick)
+            }
+        }
+    }, [selectedListID, props.list.id])
     
 
     return(
-        <li className={s.container}>
+        <li 
+            id={props.list.id} 
+            className={withClass(
+                s.container, 
+                (searchContextValue && (selectedListID || selectedTaskID)) && s.onSelect,
+                (searchContextValue && props.list.id === selectedListID) && s.select,
+                ((searchContextValue && props.list.tasks.find(task => task.id === selectedTaskID)) && s.select)
+            )}
+        >
             <div style={{backgroundColor: listColor}} className={s.color}/>
             
             <div className={s.header}>
                 <div className={s.left}>
-                    <span className={s.title}>{props.list.title}</span>
+                    <span className={s.title}>
+                        {searchContextValue 
+                            ? <Highlight text={props.list.title} search={searchContextValue}/>
+                            : props.list.title
+                        }
+                    </span>
                     {props.list.countElement && (
                         <span className={s.tasksCount}>{taskNumber}</span>
                     )}

@@ -1,12 +1,11 @@
 "use client"
 import { Task } from "@prisma/client"
 import s from "./styles.module.scss"
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
 import { deleteTask, toggleTaskFavorite } from "@/app/actions/task"
 import { useQueryClient } from "@tanstack/react-query"
-import { useAppSelector } from "@/store/hooks"
 import { toast } from "react-toastify"
 import withClass from "@/utils/class"
 import DeleteIcon from "@/components/ui/icons/delete"
@@ -15,6 +14,7 @@ import COLOR from "@/constants/color"
 import TaskDetail from "../TaskDetail"
 import ListIcon from "@/components/ui/icons/list"
 import { useDashboardContext } from "@/context/DashboardContext"
+import Highlight from "@/components/highlight"
 
 interface TaskItemProps{
     listColor:string
@@ -24,9 +24,8 @@ interface TaskItemProps{
 
 export default function TaskItem(props:TaskItemProps){
 
-    const {taskDetail, setTaskDetail} = useDashboardContext()
+    const {taskDetail, setTaskDetail, selectedTaskID, setSelectedTaskID, selectedFolderID, searchContextValue} = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
-    const selectedFolderID      = useAppSelector(store => store.folder.selectedFolderID)
     const queryClient           = useQueryClient()
     const isFavorite            = props.task.favorite
     const hasContent            = props.task.content !== null
@@ -62,16 +61,57 @@ export default function TaskItem(props:TaskItemProps){
         }
     }
 
+    useEffect(() => {
+        if(selectedTaskID){
+            const selectedList = document.getElementById(selectedTaskID)
+            if(selectedList){
+                selectedList.scrollIntoView({ block: "end", behavior:"smooth" })
+                
+            }
+        }
+    }, [selectedTaskID])
+
+    useEffect(() => {
+        if (selectedTaskID && props.task.id === selectedTaskID) {
+            const handleClick = () => {
+                setSelectedTaskID(null)
+            }
+
+            document.addEventListener('click', handleClick, { once: true })
+
+            return () => {
+                document.removeEventListener('click', handleClick)
+            }
+        }
+    }, [selectedTaskID, props.task.id])
+
     return(
         <>
-            <li title="Consulter le détail de l'élément" onClick={handleOpenTaskDetail} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} style={{backgroundColor:props.listColor}} className={s.container}>
+            <li 
+                className={withClass(
+                    s.container, 
+                    (searchContextValue && selectedTaskID) && s.onSelect,
+                    (searchContextValue && props.task.id === selectedTaskID) && s.select
+                )}
+                id={props.task.id} 
+                title="Consulter le détail de l'élément" 
+                onClick={handleOpenTaskDetail} 
+                onMouseLeave={() => setIsHover(false)} 
+                onMouseEnter={() => setIsHover(true)} 
+                style={{backgroundColor:props.listColor}} 
+            >
                 <div className={s.content}>
                     <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
                         <StarIcon animate active={props.task.favorite} size={18}/>
                     </button>
 
                     <div className={s.detail}>
-                        <span className={s.title}>{props.task.title}</span>
+                        <span className={s.title}>
+                            {searchContextValue 
+                                ? <Highlight text={props.task.title} search={searchContextValue}/>
+                                : props.task.title
+                            }
+                        </span>
                         {hasContent && <span title="L'élément contient du contenu supplémentaire" className={s.icon}><ListIcon size={18}/></span>}
                     </div>
                     
