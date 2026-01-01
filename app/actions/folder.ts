@@ -145,11 +145,13 @@ export async function reorderFolders(orderedFolderIds:reorderFoldersType) {
 
     if (orderedFolderIds.length === 0) return { success: true }
 
-    orderedFolderIds.map(async (folderId, index) =>
-        await prisma.folder.update({
-            where: { id: folderId },
-            data: { order: index },
-        })
+    await Promise.all(
+        orderedFolderIds.map((folderId, index) =>
+            prisma.folder.update({
+                where: { id: folderId },
+                data: { order: index },
+            })
+        )
     )
 
     revalidatePath("/dashboard")

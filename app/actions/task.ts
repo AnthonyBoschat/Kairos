@@ -149,12 +149,15 @@ export async function reorderTasks(orderedTasksIds:reorderTasksType) {
     if (!user.id) throw new Error("Non autorisé")
 
     if (orderedTasksIds.length === 0) return { success: true }
+    const totalTasksCount = orderedTasksIds.length
 
-    orderedTasksIds.map(async (taskID, index) =>
-        await prisma.task.update({
-            where: { id: taskID },
-            data: { order: index },
-        })
+    await Promise.all(
+        orderedTasksIds.map((taskID, index) =>
+            prisma.task.update({
+                where: { id: taskID },
+                data: { order: totalTasksCount - 1 - index },
+            })
+        )
     )
 
     revalidatePath("/dashboard")

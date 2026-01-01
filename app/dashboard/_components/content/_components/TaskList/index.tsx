@@ -31,6 +31,7 @@ export default function TaskList(props:TaskListProps){
 
     const handleReorderTasks = async(newTasks:Task[]) => {
         handleResponse(() => {
+            console.log("newTasks", newTasks)
             setOrderedTasks(newTasks)
             const orderedTasksIds = newTasks.map(task => task.id)
             reorderTasks(orderedTasksIds)

@@ -1,0 +1,19 @@
+enum HistoricItem {
+  FOLDER
+  LIST
+  TASK
+}
+
+model Historic {
+    id                  String          @id @default(cuid())
+
+    user                User            @relation(fields: [userId], references: [id], onDelete:Cascade)
+    userId              String
+
+    item                HistoricItem
+    itemId              String
+    action              String
+    createdAt           DateTime        @default(now())
+
+    @@map("historics")
+}

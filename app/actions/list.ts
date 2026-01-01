@@ -168,11 +168,13 @@ export async function reorderLists(orderedListsIds:reorderListsType) {
 
     if (orderedListsIds.length === 0) return { success: true }
 
-    orderedListsIds.map(async (listID, index) =>
-        await prisma.list.update({
-            where: { id: listID },
-            data: { order: index },
-        })
+    await Promise.all(
+        orderedListsIds.map(async (listID, index) =>
+            await prisma.list.update({
+                where: { id: listID },
+                data: { order: index },
+            })
+        )
     )
 
     revalidatePath("/dashboard")
