@@ -16,13 +16,14 @@ import { useDashboardContext } from "@/context/DashboardContext"
 interface ListItemProps{
     list: ListWithTaskAndFolder
     setSelectedListOptions: Dispatch<null|ListWithTaskAndFolder>
+    index:number
 }
 
 
 export default function ListItem(props:ListItemProps){
 
     const {selectedListID, selectedTaskID, setSelectedListID, searchContextValue}  = useDashboardContext()
-    const queryClient       = useQueryClient()
+    const queryClient = useQueryClient()
 
     const [isAddingTask, setIsAddingTask] = useState(false)
     const taskNumber = props.list.tasks.length
@@ -70,6 +71,7 @@ export default function ListItem(props:ListItemProps){
 
     return(
         <li 
+            style={{ animationDelay: `${props.index * 20}ms` }}
             id={props.list.id} 
             className={withClass(
                 s.container, 
