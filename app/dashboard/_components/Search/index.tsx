@@ -11,6 +11,7 @@ import { search } from "@/app/actions/search"
 import Highlight from "@/components/highlight"
 import { useDashboardContext } from "@/context/DashboardContext"
 import StorageService from "@/services/StorageService"
+import { useRouter } from "next/navigation"
 
 type SearchResultType = {
   success: boolean
@@ -45,6 +46,7 @@ export default function Search() {
   const resultInnerRef      = useRef<HTMLDivElement | null>(null)
   const reactId             = useId()
   const listboxId           = `search-results-${reactId}`
+  const router              = useRouter()
 
   const [searchValue, setSearchValue]       = useState("")
   const [isPopoverOpen, setIsPopoverOpen]   = useState(false)
@@ -97,12 +99,14 @@ export default function Search() {
   }
 
   const handleSelectFolder = (folderID:string) => {
+    router.push(`/dashboard/${folderID}`)
     setSelectedFolderID(folderID)
     StorageService.set("selectedFolderID", folderID)
     closePopover()
   }
 
   const handleSelectList = (folderID: string, listID: string) => {
+    router.push(`/dashboard/${folderID}`)
     setSelectedFolderID(folderID)
     setSelectedListID(listID)
     StorageService.set("selectedFolderID", folderID)
@@ -110,6 +114,7 @@ export default function Search() {
   }
 
   const handleSelectTask = (folderID: string, taskID: string) => {
+    router.push(`/dashboard/${folderID}`)
     setSelectedFolderID(folderID)
     setSelectedTaskID(taskID)
     StorageService.set("selectedFolderID", folderID)

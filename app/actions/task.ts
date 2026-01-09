@@ -4,6 +4,9 @@
 import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
+import checkUser from "./utils"
+import logHistory from "./historic"
+import { HistoricItemType } from "@prisma/client"
 
 interface addTaskProps{
     title: string
@@ -11,8 +14,7 @@ interface addTaskProps{
 }
 
 export async function addTask({title, listID}: addTaskProps){
-    const user = await getCurrentUser()
-    if(!user?.id) throw new Error("Non autorisé")
+    const user = await checkUser()
 
     const list = await prisma.list.findUnique({
         where:{
@@ -38,6 +40,7 @@ export async function addTask({title, listID}: addTaskProps){
             order: (maxOrder._max.order ?? -1) + 1
         }
     })
+    await logHistory(createdTask, HistoricItemType.TASK)
 
     revalidatePath("/dashboard")
     return {success:true, message:"Tâche ajouter"}
@@ -47,8 +50,7 @@ interface toggleTaskFavoriteProps{
     taskID:string
 }
 export async function toggleTaskFavorite({taskID}: toggleTaskFavoriteProps){
-    const user = await getCurrentUser()
-    if(!user?.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const task = await prisma.task.findUnique({
         where:{id:taskID}
@@ -72,8 +74,7 @@ interface deleteTaskProps{
     taskID:string
 }
 export async function deleteTask({taskID}: deleteTaskProps){
-    const user = await getCurrentUser()
-    if(!user.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const task = await prisma.task.findUnique({
         where:{id:taskID}
@@ -81,10 +82,11 @@ export async function deleteTask({taskID}: deleteTaskProps){
 
     if(!task) throw new Error("Tâche non trouvé")
 
-    await prisma.task.delete({
+    const deletedTask = await prisma.task.delete({
         where:{id:taskID}
     })
 
+    await logHistory(deletedTask, HistoricItemType.TASK, true)
     return{success:true, message:"Tâche supprimé"}
 }
 
@@ -93,8 +95,7 @@ type updateTaskContentProps = {
     content:string
 }
 export async function updateTaskContent({taskID, content}: updateTaskContentProps){
-    const user = await getCurrentUser()
-    if(!user.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const task = await prisma.task.findUnique({
         where:{id:taskID}
@@ -118,8 +119,7 @@ type updateTaskTitleProps = {
     title:string
 }
 export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
-    const user = await getCurrentUser()
-    if(!user.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const task = await prisma.task.findUnique({
         where:{id:taskID}
@@ -135,7 +135,7 @@ export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
             title:nullTitle ? task.title : title
         }
     })
-
+    
     return {success:true}
 }
 
@@ -145,8 +145,7 @@ export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
 type reorderTasksType = string[]
 
 export async function reorderTasks(orderedTasksIds:reorderTasksType) {
-    const user = await getCurrentUser()
-    if (!user.id) throw new Error("Non autorisé")
+    await checkUser()
 
     if (orderedTasksIds.length === 0) return { success: true }
     const totalTasksCount = orderedTasksIds.length

@@ -1,0 +1,207 @@
+.container{
+
+    width: 95%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-left: 6rem;
+    padding-top: 10vh;
+    gap: 0.5rem;
+
+    .title{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+    .records{
+        margin-top: 1.5rem;
+        width: 100%;
+    
+        position: relative;
+        height: fit-content;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(10, fit-content);
+        align-content: start;
+        height:40rem;
+        gap: 0.5rem;
+    
+        .record{
+            position: relative;
+        }
+    }
+}
+
+
+.row {
+    display: grid;
+    width: 80%;
+    grid-template-columns: 100%;
+    align-items: start;
+    justify-items: end;
+    gap: 0.75rem;
+    position: relative;
+    inset: 0;
+    z-index: 1;
+    border-radius: 8px 16px 16px 8px;
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.03);
+    
+    &:hover {
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
+        // border-color: rgba(0, 0, 0, 0.12);
+        cursor: pointer;
+    }
+
+  
+    .card {
+        width: calc(100% - 0.5rem);
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        background: v.$light-primary;
+        
+        transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        gap: 1rem;
+
+        
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.35rem;
+
+            .badges{
+                display: flex;
+                gap: 0.5rem;
+
+                .badge {
+                    font-size: 0.75rem;
+                    padding: 0.18rem 0.5rem;
+                    border-radius: 4px;
+                    border: 1px solid rgba(0, 0, 0, 0.08);
+                    background: v.$light-secondary;
+                    letter-spacing: 0.2px;
+                }
+            }
+
+            .time {
+                font-size: 0.8rem;
+                opacity: 0.65;
+                white-space: nowrap;
+            }
+        }
+
+        .message {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem;
+            line-height: 1.35;
+
+            .type {
+                opacity: 0.75;
+            }
+
+            .title {
+                font-weight: 600;
+                text-decoration: none;
+            }
+
+            .text {
+                opacity: 0.75;
+            }
+
+            .action {
+                font-weight: 600;
+            }
+        }
+    }
+}
+
+
+
+
+.pagination {
+    width: 80%;
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    // box-shadow: 0px -6px 7px -8px rgb(32, 117, 220, 1);
+    border-top: 1px solid rgb(32, 117, 220, 0.4);
+    padding-top: 0.5rem;
+
+    .pageList {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.15rem 0.25rem;
+        border-radius: 10px;
+
+        .ellipsis {
+            opacity: 0.55;
+            padding: 0 0.25rem;
+        }
+    }
+
+    .pageButton,
+    .pageNumber {
+        all: unset;
+        cursor: pointer;
+        user-select: none;
+        font-size: 0.9rem;
+        line-height: 1;
+        padding: 0.45rem 0.6rem;
+        border-radius: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.10);
+        background: v.$light-primary;
+        transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
+
+
+        &:hover:not(:disabled) {
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.18);
+        }
+
+        &:active:not(:disabled) {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        &:disabled {
+            cursor: not-allowed;
+            opacity: 0.45;
+        }
+    }
+
+    .pageButton {
+        color: rgb(32, 117, 220);
+    }
+
+    .pageNumber {
+        min-width: 2.2rem;
+        text-align: center;
+        color: rgba(0, 0, 0, 0.78);
+
+        &:focus-visible {
+            outline: 2px solid rgba(32, 117, 220, 0.45);
+            outline-offset: 2px;
+        }
+
+        &.isActive {
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.92);
+            border-color: rgba(32, 117, 220, 0.35);
+            background: rgba(32, 117, 220, 0.1);
+            box-shadow: 0 8px 18px rgba(32, 117, 220, 0.12);
+        }
+    }
+}
+
+
+

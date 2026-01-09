@@ -13,6 +13,7 @@ import StorageService from "@/services/StorageService"
 import { FolderWithList } from "@/types/list"
 import Highlight from "@/components/highlight"
 import { useDashboardContext } from "@/context/DashboardContext"
+import { usePathname, useRouter } from "next/navigation"
 
 interface FolderItemProps{
     folder: FolderWithList
@@ -22,17 +23,20 @@ interface FolderItemProps{
 
 export default function FolderItem(props:FolderItemProps){
 
-
+    const folderDetailURL = `/dashboard/${props.folder.id}`
     const {selectedFolderID, setSelectedFolderID, searchContextValue}    = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
+    const router = useRouter()
+    const pathname = usePathname()
 
     const isFavorite = useMemo(() => {
         return props.folder?.favorite
     }, [props.folder])
 
     const isSelected = useMemo(() => {
-        return selectedFolderID === props.folder.id
-    }, [selectedFolderID, props.folder])
+        // return selectedFolderID === props.folder.id
+        return folderDetailURL === pathname
+    }, [selectedFolderID, props.folder, folderDetailURL, pathname])
 
     const handleToggleFavorite = (event:React.MouseEvent) => {
         if(props.folder?.id){
@@ -45,9 +49,15 @@ export default function FolderItem(props:FolderItemProps){
     }
 
     const handleClick = useCallback(() => {
-        setSelectedFolderID(isSelected ? null : props.folder?.id)
-        StorageService.set("selectedFolderID", isSelected ? null : props.folder?.id)
-    }, [isSelected, props.folder])
+        if(pathname === folderDetailURL){
+            router.push("/dashboard")
+        }else{
+            router.push(folderDetailURL)
+        }
+        // router.push(`/dashboard/${props.folder.id}`)
+        // setSelectedFolderID(isSelected ? null : props.folder?.id)
+        // StorageService.set("selectedFolderID", isSelected ? null : props.folder?.id)
+    }, [isSelected, props.folder, pathname, folderDetailURL ])
 
     const handleClickOptions = useCallback((event:React.MouseEvent) => {
         if(props.folder){

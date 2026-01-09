@@ -18,6 +18,8 @@ interface DashboardContextType {
   setSelectedTaskID: Dispatch<SetStateAction<null|string>>
   searchContextValue: string
   setSearchContextValue: Dispatch<SetStateAction<string>>
+  historicView: boolean
+  setHistoricView: Dispatch<SetStateAction<boolean>>
 }
 const DashboardContext = createContext<DashboardContextType | null>(null);
 
@@ -31,6 +33,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [selectedListID, setSelectedListID]         = useState<null|string>(null)
   const [selectedTaskID, setSelectedTaskID]         = useState<null|string>(null)
   const [searchContextValue, setSearchContextValue] = useState<string>("")
+  const [historicView, setHistoricView]             = useState(false)
   
   return (
     <DashboardContext.Provider value={{ 
@@ -38,7 +41,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       selectedFolderID, setSelectedFolderID,
       selectedListID, setSelectedListID,
       selectedTaskID, setSelectedTaskID,
-      searchContextValue, setSearchContextValue
+      searchContextValue, setSearchContextValue,
+      historicView, setHistoricView
     }}>
       {children}
     </DashboardContext.Provider>

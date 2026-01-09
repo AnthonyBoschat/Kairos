@@ -1,0 +1,11 @@
+.container{
+    padding-left: 4rem;
+    padding-right: 2rem;
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: 20% 80%;
+    position: relative;
+    
+}

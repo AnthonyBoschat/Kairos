@@ -12,27 +12,25 @@ import handleResponse from "@/utils/handleResponse";
 import { rectSortingStrategy } from "@dnd-kit/sortable";
 import { useDashboardContext } from "@/context/DashboardContext";
 
-interface ListsProps {
-  selectedFolderID: string
-}
+
 
 const EMPTY_LISTS: ListWithTaskAndFolder[] = []
 
-export default function Lists(props: ListsProps) {
+export default function Lists() {
 
     const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
     const [orderedLists, setOrderedLists] = useState<ListWithTaskAndFolder[]>([])
 
-    const {taskDetail} = useDashboardContext()
+    const {taskDetail, selectedFolderID} = useDashboardContext()
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ["lists", props.selectedFolderID],
+        queryKey: ["lists", selectedFolderID],
         queryFn: async () => {
-        const result = await getLists(props.selectedFolderID)
+        const result = await getLists(selectedFolderID!)
         if (!result.success) throw new Error("Erreur chargement")
         return result.lists as ListWithTaskAndFolder[]
         },
-        enabled: !!props.selectedFolderID,
+        enabled: !!selectedFolderID,
     })
     
     const lists = data ?? EMPTY_LISTS

@@ -8,17 +8,17 @@ import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import AddListIcon from "@/components/ui/icons/addList"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 
-interface ListsActionsProps{
-    selectedFolderID?:string
-}
 
-export default function ListsActions(props:ListsActionsProps){
 
-    const queryClient = useQueryClient()
-    const formRef = useRef<null|HTMLFormElement>(null)
-    const inputRef = useRef<null|HTMLInputElement>(null)
+export default function ListsActions(){
+
+    const {selectedFolderID} = useDashboardContext()
+    const queryClient   = useQueryClient()
+    const formRef       = useRef<null|HTMLFormElement>(null)
+    const inputRef      = useRef<null|HTMLInputElement>(null)
     const [isAddingList, setIsAddingList] = useState(false)
     const [newListTitle, setNewListTitle] = useState("")
 
@@ -37,10 +37,11 @@ export default function ListsActions(props:ListsActionsProps){
         if(KeyboardEvent) KeyboardEvent.preventDefault()
         if(title.trim()){
             handleResponse(async() => {
-                if(props.selectedFolderID){
-                    await addList({title:title, folderID:props.selectedFolderID})
+                if(selectedFolderID){
+                    await addList({title:title, folderID:selectedFolderID})
                     setNewListTitle("")
-                    queryClient.invalidateQueries({ queryKey: ['lists', props.selectedFolderID] })
+                    queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
+                    queryClient.invalidateQueries({queryKey:["historic"]})
                 }
             })
         }
