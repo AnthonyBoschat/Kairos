@@ -27,7 +27,7 @@ type IdGetter<Item> = (item: Item) => UniqueIdentifier;
 interface DragAndDropProps<Item> {
   items: Item[];
   getItemId: IdGetter<Item>;
-  renderItem: (params: { item: Item; isDragging: boolean }) => React.ReactNode;
+  renderItem: (params: { item: Item; isDragging: boolean }, index:number) => React.ReactNode;
   onReorder: (nextItems: Item[]) => void;
   activationDistance?: number;
   strategy?: SortingStrategy;
@@ -61,16 +61,27 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
     onReorder(nextItems);
   };
   
-  if(!mounted) return
+  if (!mounted) {
+      return (
+          <>
+              {items.map((item, index) => (
+                  <div key={String(getItemId(item))} style={{ width: "100%" }}>
+                      {renderItem({ item, isDragging: false }, index )}
+                  </div>
+              ))}
+          </>
+      )
+  }
   return (
     <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
       <SortableContext items={itemIds} strategy={strategy}>
-        {items.map((item) => (
+        {items.map((item, index) => (
           <SortableRow
             key={String(getItemId(item))}
             id={getItemId(item)}
             item={item}
             renderItem={renderItem}
+            index={index}
             disabled={props.disabled}
           />
         ))}
@@ -82,7 +93,8 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
 interface SortableRowProps<Item> {
   id: UniqueIdentifier;
   item: Item;
-  renderItem: (params: { item: Item; isDragging: boolean }) => React.ReactNode;
+  renderItem: (params: { item: Item; isDragging: boolean }, index: number) => React.ReactNode;
+  index: number;
   disabled?: boolean;
 }
 
@@ -105,7 +117,7 @@ function SortableRow<Item>(props: SortableRowProps<Item>) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {props.renderItem({ item: props.item, isDragging })}
+      {props.renderItem({ item: props.item, isDragging }, props.index)}
     </div>
   );
 }
