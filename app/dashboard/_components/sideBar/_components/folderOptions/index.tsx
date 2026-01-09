@@ -16,6 +16,7 @@ import { FolderWithList } from "@/types/list"
 import StorageService from "@/services/StorageService"
 import ColorOptions from "@/components/colorOptions"
 import { useDashboardContext } from "@/context/DashboardContext"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
@@ -24,7 +25,7 @@ interface FolderOptionsProps{
 
 
 export default function FolderOptions(props:FolderOptionsProps){
-    
+    const queryClient = useQueryClient()
     const {setSelectedFolderID} = useDashboardContext()
     const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
     const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
@@ -43,6 +44,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                 props.setSelectedFolderOptions(null)
                 setSelectedFolderID(null)
                 StorageService.remove("selectedFolderID")
+                queryClient.invalidateQueries({queryKey:["historic"]})
             })
         }
     }
@@ -65,6 +67,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                 showProgression:folderShowProgression
             })
             setOnEditTitle(false)
+            queryClient.invalidateQueries({queryKey:["historic"]})
         })
     }
 

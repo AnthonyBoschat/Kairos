@@ -7,6 +7,7 @@ import FOLDER_COLORS from "@/constants/folderColor"
 import handleResponse from "@/utils/handleResponse"
 import { toast } from "react-toastify"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface FolderProps{
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
@@ -15,11 +16,15 @@ interface FolderProps{
 
 export default function AddFolderButton(props:FolderProps){
 
-    const titleRef = useRef<HTMLInputElement>(null);
-    const containerRef = useRef<HTMLButtonElement>(null);
+    const titleRef      = useRef<HTMLInputElement>(null);
+    const containerRef  = useRef<HTMLButtonElement>(null);
+
+    const queryClient = useQueryClient()
 
     const [folderColor, setFolderColor] = useState<number | null>(null);
-    const [title, setTitle] = useState("")
+    const [title, setTitle]             = useState("")
+
+
 
     const isEnter = (e: React.KeyboardEvent) => e.key === "Enter";
     
@@ -33,7 +38,9 @@ export default function AddFolderButton(props:FolderProps){
         if(title.trim()){
             handleResponse(async () => {
                 await addFolder({title:title})
+                queryClient.invalidateQueries({queryKey:["historic"]})
             })
+            
         }
         if(keyboardEvent){
             setTitle("")

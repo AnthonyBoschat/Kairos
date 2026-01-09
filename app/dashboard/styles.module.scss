@@ -5,4 +5,28 @@
     grid-template-columns: minmax(250px, 12%) 88%;
     position: relative;
     overflow: hidden;
+    
+
+    .contentContainer{
+        background-color: v.$light-primary;
+        // background-color: rgba(255, 0, 0, 0.267);
+        width: 100%;
+        height: 100%;
+        font-family: var(--font-mulish);
+        overflow: auto;
+        scroll-margin-bottom: 26px;
+
+        &::-webkit-scrollbar { width: 0.5rem; }
+        &::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        &::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+        &::-webkit-scrollbar-thumb:hover { 
+            background: rgba(0, 0, 0, 0.3); 
+        }
+
+    }
 }

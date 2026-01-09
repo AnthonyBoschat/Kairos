@@ -2,12 +2,8 @@
 
 import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
+import checkUser from "./utils"
 
-const checkUser = async () => {
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
-    return user
-}
 
 export async function search(searchValue: string) {
     const user = await checkUser()

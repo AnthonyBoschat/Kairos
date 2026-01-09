@@ -36,6 +36,7 @@ export default function NewTaskItem(props:NewTaskItemProps){
             handleResponse(async() => {
                 await addTask({title:taskTitle, listID:props.listID})
                 queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
+                queryClient.invalidateQueries({queryKey:["historic"]})
             })
         }
         if(keyboardEvent){

@@ -47,7 +47,7 @@ export default function TaskItem(props:TaskItemProps){
         handleResponse(async() => {
             await deleteTask({taskID:props.task.id})
             queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
-            toast.dismiss()
+            queryClient.invalidateQueries({queryKey:["historic"]})
         })
     }
 

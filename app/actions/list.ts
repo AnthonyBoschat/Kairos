@@ -4,11 +4,11 @@ import { getCurrentUser } from "@/lib/auth";
 import { getNextAvailableListColorIndexForThisFolder } from "@/lib/list-color";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import checkUser from "./utils";
+import logHistory from "./historic";
+import { HistoricItemType } from "@prisma/client";
 
-const checkUser = async() => {
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
-}
+
 
 const checkListExist = async(listID:string) => {
     const list = await prisma.list.findUnique({
@@ -18,15 +18,13 @@ const checkListExist = async(listID:string) => {
 }
 
 export async function getNextFolderColorIndexForThisFolder(folderID:string){
-    const user = await getCurrentUser();
-    if (!user?.id) throw new Error("Non autorisé");
+    await checkUser()
     const colorIndex = await getNextAvailableListColorIndexForThisFolder(folderID);
     return colorIndex;
 }
 
 export async function getLists(id:string){
-    const user = await getCurrentUser();
-    if (!user?.id) throw new Error("Non autorisé");
+    await checkUser()
 
     const lists = await prisma.list.findMany({
         where:{folderId:id},
@@ -44,8 +42,7 @@ export async function getLists(id:string){
 }
 
 export async function deleteList(id:string){
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const list = await prisma.list.findUnique({
         where:{id}}
@@ -56,14 +53,14 @@ export async function deleteList(id:string){
     const deletedList = await prisma.list.delete({
         where:{id:id}
     })
+    await logHistory(deletedList, HistoricItemType.LIST, true)
 
     revalidatePath("/dashboard")
     return {success:true, message:`La liste ${deletedList.title} a été supprimer avec succès`}
 }
 
 export async function addList({title, folderID}:{title:string, folderID:string}) {
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
+    const user = await checkUser()
     
 
     const folder = await prisma.folder.findFirst({
@@ -84,14 +81,14 @@ export async function addList({title, folderID}:{title:string, folderID:string})
             folderId: folder.id
         }
     })
+    await logHistory(createdList, HistoricItemType.LIST)
 
     revalidatePath('/dashboard')
     return {success:true, message:`La liste ${createdList.title} a été ajouter`}
 }
 
 export async function toggleListFavorite(listID: string){
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const list = await prisma.list.findUnique({
         where:{id:listID}
@@ -121,8 +118,7 @@ export async function updateList({
     title:string|undefined,
     countElement:boolean|undefined,
 }){
-    const user = await getCurrentUser()
-    if (!user?.id) throw new Error("Non autorisé")
+    await checkUser()
 
     const list = await prisma.list.findUnique({
         where:{id:listID}
@@ -130,13 +126,14 @@ export async function updateList({
 
     if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
 
-    await prisma.list.update({
+    const updatedList = await prisma.list.update({
         where:{id:listID},
         data:{
             title:title,
             countElement:countElement
         }
     })
+    await logHistory(updatedList, HistoricItemType.LIST)
 
     revalidatePath("/dashboard")
     return {success:true, message:`La liste a été correctement modifier`}
