@@ -1,0 +1,241 @@
+.container{
+    width: 80%;
+    height: 50%;
+    // outline: 1px solid red;
+    display: grid;
+    grid-template-columns: 25% 75%;
+    grid-template-rows: 1fr;
+    font-family: var(--font-redacted);
+    color: black;
+    gap: 4rem;
+
+    .folders{
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+        font-size: 1.3rem;
+        .folder{
+            position: relative;
+            padding:  0.1rem 0.5rem 0.3rem 0.5rem;
+            // width: 100%;
+            border-radius: 4px;
+            text-wrap: nowrap;
+            background-color: v.$light-primary-80;
+            text-shadow: 0px 0px 1px rgba(0, 0, 0, 0.5);
+            // opacity: 0.9;
+            transition: all 0.1s linear;
+
+            animation: fadeFolderSlideIn 0.8s ease-out both;
+
+            
+
+            &:hover{
+                opacity: 1;
+                background-color: v.$light-primary-90;
+                cursor: pointer;
+            }
+            &.active{
+                background-color: v.$light-primary-90;
+                opacity: 1;
+            }
+            .indicator{
+                position: absolute;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                right: -1.5rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: white;
+            }
+        }
+    }
+    
+    .lists{
+        display: grid;
+        align-items: start;
+        font-size: 1rem;
+        height: fit-content;
+
+        &.simple{
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: fit-content;
+            row-gap: 0.5rem;
+            column-gap: 1rem;
+
+            .element{
+                text-wrap: nowrap;
+                height: 3rem;
+                border-radius: 4px;
+                transition: all 0.1s linear;
+                animation: fadeElementSlideIn 1s ease-out both;
+                // opacity: 0.9;
+                padding-left: 0.5rem;
+
+                &.completed {
+                    animation: successWave 1s ease-out both !important;
+                }
+                &:hover{
+                    cursor: pointer;
+                    opacity: 1;
+                }
+                &.even{
+                    background-color: v.$light-primary-60;
+                    &:hover{
+                        background-color: v.$light-primary-70;
+                        cursor: pointer;
+                        opacity: 1;
+                    }
+                }
+                &.odd{
+                    background-color: v.$light-primary-40;
+                    &:hover{
+                        background-color: v.$light-primary-50;
+
+                        cursor: pointer;
+                        opacity: 1;
+                    }
+                }
+            }
+        }
+        &.complex{
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: fit-content;
+            gap: 1rem;
+
+            .list{
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+                width: 100%;
+                animation: fadeListSlideIn 0.3s ease-out both;
+
+
+                .header{
+                    padding: 0.1rem 0.5rem 0.3rem 0.5rem;
+                    border-radius: 4px;
+                    font-size: 1.2rem;
+                    line-height: 1.2rem;
+                    height: fit-content;
+                    background-color: v.$light-primary-70;
+                    opacity: 0.9;
+                    transition: opacity 0.1s linear;
+                    &:hover{
+                        background-color: v.$light-primary-80;
+                        cursor: pointer;
+                        opacity: 1;
+                    }
+                }
+
+                .tasks{
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.4rem;
+                    
+
+                    .task{
+                        border-radius: 4px;
+                        width: 80%;
+                        height: 0.6rem;
+                        background-color: v.$light-primary-50;
+                        opacity: 0.9;
+                        animation: fadeTaskSlideIn 0.5s ease-out both;
+                        transition: all 0.1s linear;
+                        &:hover{
+                        background-color: v.$light-primary-60;
+
+                            cursor: pointer;
+                            opacity: 1;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.noAnimation {
+    animation: none !important;
+}
+
+
+
+
+
+
+@keyframes fadeFolderSlideIn {
+    from {
+        opacity: 0;
+        width: 0;
+        transform: translateX(-8px);
+    }
+    to {
+        opacity: 0.9;
+        width: 100%;
+        transform: translateX(0);
+    }
+}
+@keyframes fadeListSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+@keyframes fadeTaskSlideIn {
+    from {
+        opacity: 0;
+        width: 0;
+        transform: translateX(-4px);
+    }
+    to {
+        opacity: 0.9;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeElementSlideIn {
+    from {
+        width: 0;
+        opacity: 0;
+        transform: translateX(-16px);
+    }
+    to {
+        width: 100%;
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Option 4 — "Glow" minimal (simple, élégant) */
+@keyframes successWave {
+  0% {
+    filter: brightness(1);
+    box-shadow: inset 0 0 0 0 rgba(46, 204, 113, 0);
+  }
+
+  30% {
+    filter: brightness(1.05);
+    box-shadow: inset 0 0 0 999px rgba(46, 204, 113, 0.22);
+  }
+
+  55% {
+    filter: brightness(1.1);
+    box-shadow: inset 0 0 0 999px rgba(46, 204, 113, 0.32);
+  }
+
+  80% {
+    filter: brightness(1.06);
+    box-shadow: inset 0 0 0 999px rgba(46, 204, 113, 0.22);
+
+  }
+
+  100% {
+    filter: brightness(1);
+    box-shadow: inset 0 0 0 0 rgba(46, 204, 113, 0);
+
+  }
+}

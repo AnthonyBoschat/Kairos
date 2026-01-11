@@ -18,6 +18,7 @@ const nextConfig: NextConfig = {
       @use "${path.join(__dirname, 'styles/abstracts/animations').replace(/\\/g, '/')}" as a;
     `,
   },
+  reactStrictMode: false,
 };
 
 export default nextConfig;

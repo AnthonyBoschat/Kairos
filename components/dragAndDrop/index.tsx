@@ -65,7 +65,7 @@ export default function DragAndDrop<Item>(props: DragAndDropProps<Item>) {
       return (
           <>
               {items.map((item, index) => (
-                  <div key={String(getItemId(item))} style={{ width: "100%" }}>
+                  <div key={String(getItemId(item))} style={{ width: "100%", opacity:0 }}>
                       {renderItem({ item, isDragging: false }, index )}
                   </div>
               ))}
