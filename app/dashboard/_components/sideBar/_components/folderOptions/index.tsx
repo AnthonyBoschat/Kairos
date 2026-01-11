@@ -89,7 +89,7 @@ export default function FolderOptions(props:FolderOptionsProps){
 
     if(!props.folder) return null
     return(
-        <Overlay onClose={() => props.setSelectedFolderOptions(null)}>
+        <Overlay root onClose={() => props.setSelectedFolderOptions(null)}>
             {(isClosing) => (
                 <div
                     className={withClass(s.container, isClosing && s.closing)}

@@ -5,11 +5,10 @@ import withClass from "@/utils/class"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import DragAndDrop from "@/components/dragAndDrop"
 import { rectSortingStrategy } from "@dnd-kit/sortable"
+import Writter from "./writter"
 
 
-// TaskDetail qui bug
-// Message de deconnexion non visible
-// Decalage des options si scroll
+// Problème Ajouter une liste
 
 const simpleListWord = [
     "Anthony Boschat",
@@ -176,7 +175,9 @@ export default function Presentation(){
                                     key={listIndex}
                                     className={withClass(s.list, hasAnimated && s.noAnimation)}
                                 >
-                                    <div className={s.header}>{list.label}</div>
+                                    <div className={s.header}>
+                                        {hasAnimated ? list.label : <Writter sentence={list.label} />}
+                                    </div>
                                     <div className={s.tasks}>
                                         <DragAndDrop
                                             items={list.tasks}
@@ -217,7 +218,7 @@ export default function Presentation(){
                                         (miniGameComplete && !hasAlreadyPlayCompletionAnimation) && s.completed
                                     )}
                                 >
-                                    {element.item.label}
+                                    <Writter sentence={element.item.label} />
                                 </div>
                             )}
                         />

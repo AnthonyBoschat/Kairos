@@ -71,7 +71,7 @@ export default function ListItem(props:ListItemProps){
 
     return(
         <li 
-            style={{ animationDelay: `${props.index * 20}ms` }}
+            style={{ animationDelay: `${props.index * 50}ms` }}
             id={props.list.id} 
             className={withClass(
                 s.container, 
