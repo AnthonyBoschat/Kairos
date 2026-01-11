@@ -92,7 +92,7 @@ export default function TaskDetail(props:TaskDetailProps){
     }, [title])
 
     return(
-        <Overlay onClose={() => props.setTaskDetail(null)}>
+        <Overlay root onClose={() => props.setTaskDetail(null)}>
             {(isClosing) => {
 
                 if (isClosing && !isSyncData) handleUpdateTaskContent(content)

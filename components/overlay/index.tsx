@@ -2,10 +2,12 @@
 import withClass from "@/utils/class"
 import s from "./styles.module.scss"
 import { useState } from "react"
+import { createPortal } from "react-dom"
 
 interface OverlayProps{
     onClose?:Function
     children: React.ReactNode | ((isClosing: boolean) => React.ReactNode)
+    root?: Boolean
 }
 
 
@@ -23,17 +25,34 @@ export default function Overlay(props:OverlayProps){
         }, 85)
     }
 
-    return(
-        <>    
-            <div 
-                onClick={(e) => {
-                    if (e.target === e.currentTarget) {
-                        handleClose()
-                    }
-                }} 
-                className={withClass(s.container, isClosing && s.closing)}
-            />
-            {typeof props.children === "function" ? props.children(isClosing) : props.children}
-        </>
-    )
+    if(props.root){
+        return createPortal(
+            <>    
+                <div 
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            handleClose()
+                        }
+                    }} 
+                    className={withClass(s.container, isClosing && s.closing)}
+                />
+                {typeof props.children === "function" ? props.children(isClosing) : props.children}
+            </>,
+            document.body
+        )
+    }else{
+        return(
+            <>    
+                <div 
+                    onClick={(e) => {
+                        if (e.target === e.currentTarget) {
+                            handleClose()
+                        }
+                    }} 
+                    className={withClass(s.container, isClosing && s.closing)}
+                />
+                {typeof props.children === "function" ? props.children(isClosing) : props.children}
+            </>
+        )
+    }
 }

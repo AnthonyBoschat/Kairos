@@ -94,7 +94,7 @@ export default function ListOptions(props:ListOptionsProps){
     if(!props.list) return null
     return(
         <>
-            <Overlay onClose={() => props.setSelectedListOptions(null)}>
+            <Overlay root onClose={() => props.setSelectedListOptions(null)}>
                 {(isClosing) => (
                     <div
                         className={withClass(s.container, isClosing && s.closing)}
