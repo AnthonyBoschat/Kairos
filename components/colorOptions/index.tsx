@@ -1,21 +1,25 @@
 "use client"
 import withClass from "@/utils/class"
-import CarretDownIcon from "../ui/icons/CarretDown"
 import s from "./styles.module.scss"
+import { Dispatch, SetStateAction, useRef } from "react"
+import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 
 interface DefaultProps{
     colorCollection : string[]
     onClick: Function
     currentColor: string
     columns:number
+    setOpen: Dispatch<SetStateAction<Boolean>>
 }
 
 
 export default function ColorOptions(props:DefaultProps){
 
+    const optionsContainerRef = useRef(null)
 
+    useCallbackOnClickOutside(optionsContainerRef, () => props.setOpen(false))
     return(    
-        <div className={s.colorOptions}>
+        <div ref={optionsContainerRef} className={s.colorOptions}>
             <ul style={{gridTemplateColumns:`repeat(${props.columns}, 1fr)`}}>
                 {props.colorCollection.map((color, index) => (
                     <li key={index}>

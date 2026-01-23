@@ -43,7 +43,7 @@ export async function addTask({title, listID}: addTaskProps){
     await logHistory(createdTask, HistoricItemType.TASK)
 
     revalidatePath("/dashboard")
-    return {success:true, message:"Tâche ajouter"}
+    return {success:true, message:"Tâche ajouter", task:createdTask}
 }
 
 interface toggleTaskFavoriteProps{

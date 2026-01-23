@@ -24,6 +24,7 @@ interface FolderItemProps{
 export default function FolderItem(props:FolderItemProps){
 
     const folderDetailURL = `/dashboard/${props.folder.id}`
+    const URLoptions = props.folder.listStandaloneID ? `?stantaloneID=${props.folder.listStandaloneID}` : ""
     const {selectedFolderID, setSelectedFolderID, searchContextValue}    = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
     const router = useRouter()
@@ -34,7 +35,6 @@ export default function FolderItem(props:FolderItemProps){
     }, [props.folder])
 
     const isSelected = useMemo(() => {
-        // return selectedFolderID === props.folder.id
         return folderDetailURL === pathname
     }, [selectedFolderID, props.folder, folderDetailURL, pathname])
 
@@ -52,11 +52,8 @@ export default function FolderItem(props:FolderItemProps){
         if(pathname === folderDetailURL){
             router.push("/dashboard")
         }else{
-            router.push(folderDetailURL)
+            router.push(`${folderDetailURL}${URLoptions}`)
         }
-        // router.push(`/dashboard/${props.folder.id}`)
-        // setSelectedFolderID(isSelected ? null : props.folder?.id)
-        // StorageService.set("selectedFolderID", isSelected ? null : props.folder?.id)
     }, [isSelected, props.folder, pathname, folderDetailURL ])
 
     const handleClickOptions = useCallback((event:React.MouseEvent) => {

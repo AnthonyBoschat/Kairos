@@ -7,6 +7,38 @@
     height: fit-content;
     align-items: start;
     padding-bottom: 2rem;
+
+    &.standalone{
+        grid-template-columns: 1fr;
+    }
+
+    .standaloneList{
+         display:grid;
+        grid-template-columns: repeat(6, 1fr);
+        row-gap: 0.5rem;
+        column-gap: 0.5rem;
+    }
+
+    // .standaloneList {
+    //     display: flex;
+    //     flex-wrap: wrap;
+    //     gap: 0.5rem;
+
+    //     > * {
+    //         min-width: 200px;
+    //         max-width: 400px;
+    //     }
+    // }
+
+    // .standaloneList {
+    //     columns: 5;
+    //     column-gap: 0.5rem;
+
+    //     > * {
+    //         break-inside: avoid;
+    //         margin-bottom: 0.5rem;
+    //     }
+    // }
 }
 
 .noLists{

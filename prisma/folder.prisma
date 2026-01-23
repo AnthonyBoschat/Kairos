@@ -4,7 +4,7 @@ model Folder {
   color             Int
   order             Int      
   favorite          Boolean  @default(false)
-  showProgression   Boolean  @default(false)
+  listStandaloneID  String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
 

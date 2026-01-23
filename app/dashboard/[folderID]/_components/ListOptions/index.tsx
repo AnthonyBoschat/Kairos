@@ -1,6 +1,6 @@
 "use client"
 import s from "./styles.module.scss"
-import { Dispatch, useEffect, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import { toast } from "react-toastify"
@@ -17,28 +17,43 @@ import ColorOptions from "@/components/colorOptions"
 
 interface ListOptionsProps{
     list: ListWithTaskAndFolder
-    setSelectedListOptions: Dispatch<null|ListWithTaskAndFolder>
+    setSelectedListOptions: Dispatch<SetStateAction<null|ListWithTaskAndFolder>>
 }
 
 
 export default function ListOptions(props:ListOptionsProps){
-    
     const queryClient = useQueryClient()
     const [listTitle, setListTitle]         = useState(props.list?.title)
     const [listColor, setListColor]         = useState(LIST_COLOR[props.list.color ?? 0])
     const [listFavorite, setListFavorite]   = useState(props.list?.favorite)
     const [onEditTitle, setOnEditTitle]     = useState<Boolean>(false)
     const [listCountElement, setListCountElement]       = useState(props.list?.countElement)
-    const [isOpenColorOptions, setIsOpenColorOptions]   = useState(false)
+    const [isOpenColorOptions, setIsOpenColorOptions]   = useState<Boolean>(false)
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.list.tasks.length === 0
+
+    const serverState = useMemo(() => {
+        return {
+            title:props.list.title,
+            countElement: props.list.countElement
+        }
+    }, [props.list.title, props.list.countElement])
+
+    const formState = useMemo(() => {
+        return {
+            title:listTitle,
+            countElement: listCountElement
+        }
+    }, [listTitle, listCountElement ])
+
+    const haveModificationUnsaved = useMemo(() => {
+        return JSON.stringify(serverState) !== JSON.stringify(formState)
+    }, [serverState, formState])
 
     const refetch = () => {
         queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
         queryClient.invalidateQueries({queryKey:["historic"]})
     }
-
-
     
     const handleDeleteList = async() => {
         if(props.list?.id){
@@ -71,6 +86,20 @@ export default function ListOptions(props:ListOptionsProps){
             })
             refetch()
             setOnEditTitle(false)
+            props.setSelectedListOptions({
+                ...props.list,
+                title: listTitle,
+                countElement:listCountElement
+            })
+
+            props.setSelectedListOptions(current => {
+                if (!current) return null;
+                return {
+                    ...current,
+                    title: listTitle,
+                    countElement: listCountElement
+                };
+            });
         })
     }
 
@@ -124,7 +153,7 @@ export default function ListOptions(props:ListOptionsProps){
                                     <span className={s.value}>
                                         <button onClick={() => setIsOpenColorOptions(current => !current)} style={{backgroundColor:listColor, boxShadow:"inset 0 0 0 1px rgba(0, 0, 0, 0.15)"}}/>
                                     </span>
-                                    {isOpenColorOptions && <ColorOptions columns={11} currentColor={listColor} colorCollection={LIST_COLOR} onClick={handleUpdateColor}/>}
+                                    {isOpenColorOptions && <ColorOptions setOpen={setIsOpenColorOptions} columns={11} currentColor={listColor} colorCollection={LIST_COLOR} onClick={handleUpdateColor}/>}
                                 </li>
                                 <li className={s.countElement}>
                                     <span className={s.key}>Afficher le nombre d'éléments</span>
@@ -147,7 +176,7 @@ export default function ListOptions(props:ListOptionsProps){
                                 >
                                     <button className={s.delete}>Supprimer la liste</button>
                                 </Confirmation>
-                                <button onClick={handleSave} className={s.save}>Enregister</button>
+                                <button disabled={!haveModificationUnsaved} onClick={handleSave} className={withClass(s.save, haveModificationUnsaved && s.active)}>Enregister</button>
                             </div>
                         </div>
                     </div>

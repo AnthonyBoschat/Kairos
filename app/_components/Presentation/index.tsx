@@ -71,18 +71,23 @@ export default function Presentation(){
         1: items.lists.first,
         3: items.lists.third,
     })
-    const [complexeListToRenderSelected, setComplexeListToRenderSelected] = useState(0)
     const [simpleListToRender, setSimpleListToRender] = useState(items.lists.second)
     const [hasAnimated, setHasAnimated] = useState(false)
+    const [folderHasAnimated, setFolderHasAnimated] = useState(false)
     const [hasAlreadyPlayCompletionAnimation, setHasAlreayPlayCompletionAnimation] = useState(false)
     
     const currentComplexeList = complexeLists[activeFolderID]
 
     useEffect(() => {
-        setHasAnimated(false); // <-- reset ici
+        setHasAnimated(false); 
         const timer = setTimeout(() => setHasAnimated(true), 1500);
         return () => clearTimeout(timer);
     }, [activeFolderID]);
+
+    useEffect(() => {
+        const timer = setTimeout(() => setFolderHasAnimated(true), 1200)
+        return () => clearTimeout(timer)
+    }, [])
 
 
     const listContainerClass = useMemo(() => {
@@ -148,7 +153,7 @@ export default function Presentation(){
                         <div 
                             style={{ animationDelay: `${index * 150}ms`}}
                             key={index} 
-                            className={withClass(s.folder, activeFolderID === folder.id && s.active)}
+                            className={withClass(s.folder, folderHasAnimated && s.noAnimation, activeFolderID === folder.id && s.active)}
                             onClick={() => handleFolderClick(folder.id)}
                         >
                             {folder.label}

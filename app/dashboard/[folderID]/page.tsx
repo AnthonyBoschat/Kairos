@@ -2,29 +2,31 @@
 
 
 import { use, useEffect } from "react"
-import ListsActions from "./_components/ListActions"
-import Lists from "./_components/Lists"
-import Search from "../_components/Search"
 import s from "./styles.module.scss"
 import { useDashboardContext } from "@/context/DashboardContext"
+import StandaloneListView from "./_components/StandaloneListView"
+import AllListsView from "./_components/AllListsView"
 
 
-export default function FolderPage({ params }: { params: Promise<{ folderID: string }> }) {
-
-
-    const {folderID} = use(params)
-    const {setSelectedFolderID} = useDashboardContext()
+export default function FolderPage({ params, searchParams }: { 
+    params: Promise<{ folderID: string }> 
+    searchParams: Promise<{ stantaloneID?: string }>
+}) {
+    
+    const { folderID } = use(params)
+    const { stantaloneID } = use(searchParams)
+    const { setSelectedFolderID } = useDashboardContext()
 
     useEffect(() => {
-        if(folderID){
-            setSelectedFolderID(folderID)
-        }
+        if (folderID) setSelectedFolderID(folderID)
     }, [folderID])
 
     return (
         <div className={s.container}>
-            <ListsActions/>
-            <Lists/>
+            {stantaloneID 
+                ? <StandaloneListView listId={stantaloneID} />
+                : <AllListsView />
+            }
         </div>
     )
 }

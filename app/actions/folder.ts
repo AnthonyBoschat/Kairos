@@ -69,11 +69,11 @@ export async function addFolder({title}:{title:string}) {
 export async function updateFolder({
     folderID, 
     title,
-    showProgression
+    listStandaloneID
 }:{
     folderID:string|undefined, 
-    title:string|undefined,
-    showProgression:boolean|undefined
+    title:string|undefined
+    listStandaloneID: string|null
 }){
     await checkUser()
 
@@ -87,7 +87,7 @@ export async function updateFolder({
         where:{id:folderID},
         data:{
             title:title,
-            showProgression:showProgression
+            listStandaloneID:listStandaloneID
         }
     })
     await logHistory(updatedFolder, HistoricItemType.FOLDER)

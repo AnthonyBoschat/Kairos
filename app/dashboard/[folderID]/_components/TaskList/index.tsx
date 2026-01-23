@@ -8,6 +8,8 @@ import DragAndDrop from "@/components/dragAndDrop"
 import handleResponse from "@/utils/handleResponse"
 import { reorderTasks } from "@/app/actions/task"
 import { useDashboardContext } from "@/context/DashboardContext"
+import withClass from "@/utils/class"
+import { rectSortingStrategy } from "@dnd-kit/sortable"
 
 interface TaskListProps{
     listColor:string
@@ -31,7 +33,6 @@ export default function TaskList(props:TaskListProps){
 
     const handleReorderTasks = async(newTasks:Task[]) => {
         handleResponse(() => {
-            console.log("newTasks", newTasks)
             setOrderedTasks(newTasks)
             const orderedTasksIds = newTasks.map(task => task.id)
             reorderTasks(orderedTasksIds)
@@ -40,17 +41,21 @@ export default function TaskList(props:TaskListProps){
         
 
     return(
-        <ul className={s.container}>
+        <ul className={withClass(s.container)}>
             {props.isAddingTask && (
                 <NewTaskItem setIsAddingTask={props.setIsAddingTask} listID={props.listID} listColor={props.listColor} />
             )}
             <DragAndDrop
+                strategy={rectSortingStrategy}
                 items={orderedTasks}
                 getItemId={(task) => task.id}
                 onReorder={handleReorderTasks}
                 disabled={taskDetail !== null}
                 renderItem={({item: task}) => (
-                    <TaskItem key={task.id} listColor={props.listColor} task={task}/>
+                    <TaskItem 
+                        key={task.id} 
+                        listColor={props.listColor} task={task}
+                    />
                 )}
             />
         </ul>

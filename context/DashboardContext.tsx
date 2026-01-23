@@ -42,7 +42,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       selectedListID, setSelectedListID,
       selectedTaskID, setSelectedTaskID,
       searchContextValue, setSearchContextValue,
-      historicView, setHistoricView
+      historicView, setHistoricView,
     }}>
       {children}
     </DashboardContext.Provider>
