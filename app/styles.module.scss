@@ -13,6 +13,8 @@
     display: grid;
     grid-template-rows: 100%;
     grid-template-columns: 1.5fr 1fr;
+    overflow-x: hidden;
+
 
     .left{
         width: 100%;

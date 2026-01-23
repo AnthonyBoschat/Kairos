@@ -32,6 +32,7 @@ type SearchResultType = {
     listTitle: string
     folderId: string
     folderTitle: string
+    listStandaloneID: null|string
   }[]
 }
 
@@ -113,8 +114,12 @@ export default function Search() {
     closePopover()
   }
 
-  const handleSelectTask = (folderID: string, taskID: string) => {
-    router.push(`/dashboard/${folderID}`)
+  const handleSelectTask = (folderID: string, taskID: string, listStandaloneID: null|string) => {
+    let route = `/dashboard/${folderID}`
+    if(listStandaloneID){
+      route += `?stantaloneID=${listStandaloneID}`
+    }
+    router.push(route)
     setSelectedFolderID(folderID)
     setSelectedTaskID(taskID)
     StorageService.set("selectedFolderID", folderID)
@@ -134,7 +139,7 @@ export default function Search() {
     else if(kind === "task"){
       const item = taskItems.find(item => item.task.id === id)
       if(item){
-        handleSelectTask(item.task.folderId, item.task.id)
+        handleSelectTask(item.task.folderId, item.task.id, item.task.listStandaloneID)
       }
     }
   }
@@ -439,8 +444,7 @@ export default function Search() {
                               aria-selected={isActive}
                               className={withClass(s.itemButton, isActive && s.itemButtonActive)}
                               onMouseEnter={() => setActiveItemKey(key)}
-                              // onClick={() => handleSelect("task", task.id)}
-                              onClick={() => handleSelectTask(task.folderId, task.id)}
+                              onClick={() => handleSelectTask(task.folderId, task.id, task.listStandaloneID)}
                             >
                               <span className={s.itemIcon} aria-hidden="true">
                                 {kindIcon.task}

@@ -15,7 +15,7 @@ export async function search(searchValue: string) {
         },
         select: { 
             id: true, 
-            title: true 
+            title: true
         }
     })
 
@@ -51,7 +51,8 @@ export async function search(searchValue: string) {
                     folder: { 
                         select: { 
                             id: true, 
-                            title: true 
+                            title: true,
+                            listStandaloneID: true
                         } 
                     } 
                 } 
@@ -74,7 +75,8 @@ export async function search(searchValue: string) {
             listId: t.list.id,
             listTitle: t.list.title,
             folderId: t.list.folder.id,
-            folderTitle: t.list.folder.title
+            folderTitle: t.list.folder.title,
+            listStandaloneID: t.list.folder.listStandaloneID,
         }))
     }
 }

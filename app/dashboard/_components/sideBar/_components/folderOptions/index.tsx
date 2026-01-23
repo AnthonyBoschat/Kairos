@@ -1,7 +1,7 @@
 "use client"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
+import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
@@ -17,6 +17,8 @@ import StorageService from "@/services/StorageService"
 import ColorOptions from "@/components/colorOptions"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { useQueryClient } from "@tanstack/react-query"
+import ListStandaloneSelect from "./listStandaloneSelect"
+import { useRouter } from "next/navigation"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
@@ -25,16 +27,50 @@ interface FolderOptionsProps{
 
 
 export default function FolderOptions(props:FolderOptionsProps){
+
     const queryClient = useQueryClient()
+    const router = useRouter()
+    const folderDetailURL = `/dashboard/${props.folder.id}`
     const {setSelectedFolderID} = useDashboardContext()
-    const [folderShowProgression, setFolderShowProgression] = useState(props.folder?.showProgression)
+    const [folderStandaloneListID, setFolderStandaloneListID]   = useState(props.folder?.listStandaloneID)
+    const [isOpenColorOptions, setIsOpenColorOptions]           = useState<Boolean>(false)
     const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
     const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
     const [folderFavorite, setFolderFavorite]   = useState(props.folder?.favorite)
     const [onEditTitle, setOnEditTitle]         = useState<Boolean>(false)
-    const [isOpenColorOptions, setIsOpenColorOptions] = useState<Boolean>(false)
+    const [isOpen, setIsOpen]                   = useState(false)
     const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.folder.lists.length === 0
+
+    const serverState = useMemo(() => {
+        return {
+            title: props.folder.title,
+            color: FOLDER_COLORS[props.folder?.color ?? 0],
+            folderStandaloneListID: props.folder?.listStandaloneID,
+        }
+    }, [props])
+
+    const formState = useMemo(() => {
+        return {
+            title: folderTitle,
+            color: folderColor,
+            folderStandaloneListID: folderStandaloneListID,
+        }
+    }, [folderTitle, folderStandaloneListID])
+
+    const haveModificationUnsaved = useMemo(() => {
+        return JSON.stringify(serverState) !== JSON.stringify(formState)
+    }, [serverState, formState])
+
+    const listOptions = useMemo(() => {
+        return [
+            { label: "Aucun", value: "" },
+            ...props.folder.lists.map(list => ({
+                label: list.title,
+                value: list.id
+            }))
+        ];
+    }, [props.folder.lists]);
 
     const handleDeleteFolder = async() => {
         if(props.folder?.id){
@@ -64,10 +100,20 @@ export default function FolderOptions(props:FolderOptionsProps){
             await updateFolder({
                 folderID:props.folder?.id,
                 title:folderTitle,
-                showProgression:folderShowProgression
+                listStandaloneID:folderStandaloneListID
             })
             setOnEditTitle(false)
             queryClient.invalidateQueries({queryKey:["historic"]})
+            queryClient.invalidateQueries({queryKey:["lists", props.folder.id]})
+            if(folderStandaloneListID !== props.folder.listStandaloneID){
+                const option = folderStandaloneListID ? `?stantaloneID=${folderStandaloneListID}` : ""
+                router.push(`${folderDetailURL}${option}`)
+            }
+            props.setSelectedFolderOptions(prev => prev ? {
+                ...prev,
+                title: folderTitle,
+                listStandaloneID: folderStandaloneListID,
+            } : null)
         })
     }
 
@@ -76,6 +122,10 @@ export default function FolderOptions(props:FolderOptionsProps){
             await updateFolderColor(props.folder.id, colorIndex)
             toast.dismiss()
             setFolderColor(FOLDER_COLORS[colorIndex])
+            props.setSelectedFolderOptions(prev => prev ? {
+                ...prev,
+                color: colorIndex
+            } : null)
         })
     }
 
@@ -126,16 +176,21 @@ export default function FolderOptions(props:FolderOptionsProps){
                                         <FolderSolidIcon color={folderColor}/> 
                                     </button>
                                 </span>
-                                {isOpenColorOptions && <ColorOptions columns={11} currentColor={folderColor}  colorCollection={FOLDER_COLORS} onClick={handleUpdateColor}/>}
+                                {isOpenColorOptions && <ColorOptions setOpen={setIsOpenColorOptions} columns={11} currentColor={folderColor}  colorCollection={FOLDER_COLORS} onClick={handleUpdateColor}/>}
                             </li>
 
 
-                            <li className={s.progression}>
-                                <span className={s.key}>Afficher la progression</span>
-                                <span className={s.value}>
-                                    <button onClick={() => setFolderShowProgression(true)} className={withClass(folderShowProgression && s.active)}>Oui</button>
-                                    <button onClick={() => setFolderShowProgression(false)} className={withClass(!folderShowProgression && s.active)}>Non</button>
-                                </span>
+                            <li className={s.standalone}>
+                                <span className={s.key}>Liste unique</span>
+                                <div className={s.value}>
+                                    <ListStandaloneSelect
+                                        isOpen={isOpen}
+                                        setIsOpen={setIsOpen}
+                                        selectedListId={folderStandaloneListID}
+                                        setSelectedListId={setFolderStandaloneListID}
+                                        listOptions={listOptions}
+                                    />
+                                </div>
                             </li>
                         </ul>
 
@@ -154,7 +209,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                             >
                                 <button className={s.delete}>Supprimer le dossier</button>
                             </Confirmation>
-                            <button onClick={handleSave} className={s.save}>Enregister</button>
+                            <button disabled={!haveModificationUnsaved} onClick={handleSave} className={withClass(s.save, haveModificationUnsaved && s.active)}>Enregistrer</button>
                         </div>
                     </div>
                 </div>
