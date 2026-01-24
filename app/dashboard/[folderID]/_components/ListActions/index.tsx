@@ -4,32 +4,43 @@ import withClass from "@/utils/class"
 import Overlay from "@/components/overlay"
 import handleResponse from "@/utils/handleResponse"
 import { addList } from "@/app/actions/list"
-import { toast } from "react-toastify"
 import { useQueryClient } from "@tanstack/react-query"
 import AddListIcon from "@/components/ui/icons/addList"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { addTask } from "@/app/actions/task"
 import { Task } from "@prisma/client"
-import { Qahiri } from "next/font/google"
-import { TaskAbortError } from "@reduxjs/toolkit"
-
-interface ListsActionsProps{
-    standaloneID?: undefined|string
-    setOrderedTasks?: Dispatch<SetStateAction<Task[]>>
-}
+import Select from "@/components/select"
+import { updateFolder } from "@/app/actions/folder"
+import { useRouter } from "next/navigation"
 
 
-export default function ListsActions(props:ListsActionsProps){
+export default function ListsActions(){
 
-    const {selectedFolderID} = useDashboardContext()
-    const queryClient   = useQueryClient()
-    const formRef       = useRef<null|HTMLFormElement>(null)
-    const inputRef      = useRef<null|HTMLInputElement>(null)
-    const [isAdding, setIsAdding] = useState(false)
-    const [newTitle, setNewTitle] = useState("")
+    const {
+        selectedFolderID,
+        standaloneListID,
+        setOrderedTasks,
+        lists
+    } = useDashboardContext()
 
-    const addLabel = useMemo(() => props.standaloneID ? "Ajouter un élément" : "Ajouter une liste", [props.standaloneID])
+    const folderDetailURL       = `/dashboard/${selectedFolderID}`
+    const queryClient           = useQueryClient()
+    const router                = useRouter()
+
+    const formRef               = useRef<null|HTMLFormElement>(null)
+    const inputRef              = useRef<null|HTMLInputElement>(null)
+
+    const [isAdding, setIsAdding]               = useState(false)
+    const [newTitle, setNewTitle]               = useState("")
+    const [selectedOption, setSelectedOption]   = useState(standaloneListID)
+
+    const standaloneListOptions = [
+        { label: "Toute les listes", value: null },
+        ...(lists?.map(list => ({ label: list.title, value: list.id })) ?? [])
+    ]
+
+    const addLabel = useMemo(() => standaloneListID ? "Ajouter un élément" : "Ajouter une liste", [standaloneListID])
 
     const isEnter = (e: React.KeyboardEvent) => e.key === "Enter";
 
@@ -42,6 +53,21 @@ export default function ListsActions(props:ListsActionsProps){
         setIsAdding(true)
     }
 
+    const handleSelectStandaloneList = (newValue:string|null) => {
+        handleResponse(async() => {
+            if(selectedFolderID){
+                await updateFolder({
+                    folderID:selectedFolderID,
+                    listStandaloneID:newValue ?? null,
+                })
+                if(standaloneListID !== newValue){
+                    const option = newValue ? `?standaloneID=${newValue}` : ""
+                    router.push(`${folderDetailURL}${option}`)
+                }
+                setSelectedOption(newValue)
+            }
+        })
+    }
 
     
     const handleAdd = useCallback((title:string, KeyboardEvent?:React.KeyboardEvent) => {
@@ -49,10 +75,10 @@ export default function ListsActions(props:ListsActionsProps){
         if(title.trim()){
             handleResponse(async() => {
                 if(selectedFolderID){
-                    if(props.standaloneID && props.setOrderedTasks){
-                        const result = await addTask({title: title, listID: props.standaloneID})
+                    if(standaloneListID && setOrderedTasks){
+                        const result = await addTask({title: title, listID: standaloneListID})
                         const task: Task = result.task
-                        props.setOrderedTasks(current => current ? [task, ...current] : [task])
+                        setOrderedTasks(current => current ? [task, ...current] : [task])
                     }else{
                         await addList({title:title, folderID:selectedFolderID})
                     }
@@ -70,7 +96,7 @@ export default function ListsActions(props:ListsActionsProps){
         }else{
             setIsAdding(false)
         }
-    }, [props.standaloneID])
+    }, [standaloneListID])
 
     useEffect(() => {
         if(inputRef.current){
@@ -81,10 +107,12 @@ export default function ListsActions(props:ListsActionsProps){
 
     useCallbackOnClickOutside(formRef, resetNewList)
 
+
+
     return(
         <div className={s.container}>
             <div className={s.buttonContainer}>
-                <button title={`Ouvrir le formulaire pour ajouter ${props.standaloneID ? "un nouvel élément à la liste" : "une nouvelle liste au dossier"}`} onClick={handleClickAddList} className={withClass(s.add, isAdding && s.active)}>
+                <button title={`Ouvrir le formulaire pour ajouter ${standaloneListID ? "un nouvel élément à la liste" : "une nouvelle liste au dossier"}`} onClick={handleClickAddList} className={withClass(s.add, isAdding && s.active)}>
                     {addLabel}
                 </button>
                 {isAdding && (
@@ -92,13 +120,24 @@ export default function ListsActions(props:ListsActionsProps){
                         {(isClosing) => (
                             <form ref={formRef} className={withClass(s.addListForm, isClosing && s.closing)}>
                                 <input ref={inputRef} onKeyDown={(e) => isEnter(e) && handleAdd(newTitle, e)} onChange={(e) => setNewTitle(e.currentTarget.value)} type="text" value={newTitle} />
-                                <button title={`Ajouter ${props.standaloneID ? "un nouvel élément à la liste" : "une nouvelle liste au dossier"}`} onClick={() => handleAdd(newTitle)}>
+                                <button title={`Ajouter ${standaloneListID ? "un nouvel élément à la liste" : "une nouvelle liste au dossier"}`} onClick={() => handleAdd(newTitle)}>
                                     <AddListIcon/>
                                 </button>
                             </form>
                         )}
                     </Overlay>
                 )}
+            </div>
+
+            <div className={s.options}>
+                <div className={s.option}>
+                    <Select
+                        styles={{width:"40%", height:"2.5rem"}}
+                        options={standaloneListOptions}
+                        value={selectedOption}
+                        onClick={(value:any) => handleSelectStandaloneList(value)}
+                    />
+                </div>
             </div>
         </div>
     )

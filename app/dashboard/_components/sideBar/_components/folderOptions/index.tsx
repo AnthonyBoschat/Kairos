@@ -15,9 +15,7 @@ import Overlay from "@/components/overlay"
 import { FolderWithList } from "@/types/list"
 import StorageService from "@/services/StorageService"
 import ColorOptions from "@/components/colorOptions"
-import { useDashboardContext } from "@/context/DashboardContext"
 import { useQueryClient } from "@tanstack/react-query"
-import ListStandaloneSelect from "./listStandaloneSelect"
 import { useRouter } from "next/navigation"
 
 interface FolderOptionsProps{
@@ -31,14 +29,11 @@ export default function FolderOptions(props:FolderOptionsProps){
     const queryClient = useQueryClient()
     const router = useRouter()
     const folderDetailURL = `/dashboard/${props.folder.id}`
-    const {setSelectedFolderID} = useDashboardContext()
-    const [folderStandaloneListID, setFolderStandaloneListID]   = useState(props.folder?.listStandaloneID)
     const [isOpenColorOptions, setIsOpenColorOptions]           = useState<Boolean>(false)
     const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
     const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
     const [folderFavorite, setFolderFavorite]   = useState(props.folder?.favorite)
     const [onEditTitle, setOnEditTitle]         = useState<Boolean>(false)
-    const [isOpen, setIsOpen]                   = useState(false)
     const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.folder.lists.length === 0
 
@@ -54,31 +49,20 @@ export default function FolderOptions(props:FolderOptionsProps){
         return {
             title: folderTitle,
             color: folderColor,
-            folderStandaloneListID: folderStandaloneListID,
         }
-    }, [folderTitle, folderStandaloneListID])
+    }, [folderTitle])
 
     const haveModificationUnsaved = useMemo(() => {
         return JSON.stringify(serverState) !== JSON.stringify(formState)
     }, [serverState, formState])
-
-    const listOptions = useMemo(() => {
-        return [
-            { label: "Aucun", value: "" },
-            ...props.folder.lists.map(list => ({
-                label: list.title,
-                value: list.id
-            }))
-        ];
-    }, [props.folder.lists]);
 
     const handleDeleteFolder = async() => {
         if(props.folder?.id){
             const folderID = props.folder.id
             handleResponse(async () => {
                 await deleteFolder(folderID)
+                router.push("/dashboard")
                 props.setSelectedFolderOptions(null)
-                setSelectedFolderID(null)
                 StorageService.remove("selectedFolderID")
                 queryClient.invalidateQueries({queryKey:["historic"]})
             })
@@ -100,19 +84,13 @@ export default function FolderOptions(props:FolderOptionsProps){
             await updateFolder({
                 folderID:props.folder?.id,
                 title:folderTitle,
-                listStandaloneID:folderStandaloneListID
             })
             setOnEditTitle(false)
             queryClient.invalidateQueries({queryKey:["historic"]})
             queryClient.invalidateQueries({queryKey:["lists", props.folder.id]})
-            if(folderStandaloneListID !== props.folder.listStandaloneID){
-                const option = folderStandaloneListID ? `?stantaloneID=${folderStandaloneListID}` : ""
-                router.push(`${folderDetailURL}${option}`)
-            }
             props.setSelectedFolderOptions(prev => prev ? {
                 ...prev,
-                title: folderTitle,
-                listStandaloneID: folderStandaloneListID,
+                title: folderTitle
             } : null)
         })
     }
@@ -177,20 +155,6 @@ export default function FolderOptions(props:FolderOptionsProps){
                                     </button>
                                 </span>
                                 {isOpenColorOptions && <ColorOptions setOpen={setIsOpenColorOptions} columns={11} currentColor={folderColor}  colorCollection={FOLDER_COLORS} onClick={handleUpdateColor}/>}
-                            </li>
-
-
-                            <li className={s.standalone}>
-                                <span className={s.key}>Liste unique</span>
-                                <div className={s.value}>
-                                    <ListStandaloneSelect
-                                        isOpen={isOpen}
-                                        setIsOpen={setIsOpen}
-                                        selectedListId={folderStandaloneListID}
-                                        setSelectedListId={setFolderStandaloneListID}
-                                        listOptions={listOptions}
-                                    />
-                                </div>
                             </li>
                         </ul>
 

@@ -20,18 +20,10 @@ interface FolderListProps{
 
 export default function FolderList(props:FolderListProps){
 
-    const {setSelectedFolderID} = useDashboardContext()
     const [selectedFolderOptions, setSelectedFolderOptions] = useState<null|FolderWithList>(null)
     const [orderedFolders, setOrderedFolders]               = useState<FolderWithList[]>(props.folders);
 
     useEffect(() => setOrderedFolders(props.folders), [props.folders]);
-
-    useEffect(() => {
-        const storedSelectedFolderID = StorageService.get("selectedFolderID")
-        if(storedSelectedFolderID){
-            setSelectedFolderID(storedSelectedFolderID)
-        }
-    }, [])
 
     const handleReorderFolders = async (newFolders: FolderWithList[]) => {
         handleResponse(() => {

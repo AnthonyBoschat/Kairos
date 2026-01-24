@@ -40,7 +40,7 @@ type ResultKind = "folder" | "list" | "task"
 
 export default function Search() {
 
-  const {setSelectedListID, setSelectedTaskID, setSelectedFolderID, setSearchContextValue} = useDashboardContext()
+  const {setSelectedListID, setSelectedTaskID, setSearchContextValue} = useDashboardContext()
   const containerRef        = useRef<HTMLDivElement | null>(null)
   const inputRef            = useRef<HTMLInputElement | null>(null)
   const latestRequestIdRef  = useRef(0)
@@ -101,14 +101,12 @@ export default function Search() {
 
   const handleSelectFolder = (folderID:string) => {
     router.push(`/dashboard/${folderID}`)
-    setSelectedFolderID(folderID)
     StorageService.set("selectedFolderID", folderID)
     closePopover()
   }
 
   const handleSelectList = (folderID: string, listID: string) => {
     router.push(`/dashboard/${folderID}`)
-    setSelectedFolderID(folderID)
     setSelectedListID(listID)
     StorageService.set("selectedFolderID", folderID)
     closePopover()
@@ -117,10 +115,9 @@ export default function Search() {
   const handleSelectTask = (folderID: string, taskID: string, listStandaloneID: null|string) => {
     let route = `/dashboard/${folderID}`
     if(listStandaloneID){
-      route += `?stantaloneID=${listStandaloneID}`
+      route += `?standaloneID=${listStandaloneID}`
     }
     router.push(route)
-    setSelectedFolderID(folderID)
     setSelectedTaskID(taskID)
     StorageService.set("selectedFolderID", folderID)
     closePopover()

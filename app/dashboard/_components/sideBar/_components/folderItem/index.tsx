@@ -24,8 +24,8 @@ interface FolderItemProps{
 export default function FolderItem(props:FolderItemProps){
 
     const folderDetailURL = `/dashboard/${props.folder.id}`
-    const URLoptions = props.folder.listStandaloneID ? `?stantaloneID=${props.folder.listStandaloneID}` : ""
-    const {selectedFolderID, setSelectedFolderID, searchContextValue}    = useDashboardContext()
+    const URLoptions = props.folder.listStandaloneID ? `?standaloneID=${props.folder.listStandaloneID}` : ""
+    const {selectedFolderID, searchContextValue}    = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
     const router = useRouter()
     const pathname = usePathname()
