@@ -112,9 +112,9 @@ export default function Search() {
     closePopover()
   }
 
-  const handleSelectTask = (folderID: string, taskID: string, listStandaloneID: null|string) => {
+  const handleSelectTask = (folderID: string, taskID: string, listStandaloneID: null|string, taskListID:string) => {
     let route = `/dashboard/${folderID}`
-    if(listStandaloneID){
+    if(listStandaloneID && taskListID === listStandaloneID){
       route += `?standaloneID=${listStandaloneID}`
     }
     router.push(route)
@@ -136,7 +136,7 @@ export default function Search() {
     else if(kind === "task"){
       const item = taskItems.find(item => item.task.id === id)
       if(item){
-        handleSelectTask(item.task.folderId, item.task.id, item.task.listStandaloneID)
+        handleSelectTask(item.task.folderId, item.task.id, item.task.listStandaloneID, item.task.listId)
       }
     }
   }
@@ -441,7 +441,7 @@ export default function Search() {
                               aria-selected={isActive}
                               className={withClass(s.itemButton, isActive && s.itemButtonActive)}
                               onMouseEnter={() => setActiveItemKey(key)}
-                              onClick={() => handleSelectTask(task.folderId, task.id, task.listStandaloneID)}
+                              onClick={() => handleSelectTask(task.folderId, task.id, task.listStandaloneID, task.listId)}
                             >
                               <span className={s.itemIcon} aria-hidden="true">
                                 {kindIcon.task}
