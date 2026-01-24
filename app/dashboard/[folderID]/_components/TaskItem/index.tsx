@@ -19,6 +19,8 @@ import Highlight from "@/components/highlight"
 interface TaskItemProps{
     listColor:string
     task:Task
+    animate?: boolean
+    index?: number
 }
 
 
@@ -90,6 +92,7 @@ export default function TaskItem(props:TaskItemProps){
             <li 
                 className={withClass(
                     s.container, 
+                    props.animate && s.animation,
                     (searchContextValue && selectedTaskID) && s.onSelect,
                     (searchContextValue && props.task.id === selectedTaskID) && s.select
                 )}
@@ -98,7 +101,10 @@ export default function TaskItem(props:TaskItemProps){
                 onClick={handleOpenTaskDetail} 
                 onMouseLeave={() => setIsHover(false)} 
                 onMouseEnter={() => setIsHover(true)} 
-                style={{backgroundColor:props.listColor}} 
+                style={{
+                    backgroundColor:props.listColor,
+                    animationDelay: props.index ? `${props.index * 10}ms` : "0ms"
+                }} 
             >
                 <div className={s.content}>
                     <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>

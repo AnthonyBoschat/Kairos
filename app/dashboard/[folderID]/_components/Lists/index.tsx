@@ -108,11 +108,13 @@ export default function Lists() {
                         getItemId={(task) => task.id}
                         strategy={rectSortingStrategy}
                         disabled={taskDetail !== null}
-                        renderItem={({item:task}) => (
+                        renderItem={({item:task}, index) => (
                             <TaskItem 
                                 key={task.id} 
                                 task={task} 
                                 listColor={LIST_COLOR[standaloneList.color ?? 0]} 
+                                animate
+                                index={index}
                             />
                         )}
                     />
