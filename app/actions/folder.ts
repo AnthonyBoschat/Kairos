@@ -90,7 +90,9 @@ export async function updateFolder({
             listStandaloneID:listStandaloneID
         }
     })
-    await logHistory(updatedFolder, HistoricItemType.FOLDER)
+    if(title){
+        await logHistory(updatedFolder, HistoricItemType.FOLDER)
+    }
 
     revalidatePath("/dashboard")
     return {success:true, message:`Le dossier a été correctement modifier`}
