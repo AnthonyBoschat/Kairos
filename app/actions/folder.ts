@@ -72,8 +72,8 @@ export async function updateFolder({
     listStandaloneID
 }:{
     folderID:string|undefined, 
-    title:string|undefined
-    listStandaloneID: string|null
+    title?:string|undefined
+    listStandaloneID?: string|null
 }){
     await checkUser()
 

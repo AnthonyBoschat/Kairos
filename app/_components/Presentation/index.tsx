@@ -8,8 +8,6 @@ import { rectSortingStrategy } from "@dnd-kit/sortable"
 import Writter from "./writter"
 
 
-// Problème Ajouter une liste
-
 const simpleListWord = [
     "Anthony Boschat",
     "Maurane",
