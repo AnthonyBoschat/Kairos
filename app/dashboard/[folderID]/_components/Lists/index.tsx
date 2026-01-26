@@ -113,8 +113,8 @@ export default function Lists() {
                                 key={task.id} 
                                 task={task} 
                                 listColor={LIST_COLOR[standaloneList.color ?? 0]} 
-                                animate
                                 index={index}
+                                standalone
                             />
                         )}
                     />
