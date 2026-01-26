@@ -19,7 +19,7 @@ import Highlight from "@/components/highlight"
 interface TaskItemProps{
     listColor:string
     task:Task
-    animate?: boolean
+    standalone?: boolean
     index?: number
 }
 
@@ -27,12 +27,14 @@ interface TaskItemProps{
 export default function TaskItem(props:TaskItemProps){
 
     const {taskDetail, setTaskDetail, selectedTaskID, setSelectedTaskID, selectedFolderID, searchContextValue} = useDashboardContext()
-    const [isHover, setIsHover] = useState(false)
+    const [isHover, setIsHover]         = useState(false)
+    const [isTruncated, setIsTruncated] = useState(false)
     const queryClient           = useQueryClient()
     const isFavorite            = props.task.favorite
     const hasContent            = props.task.content !== null
     const favoriteButtonRef     = useRef<HTMLButtonElement>(null)
     const deleteButtonRef       = useRef<HTMLButtonElement>(null)
+    const titleRef              = useRef<HTMLSpanElement>(null)
 
 
     const canDeleteWithoutConfirmation = props.task.content === null
@@ -86,13 +88,28 @@ export default function TaskItem(props:TaskItemProps){
             }
         }
     }, [selectedTaskID, props.task.id])
+    
+
+
+    useEffect(() => {
+        const checkTruncation = () => {
+            if (titleRef.current) {
+                setIsTruncated(titleRef.current.scrollHeight  > titleRef.current.clientHeight)
+            }
+        }
+        
+        checkTruncation()
+        window.addEventListener('resize', checkTruncation)
+        return () => window.removeEventListener('resize', checkTruncation)
+    }, [props.task.title])
 
     return(
         <>
             <li 
                 className={withClass(
                     s.container, 
-                    props.animate && s.animation,
+                    props.standalone && s.animation,
+                    props.standalone && s.standalone,
                     (searchContextValue && selectedTaskID) && s.onSelect,
                     (searchContextValue && props.task.id === selectedTaskID) && s.select
                 )}
@@ -102,24 +119,30 @@ export default function TaskItem(props:TaskItemProps){
                 onMouseLeave={() => setIsHover(false)} 
                 onMouseEnter={() => setIsHover(true)} 
                 style={{
-                    backgroundColor:props.listColor,
                     animationDelay: props.index ? `${props.index * 10}ms` : "0ms"
                 }} 
             >
+                <div style={{ backgroundColor:props.listColor}} className={s.background}></div>
                 <div className={s.content}>
                     <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
                         <StarIcon animate active={props.task.favorite} size={18}/>
                     </button>
 
                     <div className={s.detail}>
-                        <span className={s.title}>
+                        <span ref={titleRef} className={s.title}>
                             {searchContextValue 
                                 ? <Highlight text={props.task.title} search={searchContextValue}/>
                                 : props.task.title
                             }
                         </span>
-                        {hasContent && <span title="L'élément contient du contenu supplémentaire" className={s.icon}><ListIcon size={18}/></span>}
+                        {(hasContent || props.standalone) && <span title="L'élément contient du contenu supplémentaire" className={withClass(s.icon, (props.standalone && !hasContent) && s.hiddenIcon)}><ListIcon size={18}/></span>}
                     </div>
+
+                    {props.standalone && isTruncated && (
+                        <div style={{ '--list-color': props.listColor } as React.CSSProperties} className={s.tooltip}>
+                            {props.task.title}
+                        </div>
+                    )}
                     
                     <Confirmation 
                         disabled={canDeleteWithoutConfirmation}
@@ -140,7 +163,7 @@ export default function TaskItem(props:TaskItemProps){
                     </Confirmation>
                 </div>
             </li>
-            {taskDetail?.id === props.task.id && (
+            {(taskDetail?.id === props.task.id) && (
                 <TaskDetail listColor={props.listColor} setTaskDetail={setTaskDetail} task={props.task}/>
             )}
         </>

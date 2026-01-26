@@ -51,8 +51,9 @@ export default function TaskList(props:TaskListProps){
                 getItemId={(task) => task.id}
                 onReorder={handleReorderTasks}
                 disabled={taskDetail !== null}
-                renderItem={({item: task}) => (
+                renderItem={({item: task}, index) => (
                     <TaskItem 
+                        index={index}
                         key={task.id} 
                         listColor={props.listColor} task={task}
                     />
