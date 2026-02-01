@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import s from "./styles.module.scss"
 import withClass from "@/utils/class"
 import Overlay from "@/components/overlay"
@@ -12,7 +12,9 @@ import { addTask } from "@/app/actions/task"
 import { Task } from "@prisma/client"
 import Select from "@/components/select"
 import { updateFolder } from "@/app/actions/folder"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
+import ListInlineAction from "../ListInlineAction"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 
 export default function ListsActions(){
@@ -27,13 +29,17 @@ export default function ListsActions(){
     const folderDetailURL       = `/dashboard/${selectedFolderID}`
     const queryClient           = useQueryClient()
     const router                = useRouter()
-
+    const pathname              = usePathname()
+    
     const formRef               = useRef<null|HTMLFormElement>(null)
     const inputRef              = useRef<null|HTMLInputElement>(null)
 
     const [isAdding, setIsAdding]               = useState(false)
     const [newTitle, setNewTitle]               = useState("")
     const [selectedOption, setSelectedOption]   = useState(standaloneListID)
+    const [standaloneList, setStandaloneList]   = useState<null|ListWithTaskAndFolder>(null)
+
+    const isStandaloneView      = standaloneListID !== null
 
     const standaloneListOptions = [
         { label: "Toute les listes", value: null },
@@ -98,6 +104,20 @@ export default function ListsActions(){
         }
     }, [standaloneListID])
 
+    // Si on est plus dans une vue liste unique, on reset le selecteur à sa valeur par défaut (toute les listes)
+    useEffect(() => {
+        if(!standaloneListID){
+            setSelectedOption(null)
+        }
+    }, [standaloneListID])
+
+    useEffect(() => {
+        if(isStandaloneView && lists){
+            const list = lists.find(list => list.id === standaloneListID)
+            setStandaloneList(list ?? null)
+        }
+    }, [isStandaloneView, standaloneListID, lists])
+
     useEffect(() => {
         if(inputRef.current){
             if(isAdding) inputRef.current.focus()
@@ -130,14 +150,19 @@ export default function ListsActions(){
             </div>
 
             <div className={s.options}>
-                <div className={s.option}>
+                <div className={withClass(s.selectList)}>
                     <Select
-                        styles={{width:"40%", height:"2.5rem"}}
+                        styles={{ height:"2.5rem"}}
                         options={standaloneListOptions}
                         value={selectedOption}
                         onClick={(value:any) => handleSelectStandaloneList(value)}
                     />
                 </div>
+                {(standaloneList && isStandaloneView) && (
+                    <div className={s.actions}>
+                        <ListInlineAction list={standaloneList}/>
+                    </div>
+                )}
             </div>
         </div>
     )

@@ -16,7 +16,7 @@ interface DashboardContextType {
   selectedFolderID: string | null
   /** ID de la liste standalone si vue liste unique (extrait des query params) */
   standaloneListID: string | null
-  /** Est-ce que les lsits sont en train d'être récupérer */
+  /** Est-ce que les listes sont en train d'être récupérer */
   isLoadingLists: boolean
   /** Listes du dossier actuel (fetch via React Query) */
   lists: ListWithTaskAndFolder[]
@@ -29,6 +29,9 @@ interface DashboardContextType {
   /** ID de la task sélectionnée */
   selectedTaskID: string | null
   setSelectedTaskID: Dispatch<SetStateAction<string | null>>
+  // Les options de quelle liste sont ouvert
+  selectedListOptions: ListWithTaskAndFolder | null
+  setSelectedListOptions: Dispatch<SetStateAction<ListWithTaskAndFolder | null>>
   /** Task affichée dans le panneau de détail */
   taskDetail: Task | null
   setTaskDetail: Dispatch<SetStateAction<Task | null>>
@@ -66,6 +69,8 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
   const [taskDetail, setTaskDetail]                 = useState<Task | null>(null)
   const [searchContextValue, setSearchContextValue] = useState('')
   const [historicView, setHistoricView]             = useState(false)
+  const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
+
 
   return (
     <DashboardContext.Provider value={{
@@ -78,6 +83,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       taskDetail, setTaskDetail,
       searchContextValue, setSearchContextValue,
       historicView, setHistoricView,
+      selectedListOptions, setSelectedListOptions
     }}>
       {children}
     </DashboardContext.Provider>

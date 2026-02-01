@@ -1,0 +1,23 @@
+
+
+    button.action{
+        all:unset;
+        display: flex;
+        align-items: center;
+        &.checkable {
+            padding-bottom: 0.1rem;
+            
+        }
+        &.favorite{
+            padding-bottom: 0.1rem;
+        }
+        svg{
+            opacity: 0.8;
+            fill:v.$dark-primary-80;
+            transition: opacity 0.1s linear;
+            cursor: pointer;
+            &:hover{
+                opacity: 1;
+            }
+        }
+    }

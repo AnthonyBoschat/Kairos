@@ -5,6 +5,7 @@ model List {
   countElement      Boolean  @default(true)
   color             Int
   order             Int      
+  checkable         Boolean  @default(false)
 
   folderId          String
   folder            Folder   @relation(fields: [folderId], references: [id], onDelete:Cascade)
