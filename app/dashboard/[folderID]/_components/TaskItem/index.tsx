@@ -4,7 +4,7 @@ import s from "./styles.module.scss"
 import React, { useEffect, useRef, useState } from "react"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
-import { deleteTask, toggleTaskFavorite } from "@/app/actions/task"
+import { deleteTask, toggleTaskDone, toggleTaskFavorite } from "@/app/actions/task"
 import { useQueryClient } from "@tanstack/react-query"
 import { toast } from "react-toastify"
 import withClass from "@/utils/class"
@@ -15,8 +15,10 @@ import TaskDetail from "../TaskDetail"
 import ListIcon from "@/components/ui/icons/list"
 import { useDashboardContext } from "@/context/DashboardContext"
 import Highlight from "@/components/highlight"
+import CheckIcon from "@/components/ui/icons/check"
 
 interface TaskItemProps{
+    listCheckable:boolean
     listColor:string
     task:Task
     standalone?: boolean
@@ -31,6 +33,8 @@ export default function TaskItem(props:TaskItemProps){
     const [isTruncated, setIsTruncated] = useState(false)
     const queryClient           = useQueryClient()
     const isFavorite            = props.task.favorite
+    const isDone                = props.task.done
+    const isListCheckable       = props.listCheckable
     const hasContent            = props.task.content !== null
     const favoriteButtonRef     = useRef<HTMLButtonElement>(null)
     const deleteButtonRef       = useRef<HTMLButtonElement>(null)
@@ -50,6 +54,15 @@ export default function TaskItem(props:TaskItemProps){
     const handleDeleteTask = () => {
         handleResponse(async() => {
             await deleteTask({taskID:props.task.id})
+            queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
+            queryClient.invalidateQueries({queryKey:["historic"]})
+        })
+    }
+
+    const handleToggleDone = (event: React.MouseEvent) => {
+        event.stopPropagation()
+        handleResponse(async() => {
+            await toggleTaskDone({taskID:props.task.id})
             queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
             queryClient.invalidateQueries({queryKey:["historic"]})
         })
@@ -111,7 +124,8 @@ export default function TaskItem(props:TaskItemProps){
                     props.standalone && s.animation,
                     props.standalone && s.standalone,
                     (searchContextValue && selectedTaskID) && s.onSelect,
-                    (searchContextValue && props.task.id === selectedTaskID) && s.select
+                    (searchContextValue && props.task.id === selectedTaskID) && s.select,
+                    (isDone && isListCheckable) && s.done
                 )}
                 id={props.task.id} 
                 title="Consulter le détail de l'élément" 
@@ -124,12 +138,16 @@ export default function TaskItem(props:TaskItemProps){
             >
                 <div style={{ backgroundColor:props.listColor}} className={s.background}></div>
                 <div className={s.content}>
-                    <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
-                        <StarIcon animate active={props.task.favorite} size={18}/>
-                    </button>
+                    
+                    
+                    <div className={s.check}>
+                        <button onClick={handleToggleDone}>
+                            <CheckIcon active={props.task.done} hidden={!props.listCheckable} size={16}/>
+                        </button>
+                    </div>
 
                     <div className={s.detail}>
-                        <span ref={titleRef} className={s.title}>
+                        <span ref={titleRef} className={withClass(s.title, (isDone && isListCheckable) && s.done)}>
                             {searchContextValue 
                                 ? <Highlight text={props.task.title} search={searchContextValue}/>
                                 : props.task.title
@@ -144,23 +162,29 @@ export default function TaskItem(props:TaskItemProps){
                         </div>
                     )}
                     
-                    <Confirmation 
-                        disabled={canDeleteWithoutConfirmation}
-                        onClose={() => setIsHover(false)}
-                        onClick={handleDeleteTask} 
-                        content={
-                            <div>
-                                <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette tâche ?</span>
-                                <div>Son contenu sera définitivement perdu.</div>
-                            </div>
-                        }
-                    >
-                        {(open, isClosing) => (
-                            <button title="Supprimer l'élément" ref={deleteButtonRef} className={withClass(s.button, s.delete, isHover && s.visible, (open && !isClosing) && s.active)}>
-                                <DeleteIcon size={20}/>
-                            </button>
-                        )}
-                    </Confirmation>
+                    <div className={s.buttons}>
+                       
+                        <Confirmation 
+                            disabled={canDeleteWithoutConfirmation}
+                            onClose={() => setIsHover(false)}
+                            onClick={handleDeleteTask} 
+                            content={
+                                <div>
+                                    <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette tâche ?</span>
+                                    <div>Son contenu sera définitivement perdu.</div>
+                                </div>
+                            }
+                        >
+                            {(open, isClosing) => (
+                                <button title="Supprimer l'élément" ref={deleteButtonRef} className={withClass(s.button, s.delete, isHover && s.visible, (open && !isClosing) && s.active)}>
+                                    <DeleteIcon size={18}/>
+                                </button>
+                            )}
+                        </Confirmation>
+                         <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
+                            <StarIcon animate active={props.task.favorite} size={16}/>
+                        </button>
+                    </div>
                 </div>
             </li>
             {(taskDetail?.id === props.task.id) && (

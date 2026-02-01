@@ -109,14 +109,38 @@ export async function toggleListFavorite(listID: string){
     return {success:true, message:message}
 }
 
+export async function toggleListCheckable(listID: string){
+    await checkUser()
+
+    const list = await prisma.list.findUnique({
+        where:{id:listID}
+    })
+
+    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+
+    const newCheckableState = !list.checkable
+    await prisma.list.update({
+        where:{id:listID},
+        data:{
+            checkable:newCheckableState
+        }
+    }) 
+
+    const message = newCheckableState ? "Les éléments de la liste sont maintenant réalisable" : "Les éléments de la liste ne sont plus réalisable"
+    revalidatePath("/dashboard")
+    return {success:true, message:message}
+}
+
 export async function updateList({
     listID, 
     title, 
-    countElement
+    countElement,
+    // checkable
 }:{
     listID:string|undefined, 
     title:string|undefined,
     countElement:boolean|undefined,
+    // checkable:boolean|undefined,
 }){
     await checkUser()
 
@@ -130,7 +154,8 @@ export async function updateList({
         where:{id:listID},
         data:{
             title:title,
-            countElement:countElement
+            countElement:countElement,
+            // checkable: checkable
         }
     })
     await logHistory(updatedList, HistoricItemType.LIST)

@@ -14,6 +14,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import Overlay from "@/components/overlay"
 import { ListWithTaskAndFolder } from "@/types/list"
 import ColorOptions from "@/components/colorOptions"
+import { useRouter } from "next/navigation"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface ListOptionsProps{
     list: ListWithTaskAndFolder
@@ -22,11 +24,14 @@ interface ListOptionsProps{
 
 
 export default function ListOptions(props:ListOptionsProps){
-    const queryClient = useQueryClient()
+    const queryClient   = useQueryClient()
+    const router        = useRouter()
+    const {standaloneListID} = useDashboardContext()
     const [listTitle, setListTitle]         = useState(props.list?.title)
     const [listColor, setListColor]         = useState(LIST_COLOR[props.list.color ?? 0])
     const [listFavorite, setListFavorite]   = useState(props.list?.favorite)
     const [onEditTitle, setOnEditTitle]     = useState<Boolean>(false)
+    const [checkable, setCheckable]         = useState(props.list?.checkable)
     const [listCountElement, setListCountElement]       = useState(props.list?.countElement)
     const [isOpenColorOptions, setIsOpenColorOptions]   = useState<Boolean>(false)
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
@@ -35,16 +40,18 @@ export default function ListOptions(props:ListOptionsProps){
     const serverState = useMemo(() => {
         return {
             title:props.list.title,
-            countElement: props.list.countElement
+            countElement: props.list.countElement,
+            checkable: props.list.checkable
         }
-    }, [props.list.title, props.list.countElement])
+    }, [props.list.title, props.list.countElement, props.list.checkable])
 
     const formState = useMemo(() => {
         return {
             title:listTitle,
-            countElement: listCountElement
+            countElement: listCountElement,
+            checkable: checkable
         }
-    }, [listTitle, listCountElement ])
+    }, [listTitle, listCountElement, checkable ])
 
     const haveModificationUnsaved = useMemo(() => {
         return JSON.stringify(serverState) !== JSON.stringify(formState)
@@ -55,6 +62,8 @@ export default function ListOptions(props:ListOptionsProps){
         queryClient.invalidateQueries({queryKey:["historic"]})
     }
     
+    // Supprime une liste avec son ID
+    // Si on est actuellement dans une vue liste unique (standaloneListID), et que cette liste est celle qui vient d'être supprimer, on reviens à la vue global
     const handleDeleteList = async() => {
         if(props.list?.id){
             const listID = props.list.id
@@ -62,6 +71,9 @@ export default function ListOptions(props:ListOptionsProps){
                 await deleteList(listID)
                 refetch()
                 props.setSelectedListOptions(null)
+                if(standaloneListID && standaloneListID === listID){
+                    router.push(`/dashboard/${props.list.folderId}`)
+                }
             })
         }
     }
@@ -83,21 +95,17 @@ export default function ListOptions(props:ListOptionsProps){
                 listID:props.list?.id,
                 title:listTitle,
                 countElement:listCountElement
+                // checkable: checkable
             })
             refetch()
             setOnEditTitle(false)
-            props.setSelectedListOptions({
-                ...props.list,
-                title: listTitle,
-                countElement:listCountElement
-            })
-
             props.setSelectedListOptions(current => {
                 if (!current) return null;
                 return {
                     ...current,
                     title: listTitle,
-                    countElement: listCountElement
+                    countElement: listCountElement,
+                    // checkable: checkable
                 };
             });
         })
@@ -125,9 +133,7 @@ export default function ListOptions(props:ListOptionsProps){
         <>
             <Overlay root onClose={() => props.setSelectedListOptions(null)}>
                 {(isClosing) => (
-                    <div
-                        className={withClass(s.container, isClosing && s.closing)}
-                    >
+                    <div className={withClass(s.container, isClosing && s.closing)}>
                         
                         <div className={s.card}>
                             <div className={s.header}>
@@ -155,7 +161,7 @@ export default function ListOptions(props:ListOptionsProps){
                                     </span>
                                     {isOpenColorOptions && <ColorOptions setOpen={setIsOpenColorOptions} columns={11} currentColor={listColor} colorCollection={LIST_COLOR} onClick={handleUpdateColor}/>}
                                 </li>
-                                <li className={s.countElement}>
+                                <li className={withClass(s.radio)}>
                                     <span className={s.key}>Afficher le nombre d'éléments</span>
                                     <span className={s.value}>
                                         <button onClick={() => setListCountElement(true)} className={withClass(listCountElement && s.active)}>Oui</button>

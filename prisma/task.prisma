@@ -3,7 +3,8 @@ model Task {
   title             String    @db.VarChar(255)
   content           String?   @db.Text
   favorite          Boolean   @default(false)
-  order             Int      
+  order             Int  
+  done              Boolean   @default(false)    
 
   listId            String
   list              List      @relation(fields: [listId], references: [id], onDelete:Cascade)

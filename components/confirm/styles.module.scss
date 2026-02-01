@@ -1,83 +1,82 @@
-.container{
+.container {
     position: relative;
-    opacity: 2;
     align-self: flex-start;
-    
 
-    .children_container{
+    .children_container {
         position: relative;
         width: fit-content;
         height: fit-content;
     }
+}
 
-    .confirm_container{
+// Sorti de .container pour être accessible depuis le portail
+.confirm_container {
+    height: fit-content;
+    padding: 1rem;
+    background-color: v.$light-primary;
+    border-radius: 4px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    white-space: nowrap;
+    font-size: 0.9rem;
+    animation: opacityIn 0.075s linear forwards;
+
+    &.portal {
+        z-index: 9999;
+    }
+
+    &.closing {
+        animation: opacityOut 0.075s linear forwards;
+    }
+
+    .content {
+        padding-right: 2rem;
+    }
+
+    .footer {
+        margin-top: 1rem;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        .icon {
+            padding-bottom: 0.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        button {
+            border: none;
+            background-color: transparent;
+            opacity: 0.7;
+            transition: opacity 0.05s linear;
+            cursor: pointer;
+            &:hover {
+                opacity: 1;
+            }
+            &.cancel {
+                color: v.$state-error-dark;
+            }
+            &.confirm {
+                &.active { opacity: 1; }
+                color: v.$state-success;
+            }
+        }
+    }
+
+    .arrow {
         position: absolute;
+        bottom: -0.5rem;
         left: 50%;
         transform: translateX(-50%);
-        height: fit-content;
-        padding: 1rem;
-        background-color: v.$light-primary;
-        border-radius: 4px;
-        box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.4);
-        bottom: calc(100% + 0.5rem);
-        z-index: 1000;
-        display: flex;
-        flex-direction: column;
-        white-space: nowrap;
-        font-size: 0.9rem;
-        animation: opacityIn 0.075s linear forwards;
-        
-        &.closing{
-            animation: opacityOut 0.075s linear forwards;
-        }
-        
-        .content{
-            padding-right: 2rem;
-        }
-
-        .footer{
-            margin-top: 1rem;
-            width:100%;
-            display:flex;
-            justify-content: space-between;
-            align-items: center;
-
-            .icon{
-                padding-bottom: 0.1rem;
-                display: flex;
-                align-items: center;
-            }
-            
-            button{
-                border: none;
-                background-color: transparent;
-                opacity: 0.7;
-                transition: opacity 0.05s linear;
-                cursor: pointer;
-                &:hover{
-                    opacity: 1;
-                }
-                &.cancel{
-                    color: v.$state-error-dark;
-                }
-                &.confirm{
-                    &.active{opacity: 1;}
-                    color: v.$state-success;
-                }
-            }
-        }
-
-        .arrow {
-            position: absolute;
-            bottom: -0.5rem;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 0.5rem solid transparent;
-            border-right: 0.5rem solid transparent;
-            border-top: 0.5rem solid v.$dark-primary;
-            opacity: 0.7;
-        }
+        width: 0;
+        height: 0;
+        border-left: 0.5rem solid transparent;
+        border-right: 0.5rem solid transparent;
+        border-top: 0.5rem solid v.$dark-primary;
+        opacity: 0.7;
     }
 }

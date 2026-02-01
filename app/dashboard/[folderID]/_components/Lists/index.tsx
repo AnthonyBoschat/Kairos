@@ -26,12 +26,14 @@ export default function Lists() {
         lists,
         isLoadingLists,
         setOrderedTasks,
-        orderedTasks
+        orderedTasks,
+        selectedListOptions,
+        setSelectedListOptions
     } = useDashboardContext()
 
     const queryClient                       = useQueryClient()
 
-    const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
+    // const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
     const [orderedLists, setOrderedLists]               = useState<ListWithTaskAndFolder[]>([])
     const [standaloneList, setStandalonelist]           = useState<null|ListWithTaskAndFolder>(null)
 
@@ -115,6 +117,7 @@ export default function Lists() {
                                 listColor={LIST_COLOR[standaloneList.color ?? 0]} 
                                 index={index}
                                 standalone
+                                listCheckable={standaloneList?.checkable}
                             />
                         )}
                     />
@@ -130,7 +133,6 @@ export default function Lists() {
                     disabled={taskDetail !== null}
                     renderItem={({ item: list }, index) => (
                         <ListItem
-                            setSelectedListOptions={setSelectedListOptions}
                             key={list.id}
                             list={list}
                             index={index}

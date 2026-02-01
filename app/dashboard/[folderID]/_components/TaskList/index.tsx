@@ -12,6 +12,7 @@ import withClass from "@/utils/class"
 import { rectSortingStrategy } from "@dnd-kit/sortable"
 
 interface TaskListProps{
+    listCheckable:boolean
     listColor:string
     listID:string
     tasks: Task[]
@@ -56,6 +57,7 @@ export default function TaskList(props:TaskListProps){
                         index={index}
                         key={task.id} 
                         listColor={props.listColor} task={task}
+                        listCheckable={props.listCheckable}
                     />
                 )}
             />

@@ -139,6 +139,30 @@ export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
     return {success:true}
 }
 
+type toggleTaskDoneProps = {
+    taskID:string
+}
+export async function toggleTaskDone({taskID}: toggleTaskDoneProps){
+    await checkUser()
+
+    const task = await prisma.task.findUnique({
+        where:{id:taskID}
+    })
+
+    if(!task) throw new Error("Tâche non trouvé")
+
+    const currentTaskDone = task.done
+
+    await prisma.task.update({
+        where:{id:taskID},
+        data:{
+            done:!currentTaskDone
+        }
+    })
+    
+    return {success:true}
+}
+
 
 
 
