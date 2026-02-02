@@ -18,17 +18,37 @@ export default function Confirmation(props: ConfirmationProps) {
     const [open, setOpen] = useState(false)
     const [isClosing, setIsClosing] = useState(false)
     const [position, setPosition] = useState({ top: 0, left: 0 })
+    const [arrowPosition, setArrowPosition] = useState({top:0, left:0})
+    const [overflow, setOverflow] = useState(false)
     const triggerRef = useRef<HTMLDivElement>(null)
     const popupRef = useRef<HTMLDivElement>(null)
 
     const updatePosition = () => {
-        if (triggerRef.current) {
-            const rect = triggerRef.current.getBoundingClientRect()
-            setPosition({
-                top: rect.top + window.scrollY,
-                left: rect.left + rect.width / 2 + window.scrollX
-            })
-        }
+        if (!triggerRef.current) return
+        
+        const rect = triggerRef.current.getBoundingClientRect()
+        const popupWidth = 410  // largeur estimée de la popup
+        const margin = 16       // marge minimale par rapport aux bords
+        
+        // Position de base : centré au-dessus du trigger
+        let left = rect.left + rect.width / 2 + window.scrollX
+        const top = rect.top + window.scrollY
+        
+        // Calcul du décalage si la popup déborde
+        const halfPopup     = popupWidth / 2
+        const rightOverflow = left + halfPopup - window.innerWidth + margin
+        
+        let arrowOffset = 0
+        
+        if (rightOverflow > 0) {
+            // Déborde à droite
+            left -= rightOverflow
+            arrowOffset = rightOverflow
+            setOverflow(true)
+        } 
+        
+        setPosition({ top, left })
+        setArrowPosition({ top: 0, left: 50 + (arrowOffset / popupWidth) * 100 }) // en pourcentage
     }
 
     const handleClick = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -108,7 +128,11 @@ export default function Confirmation(props: ConfirmationProps) {
                             <button onClick={handleConfirm} className={s.confirm}>Confirmer</button>
                         </div>
                     </div>
-                    <div className={s.arrow}></div>
+                    <div
+                        style={{ left: `${arrowPosition.left}%`, transform:`translateX(${overflow ? "-25%" : "-50%"})` }}
+                        className={s.arrow}>
+                        
+                    </div>
                 </div>,
                 document.body
             )}
