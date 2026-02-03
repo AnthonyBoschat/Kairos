@@ -22,7 +22,7 @@ const redacted = Redacted_Script({
 });
 
 export const metadata: Metadata = {
-  title: 'Kairos',
+  title: 'Kairos: les bonnes actions, au bon moment',
   description: 'Organisez vos projets avec Kairos : créez des dossiers, listes de tâches et suivez vos objectifs efficacement',
 }
 
