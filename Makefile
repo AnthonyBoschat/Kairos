@@ -39,7 +39,7 @@ push:
 # Démarrer le serveur de développement
 dev:
 	sudo service postgresql restart
-	npm run dev
+	npx dotenv -e $(PRISMA_ENV) -- npm run dev
 
 # Build de production
 build:
