@@ -5,16 +5,15 @@ import AddFolderButton from "./_components/addFolderButton"
 import FolderList from "./_components/folderList"
 import UserMenu from "./_components/userMenu"
 import { useState } from "react"
-import { FolderWithList } from "@/types/list"
-import { userType } from "@/types/user"
-
-interface SideBarProps{
-    folders: FolderWithList[]
-    user: userType
-}
+import { useDashboardContext } from "@/context/DashboardContext"
 
 
-export default function SideBar(props:SideBarProps){
+
+
+export default function SideBar(){
+
+    const {folders, user} = useDashboardContext()
+    
     const [isAddingFolder, setIsAddingFolder] = useState(false)
 
     return(
@@ -36,11 +35,11 @@ export default function SideBar(props:SideBarProps){
                 <Divider width={"30%"} style={{marginTop:"1rem"}} />
                 
                 {/* Liste des dossiers */}
-                <FolderList setIsAddingFolder={setIsAddingFolder} isAddingFolder={isAddingFolder} folders={props.folders}/>
+                <FolderList setIsAddingFolder={setIsAddingFolder} isAddingFolder={isAddingFolder} folders={folders}/>
 
             </div>
             <div className={s.logout}>
-                <UserMenu user={props.user}/>
+                <UserMenu user={user}/>
             </div>
         </div>
     )

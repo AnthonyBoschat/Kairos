@@ -15,6 +15,7 @@ import { updateFolder } from "@/app/actions/folder"
 import { usePathname, useRouter } from "next/navigation"
 import ListInlineAction from "../ListInlineAction"
 import { ListWithTaskAndFolder } from "@/types/list"
+import DeleteIcon from "@/components/ui/icons/delete"
 
 
 export default function ListsActions(){
@@ -23,13 +24,13 @@ export default function ListsActions(){
         selectedFolderID,
         standaloneListID,
         setOrderedTasks,
-        lists
+        lists,
+        user
     } = useDashboardContext()
 
     const folderDetailURL       = `/dashboard/${selectedFolderID}`
     const queryClient           = useQueryClient()
     const router                = useRouter()
-    const pathname              = usePathname()
     
     const formRef               = useRef<null|HTMLFormElement>(null)
     const inputRef              = useRef<null|HTMLInputElement>(null)
@@ -38,6 +39,7 @@ export default function ListsActions(){
     const [newTitle, setNewTitle]               = useState("")
     const [selectedOption, setSelectedOption]   = useState(standaloneListID)
     const [standaloneList, setStandaloneList]   = useState<null|ListWithTaskAndFolder>(null)
+
 
     const isStandaloneView      = standaloneListID !== null
 
@@ -71,6 +73,7 @@ export default function ListsActions(){
                     router.push(`${folderDetailURL}${option}`)
                 }
                 setSelectedOption(newValue)
+                queryClient.invalidateQueries({ queryKey: ['folders', user.id] })
             }
         })
     }
@@ -91,8 +94,6 @@ export default function ListsActions(){
 
                     setNewTitle("")
                     queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
-                    queryClient.invalidateQueries({queryKey:["historic"]})
-
                 }
             })
         }

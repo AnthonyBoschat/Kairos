@@ -1,0 +1,5 @@
+model UserSettings {
+  id                  String  @id @default(cuid())
+  userId              String  @unique
+  trashRetentionDays  Int     @default(15) // 0-30
+}

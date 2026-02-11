@@ -2,18 +2,19 @@
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
+import React, { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
-import { toggleFolderFavorite } from "@/app/actions/folder"
-import StorageService from "@/services/StorageService"
+import { restoreFolder, toggleFolderFavorite } from "@/app/actions/folder"
 import { FolderWithList } from "@/types/list"
 import Highlight from "@/components/highlight"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { usePathname, useRouter } from "next/navigation"
+import RestoreIcon from "@/components/ui/icons/restore"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface FolderItemProps{
     folder: FolderWithList
@@ -23,12 +24,16 @@ interface FolderItemProps{
 
 export default function FolderItem(props:FolderItemProps){
 
-    const folderDetailURL = `/dashboard/${props.folder.id}`
-    const URLoptions = props.folder.listStandaloneID ? `?standaloneID=${props.folder.listStandaloneID}` : ""
-    const {selectedFolderID, searchContextValue}    = useDashboardContext()
+    const router        = useRouter()
+    const pathname      = usePathname()
+    const queryClient   = useQueryClient()
+
+    const {selectedFolderID, searchContextValue, user}    = useDashboardContext()
     const [isHover, setIsHover] = useState(false)
-    const router = useRouter()
-    const pathname = usePathname()
+
+    const URLoptions = props.folder.listStandaloneID ? `?standaloneID=${props.folder.listStandaloneID}` : ""
+    const folderDetailURL = `/dashboard/${props.folder.id}`
+    const isFolderDeleted = props.folder.deletedAt !== null
 
     const isFavorite = useMemo(() => {
         return props.folder?.favorite
@@ -44,6 +49,18 @@ export default function FolderItem(props:FolderItemProps){
             const folderID = props.folder.id
             handleResponse(async () => {
                 await toggleFolderFavorite(folderID)
+            })
+        }
+    }
+
+    const handleRestoreFolder = (event: React.MouseEvent) => {
+        if(props.folder?.id){
+            event.stopPropagation()
+            const folderID = props.folder.id
+            handleResponse(async () => {
+                await restoreFolder(folderID)
+                queryClient.invalidateQueries({queryKey:['folders', user.id]})
+                queryClient.invalidateQueries({queryKey: ["lists", folderID]})
             })
         }
     }
@@ -64,15 +81,24 @@ export default function FolderItem(props:FolderItemProps){
     }, [props.folder])
 
     return(
-        <button onClick={handleClick} onMouseLeave={() => setIsHover(false)} onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" className={withClass(s.container, isSelected && s.active)}>
+        <button 
+            onClick={handleClick} 
+            onMouseLeave={() => setIsHover(false)} 
+            onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" 
+            className={withClass(
+                s.container, 
+                isSelected && s.active,
+                isFolderDeleted && s.deleted
+            )}
+        >
             <div className={s.icons}>
                 <FolderSolidIcon color={FOLDER_COLORS[props.folder.color ?? 0]} size={18} />
-                {isFavorite && (
+                {(isFavorite && !isFolderDeleted) && (
                     <div onClick={handleToggleFavorite} title="Ce dossier est en favori" className={s.favorite}>
                         <StarIcon animate active size={16}/>
                     </div>
                 )}
-                {(!isFavorite && isHover) && (
+                {(!isFavorite && isHover && !isFolderDeleted) && (
                     <div onClick={handleToggleFavorite} title="Ajouter ce dossier aux favori ?" className={s.favorite}>
                         <StarIcon size={16}/>
                     </div>
@@ -88,9 +114,28 @@ export default function FolderItem(props:FolderItemProps){
             <div className={withClass(s.indicator, (isHover || isSelected) && s.active)}>
                 {(isHover || isSelected) && <ArrowLeftIcon size={16}/>}
             </div>
+
             <div className={withClass(s.options, isHover && s.active)}>
-                {isHover && <div title="Accédez aux options du dossier" onClick={(event) => handleClickOptions(event)}><OptionsIcon size={20}/></div>}
+                {isFolderDeleted && (
+                            <div 
+                                className={s.restore}
+                                title={`Restaurer le dossier "${props.folder.title}"` }
+                                onClick={handleRestoreFolder}
+                            >
+                                <RestoreIcon size={18}/>
+                            </div>
+                        )}
+                {(isHover && !isFolderDeleted) && (
+                    <div 
+                        className={s.option} 
+                        title="Accédez aux options du dossier" 
+                        onClick={handleClickOptions}
+                    >
+                        <OptionsIcon size={20}/>
+                    </div>
+                )}
             </div>
+
         </button>
     )
 }

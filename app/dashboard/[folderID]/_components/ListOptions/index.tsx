@@ -59,7 +59,7 @@ export default function ListOptions(props:ListOptionsProps){
 
     const refetch = () => {
         queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
-        queryClient.invalidateQueries({queryKey:["historic"]})
+        
     }
     
     // Supprime une liste avec son ID

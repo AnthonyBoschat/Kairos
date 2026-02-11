@@ -1,16 +1,19 @@
 model Folder {
-  id                String   @id @default(cuid())
+  id                String    @id @default(cuid())
   title             String   
   color             Int
   order             Int      
-  favorite          Boolean  @default(false)
+  favorite          Boolean   @default(false)
   listStandaloneID  String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
 
   userId            String
-  user              User @relation(fields: [userId], references: [id], onDelete:Cascade)
+  user              User      @relation(fields: [userId], references: [id], onDelete:Cascade)
 
   lists             List[]
+
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  deletedAt         DateTime?
+  
   @@map("folders")
 }

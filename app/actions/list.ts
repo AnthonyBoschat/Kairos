@@ -5,8 +5,8 @@ import { getNextAvailableListColorIndexForThisFolder } from "@/lib/list-color";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import checkUser from "./utils";
-import logHistory from "./historic";
-import { HistoricItemType } from "@prisma/client";
+import { withTrash } from "@/utils/trash";
+import { TrashFilter } from "@/types/trashFilter";
 
 
 
@@ -23,18 +23,23 @@ export async function getNextFolderColorIndexForThisFolder(folderID:string){
     return colorIndex;
 }
 
-export async function getLists(id:string){
+export async function getLists(id:string, trashFilter: TrashFilter = "no"){
     await checkUser()
-
+    
     const lists = await prisma.list.findMany({
-        where:{folderId:id},
+        where:{
+            folderId:id, 
+            ...withTrash(trashFilter, "list")
+        },
         include:{
             folder:{
                 select:{
                     title: true
                 }
             },
-            tasks:true
+            tasks: {
+                where: withTrash(trashFilter, "task"),
+            },
         }
     })
     
@@ -53,7 +58,6 @@ export async function deleteList(id:string){
     const deletedList = await prisma.list.delete({
         where:{id:id}
     })
-    await logHistory(deletedList, HistoricItemType.LIST, true)
 
     revalidatePath("/dashboard")
     return {success:true, message:`La liste ${deletedList.title} a été supprimer avec succès`}
@@ -81,7 +85,6 @@ export async function addList({title, folderID}:{title:string, folderID:string})
             folderId: folder.id
         }
     })
-    await logHistory(createdList, HistoricItemType.LIST)
 
     revalidatePath('/dashboard')
     return {success:true, message:`La liste ${createdList.title} a été ajouter`}
@@ -158,7 +161,6 @@ export async function updateList({
             // checkable: checkable
         }
     })
-    await logHistory(updatedList, HistoricItemType.LIST)
 
     revalidatePath("/dashboard")
     return {success:true, message:`La liste a été correctement modifier`}
@@ -201,4 +203,27 @@ export async function reorderLists(orderedListsIds:reorderListsType) {
 
     revalidatePath("/dashboard")
     return { success: true }
+}
+
+
+export async function restoreList(listID:string){
+    await checkUser()
+
+    const folder = await prisma.list.findUnique({
+        where:{
+            id:listID,
+            deletedAt: {not: null}
+        }
+    })
+
+    if(!folder) throw new Error("La liste que vous essayez de restaurer n'existe pas")
+
+    await prisma.list.update({
+        where:{id:listID},
+        data:{
+            deletedAt: null
+        }
+    })
+
+    return {success:true}
 }
