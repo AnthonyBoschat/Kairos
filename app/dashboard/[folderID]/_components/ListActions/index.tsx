@@ -68,12 +68,12 @@ export default function ListsActions(){
                     folderID:selectedFolderID,
                     listStandaloneID:newValue ?? null,
                 })
+                await queryClient.invalidateQueries({ queryKey: ['folders', user.id] })
                 if(standaloneListID !== newValue){
                     const option = newValue ? `?standaloneID=${newValue}` : ""
                     router.push(`${folderDetailURL}${option}`)
                 }
                 setSelectedOption(newValue)
-                queryClient.invalidateQueries({ queryKey: ['folders', user.id] })
             }
         })
     }
