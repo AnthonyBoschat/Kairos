@@ -1,12 +1,8 @@
 'use server'
 
-
-import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import checkUser from "./utils"
-import logHistory from "./historic"
-import { HistoricItemType } from "@prisma/client"
 
 interface addTaskProps{
     title: string
@@ -40,7 +36,6 @@ export async function addTask({title, listID}: addTaskProps){
             order: (maxOrder._max.order ?? -1) + 1
         }
     })
-    await logHistory(createdTask, HistoricItemType.TASK)
 
     revalidatePath("/dashboard")
     return {success:true, message:"Tâche ajouter", task:createdTask}
@@ -85,8 +80,6 @@ export async function deleteTask({taskID}: deleteTaskProps){
     const deletedTask = await prisma.task.delete({
         where:{id:taskID}
     })
-
-    await logHistory(deletedTask, HistoricItemType.TASK, true)
     return{success:true, message:"Tâche supprimé"}
 }
 
@@ -185,4 +178,28 @@ export async function reorderTasks(orderedTasksIds:reorderTasksType) {
 
     revalidatePath("/dashboard")
     return { success: true }
+}
+
+
+
+export async function restoreTask(taskID:string){
+    await checkUser()
+
+    const folder = await prisma.task.findUnique({
+        where:{
+            id:taskID,
+            deletedAt: {not: null}
+        }
+    })
+
+    if(!folder) throw new Error("L'élément que vous essayez de restaurer n'existe pas")
+
+    await prisma.task.update({
+        where:{id:taskID},
+        data:{
+            deletedAt: null
+        }
+    })
+
+    return {success:true}
 }

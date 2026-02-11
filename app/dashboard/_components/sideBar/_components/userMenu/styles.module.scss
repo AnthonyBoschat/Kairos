@@ -16,6 +16,47 @@
             }
         }
     }
+
+    .indicator{
+        margin-left: 1.5rem;
+        margin-right: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        justify-content: center;
+        transition: opacity 0.1s linear;
+        opacity: 1;
+        &.hidden{
+            opacity: 0;
+        }
+
+
+            .trash{
+                color: white;
+                display: flex;
+                padding: 0.2rem;
+                border-radius: 4px;
+                position: relative;
+                background-color: rgb(64, 69, 89);
+                &.yes{
+
+                }
+                &.only{
+                     background-color: rgba(240, 42, 42, 0.8);
+                    .warningIcon{
+                        position: absolute;
+                        top: 0;
+                        right: 0;
+                        border-radius: 999px;
+                        width: 0.8rem;
+                        height: 0.8rem;
+                        transform: translate(25%, -25%);
+                        color: white;
+                    }
+                }
+            }
+
+        
+    }
     
     .menuButton{
         padding-left: 1.5rem;
@@ -60,11 +101,24 @@
         transition: transform 0.3s ease-in-out, opacity 0.2s linear;
         opacity: 0;
 
+        .indicator{
+            margin-left: 0;
+            position: absolute;
+            left: 50%;
+            top: -0.4rem;
+            transform: translate(-50%, -100%);
+        }
+
         &.active{
             transform: translateY(0);
             opacity: 1;
         }
-        button{
+        button.action, select.action{
+            &:hover, &.active{
+                opacity: 1;
+            }
+        }
+        .action{
             all:unset;
             display: flex;
             gap: 0.5rem;
@@ -72,8 +126,63 @@
             opacity: 0.8;
             transition: all 0.15s linear;
             cursor: pointer;
-            &:hover, &.active{
-                opacity: 1;
+
+            &.trash{
+                display: flex;
+                justify-content: center;
+                margin-bottom: 2rem;
+                .trashIcons{
+                    display: flex;
+                    width: 80%;
+                    justify-content: space-evenly;
+                    outline: 1px solid rgb(98, 98, 98);
+                    padding: 0.4rem;
+                    border-radius: 4px;
+                    background-color: rgba(0, 0, 0, 0.3);
+                    >span{
+                        display: flex;
+                        padding: 0.2rem;
+                        border-radius: 4px;
+                        position: relative;
+                        transition: all 0.1s linear;
+                        cursor: pointer;
+
+                        &:hover{
+                            opacity: 1;
+                            background-color: rgba(255, 255, 255, 0.25);
+                            &.warning{
+                                background-color: rgb(240, 42, 42, 0.4);
+                            }
+                        }
+                        &.active{
+                            opacity: 1;
+                            background-color: rgba(255, 255, 255, 0.25);
+                            &.warning{
+                                background-color: rgb(240, 42, 42, 0.4);
+                            }
+                        }
+                    }
+                    >span.no{
+                        svg{
+                            opacity: 0.5;
+                        }
+                    }
+                    >span.only{
+                        >svg{
+                            color: rgb(240, 42, 42);
+                        }
+                        .warningIcon{
+                            position: absolute;
+                            top: 0;
+                            right: 0;
+                            border-radius: 999px;
+                            width: 0.8rem;
+                            height: 0.8rem;
+                            transform: translate(25%, -25%);
+                            color: white;
+                        }
+                    }
+                }
             }
         }
 

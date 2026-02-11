@@ -7,7 +7,6 @@ model User {
   updatedAt   DateTime    @updatedAt
 
   folders     Folder[]
-  historics   Historic[]
 
   @@map("users")
 }

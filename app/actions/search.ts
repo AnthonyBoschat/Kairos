@@ -1,6 +1,4 @@
 'use server'
-
-import { getCurrentUser } from "@/lib/auth"
 import { prisma } from "@/lib/prisma"
 import checkUser from "./utils"
 

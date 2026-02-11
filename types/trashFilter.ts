@@ -1,0 +1,1 @@
+export type TrashFilter = "no" | "yes" | "only"
