@@ -24,7 +24,8 @@ export default function ListsActions(){
         selectedFolderID,
         standaloneListID,
         setOrderedTasks,
-        lists
+        lists,
+        user
     } = useDashboardContext()
 
     const folderDetailURL       = `/dashboard/${selectedFolderID}`
@@ -72,6 +73,7 @@ export default function ListsActions(){
                     router.push(`${folderDetailURL}${option}`)
                 }
                 setSelectedOption(newValue)
+                queryClient.invalidateQueries({ queryKey: ['folders', user.id] })
             }
         })
     }
