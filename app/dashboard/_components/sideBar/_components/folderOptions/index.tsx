@@ -17,6 +17,7 @@ import StorageService from "@/services/StorageService"
 import ColorOptions from "@/components/colorOptions"
 import { useQueryClient } from "@tanstack/react-query"
 import { useRouter } from "next/navigation"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderOptionsProps{
     folder: FolderWithList,
@@ -26,9 +27,9 @@ interface FolderOptionsProps{
 
 export default function FolderOptions(props:FolderOptionsProps){
 
-    const queryClient = useQueryClient()
-    const router = useRouter()
-    const folderDetailURL = `/dashboard/${props.folder.id}`
+    const queryClient   = useQueryClient()
+    const router        = useRouter()
+    const {user, trashFilter}        = useDashboardContext()
     const [isOpenColorOptions, setIsOpenColorOptions]           = useState<Boolean>(false)
     const [folderTitle, setFolderTitle]         = useState(props.folder?.title)
     const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
@@ -61,10 +62,14 @@ export default function FolderOptions(props:FolderOptionsProps){
             const folderID = props.folder.id
             handleResponse(async () => {
                 await deleteFolder(folderID)
-                router.push("/dashboard")
                 props.setSelectedFolderOptions(null)
                 StorageService.remove("selectedFolderID")
-                queryClient.invalidateQueries({queryKey:["historic"]})
+                queryClient.invalidateQueries({queryKey:['folders', user.id]})
+                if(trashFilter === "yes" || trashFilter === "only"){
+                    queryClient.invalidateQueries({queryKey: ["lists", folderID]})
+                }else{
+                    router.push("/dashboard")
+                }
             })
         }
     }
@@ -86,7 +91,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                 title:folderTitle,
             })
             setOnEditTitle(false)
-            queryClient.invalidateQueries({queryKey:["historic"]})
+            
             queryClient.invalidateQueries({queryKey:["lists", props.folder.id]})
             props.setSelectedFolderOptions(prev => prev ? {
                 ...prev,

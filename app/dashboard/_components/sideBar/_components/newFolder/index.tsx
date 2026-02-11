@@ -1,13 +1,13 @@
 "use client"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
-import React, { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react"
+import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import { addFolder, getNextFolderColorIndexForCurrentUser } from "@/app/actions/folder"
 import FOLDER_COLORS from "@/constants/folderColor"
 import handleResponse from "@/utils/handleResponse"
-import { toast } from "react-toastify"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 import { useQueryClient } from "@tanstack/react-query"
+import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderProps{
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
@@ -16,6 +16,7 @@ interface FolderProps{
 
 export default function AddFolderButton(props:FolderProps){
 
+    const {user}        = useDashboardContext()
     const titleRef      = useRef<HTMLInputElement>(null);
     const containerRef  = useRef<HTMLButtonElement>(null);
 
@@ -38,7 +39,7 @@ export default function AddFolderButton(props:FolderProps){
         if(title.trim()){
             handleResponse(async () => {
                 await addFolder({title:title})
-                queryClient.invalidateQueries({queryKey:["historic"]})
+                queryClient.invalidateQueries({queryKey:['folders', user.id]})
             })
             
         }

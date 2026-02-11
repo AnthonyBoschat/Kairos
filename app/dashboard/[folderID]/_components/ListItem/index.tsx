@@ -8,6 +8,10 @@ import Highlight from "@/components/highlight"
 import withClass from "@/utils/class"
 import { useDashboardContext } from "@/context/DashboardContext"
 import ListInlineAction from "../ListInlineAction"
+import RestoreIcon from "@/components/ui/icons/restore"
+import handleResponse from "@/utils/handleResponse"
+import { restoreList } from "@/app/actions/list"
+import { useQueryClient } from "@tanstack/react-query"
 
 interface ListItemProps{
     list: ListWithTaskAndFolder
@@ -17,14 +21,27 @@ interface ListItemProps{
 
 export default function ListItem(props:ListItemProps){
 
-    const {selectedListID, selectedTaskID, setSelectedListID, searchContextValue}  = useDashboardContext()
-
+    const queryClient = useQueryClient()
+    const {selectedListID, selectedTaskID, setSelectedListID, searchContextValue, user}  = useDashboardContext()
     const [isAddingTask, setIsAddingTask] = useState(false)
     const taskNumber = props.list.tasks.length
+    const isListDeleted = props.list.deletedAt !== null
 
     const listColor = useMemo(() => {
         return LIST_COLOR[props.list.color ?? 0]
     }, [props])
+
+    const handleRestoreList = (event: React.MouseEvent) => {
+        if(props.list?.id){
+            event.stopPropagation()
+            const listID = props.list.id
+            handleResponse(async () => {
+                await restoreList(listID)
+                queryClient.invalidateQueries({queryKey: ["lists", props.list.folderId]})
+                queryClient.invalidateQueries({queryKey: ["folders", user.id]})
+            })
+        }
+    }
 
     useEffect(() => {
         if (selectedListID && props.list.id === selectedListID) {
@@ -60,7 +77,8 @@ export default function ListItem(props:ListItemProps){
                 s.container, 
                 (searchContextValue && (selectedListID || selectedTaskID)) && s.onSelect,
                 (searchContextValue && props.list.id === selectedListID) && s.select,
-                ((searchContextValue && props.list.tasks.find(task => task.id === selectedTaskID)) && s.select)
+                ((searchContextValue && props.list.tasks.find(task => task.id === selectedTaskID)) && s.select),
+                isListDeleted && s.deleted
             )}
         >
             <div style={{backgroundColor: listColor}} className={s.color}/>
@@ -78,7 +96,16 @@ export default function ListItem(props:ListItemProps){
                     )}
                 </div>
                 <div className={s.right}>
-                    <ListInlineAction list={props.list}/>
+                    {isListDeleted && (
+                        <div 
+                            className={s.restore}
+                            title={`Restaurer la liste "${props.list.title}"` }
+                            onClick={handleRestoreList}
+                        >
+                            <RestoreIcon size={20}/>
+                        </div>
+                    )}
+                    {!isListDeleted && <ListInlineAction list={props.list}/>}
                 </div>
             </div>
 

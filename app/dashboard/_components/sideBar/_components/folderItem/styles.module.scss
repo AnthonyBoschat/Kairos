@@ -13,6 +13,21 @@
     padding-bottom: 0.2rem;
     width: 100%;
 
+    
+    &.deleted{
+        &::after{
+            opacity: 1;
+            outline: 1px dashed v.$toast-error;
+            background-color: rgb(255, 236, 236, 0.7);
+            height: 97%;
+        }
+        &:hover, &.active{
+            &::after{
+                background-color: rgb(255, 236, 236);
+
+            }
+        }
+    }
     &::after{
         content: "";
         position: absolute;
@@ -85,21 +100,38 @@
         justify-content: center;
         right: -1rem;
         margin-top: 0.20rem;
-        div{
+        .option{
             all:unset;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        svg>g{
-            opacity: 0.6;
-            fill: v.$dark-primary-80;
-        }
-        &:hover{
             svg>g{
-                opacity: 1;
+                opacity: 0.6;
                 fill: v.$dark-primary-80;
             }
+            &:hover{
+                svg>g{
+                    opacity: 1;
+                    fill: v.$dark-primary-80;
+                }
+            }
         }
+
+        .restore{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: v.$state-error-dark;
+            svg{
+                opacity: 0.5;
+                transition: opacity 0.1s linear;
+            }
+            &:hover{
+                svg{
+                    opacity: 0.8;
+                }
+            }
+        }
+        
     }
 }

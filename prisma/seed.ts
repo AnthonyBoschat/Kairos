@@ -75,14 +75,23 @@ async function main() {
   const hashedPassword = await bcrypt.hash('sudo', 10);
 
   const user = await prisma.user.upsert({
-    where: { email: 'AnthonyBoschat.dev@hotmail.com' },
+    where: { email: 'Kairos.test@hotmail.com' },
     update: {},
     create: {
-      email: 'AnthonyBoschat.dev@hotmail.com',
+      email: 'Kairos.test@hotmail.com',
       password: hashedPassword,
-      name: 'Anthony',
+      name: 'Kairos',
     },
   });
+
+  const userSettings = await prisma.userSettings.upsert({
+    where: {userId: user.id},
+    update:{},
+    create:{
+      userId:user.id,
+    }
+
+  })
 
   const folders: FolderSeed[] = [
     // 1) Programmation
