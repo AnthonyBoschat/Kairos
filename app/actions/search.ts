@@ -1,15 +1,18 @@
 'use server'
 import { prisma } from "@/lib/prisma"
 import checkUser from "./utils"
+import { TrashFilter } from "@/types/trashFilter"
+import { withTrash } from "@/utils/trash"
 
 
-export async function search(searchValue: string) {
+export async function search(searchValue: string, trashFilter: TrashFilter = "no") {
     const user = await checkUser()
 
     const folders = await prisma.folder.findMany({
         where: {
             userId: user.id,
-            title: { contains: searchValue, mode: "insensitive" }
+            title: { contains: searchValue, mode: "insensitive" },
+            ...withTrash(trashFilter, "folder")
         },
         select: { 
             id: true, 
@@ -20,7 +23,8 @@ export async function search(searchValue: string) {
     const lists = await prisma.list.findMany({
         where: {
             folder: { userId: user.id },
-            title: { contains: searchValue, mode: "insensitive" }
+            title: { contains: searchValue, mode: "insensitive" },
+            ...withTrash(trashFilter, "list")
         },
         select: { 
             id: true, 
@@ -37,7 +41,8 @@ export async function search(searchValue: string) {
     const tasks = await prisma.task.findMany({
         where: {
             list: { folder: { userId: user.id } },
-            title: { contains: searchValue, mode: 'insensitive' }
+            title: { contains: searchValue, mode: 'insensitive' },
+            ...withTrash(trashFilter, "task")
         },
         select: {
             id: true,
