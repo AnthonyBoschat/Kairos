@@ -12,6 +12,10 @@ model Task {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
+
+  @@index([listId, deletedAt, order])
+  @@index([listId, deletedAt, done])
+  @@index([listId, deletedAt, favorite])
   
   @@map("tasks")
 }

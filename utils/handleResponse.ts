@@ -1,12 +1,15 @@
 import { toast } from "react-toastify"
 
-export default async function handleResponse(callback: Function){
+export default async function handleResponse(successCallback: Function, errorCallback?: Function){
     try{
-        await callback()
+        await successCallback()
     }catch(error){
-        console.log(error)
+        console.error(error)
         if(error instanceof Error){
             toast.error(error.message)
+            if(errorCallback){
+                errorCallback()
+            }
         }
     }
 }

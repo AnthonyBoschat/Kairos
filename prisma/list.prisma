@@ -16,5 +16,8 @@ model List {
   updatedAt         DateTime  @updatedAt
   deletedAt         DateTime?
 
+  @@index([folderId, deletedAt, order])
+  @@index([folderId, deletedAt, favorite])
+
   @@map("lists")
 }
