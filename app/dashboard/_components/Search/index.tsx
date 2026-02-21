@@ -40,7 +40,7 @@ type ResultKind = "folder" | "list" | "task"
 
 export default function Search() {
 
-  const {setSelectedListID, setSelectedTaskID, setSearchContextValue} = useDashboardContext()
+  const {setSelectedListID, setSelectedTaskID, setSearchContextValue, trashFilter} = useDashboardContext()
   const containerRef        = useRef<HTMLDivElement | null>(null)
   const inputRef            = useRef<HTMLInputElement | null>(null)
   const latestRequestIdRef  = useRef(0)
@@ -175,7 +175,7 @@ export default function Search() {
     setIsLoading(true)
 
     handleResponse(async () => {
-      const response = await search(value)
+      const response = await search(value, trashFilter)
       if (requestId !== latestRequestIdRef.current) return
       setSearchResult(response)
       setIsLoading(false)

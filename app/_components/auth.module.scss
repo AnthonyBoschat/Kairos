@@ -33,8 +33,8 @@
     }
 
     .form{
-        padding-left: 4rem;
-        padding-right: 4rem;
+        padding-left: 2rem;
+        padding-right: 2rem;
     }
 }
 
@@ -57,7 +57,7 @@
             border: 1px solid rgba(0, 0, 0, 0.1);
             background-color: v.$light-secondary-50;
             padding: 4px 8px;
-            width: 22rem;
+            width: 25rem;
             transition: border 0.1s linear;
             border-radius: 0.25rem;
             &::placeholder{
@@ -78,7 +78,7 @@
             margin-top: 4px;
             text-align: end;
             button{
-                visibility: hidden;
+                // visibility: hidden;
                 color: v.$blue-primary;
                 border: none;
                 background-color: transparent;

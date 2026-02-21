@@ -46,7 +46,11 @@ export default function Login(props:LoginProps) {
     }
   }
 
-  
+
+  const handleForgotPassword = async () => {
+    router.push("/forgot")
+  };
+
   return (
     <form className={s.container} onSubmit={handleSubmit}>
       <div className={s.row}>
@@ -81,7 +85,7 @@ export default function Login(props:LoginProps) {
           </button>
         </div>
         <span className={s.forgot}>
-          <button>
+          <button type="button" onClick={handleForgotPassword}>
             Mot de passe oublié ?
           </button>
         </span>
