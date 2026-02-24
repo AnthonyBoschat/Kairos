@@ -8,7 +8,7 @@ import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
-import { restoreFolder, toggleFolderFavorite } from "@/app/actions/folder"
+import { restoreFolder, restoreFolderResponse, toggleFolderFavorite, toggleFolderFavoriteResponse } from "@/app/actions/folder"
 import { FolderWithList } from "@/types/list"
 import Highlight from "@/components/highlight"
 import { useDashboardContext } from "@/context/DashboardContext"
@@ -43,12 +43,24 @@ export default function FolderItem(props:FolderItemProps){
         return folderDetailURL === pathname
     }, [selectedFolderID, props.folder, folderDetailURL, pathname])
 
+    const syncQueryClientData = (response:any) => {
+        if(response.success && response.updatedFolder){
+            queryClient.setQueriesData<FolderWithList[]>({queryKey:['folders', user.id]}, (previousFolders) => {
+                if(!previousFolders) return previousFolders
+                return previousFolders.map(folder => folder.id === response.updatedFolder.id ? {...folder, ...response.updatedFolder} : folder)
+            })
+        }
+    }
+
     const handleToggleFavorite = (event:React.MouseEvent) => {
         if(props.folder?.id){
             event.stopPropagation()
             const folderID = props.folder.id
-            handleResponse(async () => {
-                await toggleFolderFavorite(folderID)
+            handleResponse({
+                request: () => toggleFolderFavorite(folderID),
+                onSuccess: (response:toggleFolderFavoriteResponse) => {
+                    syncQueryClientData(response)
+                },
             })
         }
     }
@@ -57,10 +69,13 @@ export default function FolderItem(props:FolderItemProps){
         if(props.folder?.id){
             event.stopPropagation()
             const folderID = props.folder.id
-            handleResponse(async () => {
-                await restoreFolder(folderID)
-                queryClient.invalidateQueries({queryKey:['folders', user.id]})
-                queryClient.invalidateQueries({queryKey: ["lists", folderID]})
+            handleResponse({
+                request: () => restoreFolder(folderID),
+                onSuccess: (response:restoreFolderResponse) => {
+                    syncQueryClientData(response)
+                    queryClient.invalidateQueries({queryKey: ["lists", folderID]})
+
+                },
             })
         }
     }

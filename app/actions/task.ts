@@ -3,12 +3,14 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import checkUser from "./utils"
+import { responseError } from "@/utils/responseError"
 
 interface addTaskProps{
     title: string
     listID: string
 }
 
+export type addTaskResponse = Awaited<ReturnType<typeof addTask>>;
 export async function addTask({title, listID}: addTaskProps){
     const user = await checkUser()
 
@@ -21,8 +23,8 @@ export async function addTask({title, listID}: addTaskProps){
         }
     })
 
-    if(!list) throw new Error("Liste non trouvé")
-    if(list.folder.userId !== user.id) throw new Error("Non autorisé, cette liste ne vous appartient pas")
+    if(!list) return responseError("Liste non trouvé")
+    if(list.folder.userId !== user.id) return responseError("Non autorisé, cette liste ne vous appartient pas")
 
     const maxOrder = await prisma.task.aggregate({
         where:{listId: list.id},
@@ -38,7 +40,7 @@ export async function addTask({title, listID}: addTaskProps){
     })
 
     revalidatePath("/dashboard")
-    return {success:true, message:"Tâche ajouter", task:createdTask}
+    return {success:true, task:createdTask}
 }
 
 interface toggleTaskFavoriteProps{
@@ -51,7 +53,7 @@ export async function toggleTaskFavorite({taskID}: toggleTaskFavoriteProps){
         where:{id:taskID}
     })
 
-    if(!task) throw new Error("Tâche non trouvé")
+    if(!task) return responseError("Tâche non trouvé")
 
     const newFavoriteState = !task.favorite
     await prisma.task.update({
@@ -62,12 +64,13 @@ export async function toggleTaskFavorite({taskID}: toggleTaskFavoriteProps){
     })
 
     revalidatePath("/dashboard")
-    return {success:true, message:"Tâche ajouté aux favoris"}
+    return {success:true}
 }
 
 interface deleteTaskProps{
     taskID:string
 }
+export type deleteTaskResponse = Awaited<ReturnType<typeof deleteTask>>;
 export async function deleteTask({taskID}: deleteTaskProps){
     await checkUser()
 
@@ -75,12 +78,12 @@ export async function deleteTask({taskID}: deleteTaskProps){
         where:{id:taskID}
     })
 
-    if(!task) throw new Error("Tâche non trouvé")
+    if(!task) return responseError("Tâche non trouvé")
 
     const deletedTask = await prisma.task.delete({
         where:{id:taskID}
     })
-    return{success:true, message:"Tâche supprimé"}
+    return{success:true, deletedAt:deletedTask.deletedAt}
 }
 
 type updateTaskContentProps = {
@@ -94,7 +97,7 @@ export async function updateTaskContent({taskID, content}: updateTaskContentProp
         where:{id:taskID}
     })
 
-    if(!task) throw new Error("Tâche non trouvé")
+    if(!task) return responseError("Tâche non trouvé")
 
     const nullContent = content.trim() === "" 
     await prisma.task.update({
@@ -118,7 +121,7 @@ export async function updateTaskTitle({taskID, title}: updateTaskTitleProps){
         where:{id:taskID}
     })
 
-    if(!task) throw new Error("Tâche non trouvé")
+    if(!task) return responseError("Tâche non trouvé")
 
     const nullTitle = title.trim() === "" 
 
@@ -142,7 +145,7 @@ export async function toggleTaskDone({taskID}: toggleTaskDoneProps){
         where:{id:taskID}
     })
 
-    if(!task) throw new Error("Tâche non trouvé")
+    if(!task) return responseError("Tâche non trouvé")
 
     const currentTaskDone = task.done
 
@@ -192,7 +195,7 @@ export async function restoreTask(taskID:string){
         }
     })
 
-    if(!folder) throw new Error("L'élément que vous essayez de restaurer n'existe pas")
+    if(!folder) return responseError("L'élément que vous essayez de restaurer n'existe pas")
 
     await prisma.task.update({
         where:{id:taskID},

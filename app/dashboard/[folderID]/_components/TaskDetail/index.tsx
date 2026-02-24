@@ -11,8 +11,8 @@ import { useQueryClient } from "@tanstack/react-query"
 import LoadingIcon from "@/components/ui/icons/Loading"
 import SuccessIcon from "@/components/ui/icons/Success"
 import StarIcon from "@/components/ui/icons/Star"
-import { toast } from "react-toastify"
 import { useDashboardContext } from "@/context/DashboardContext"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface TaskDetailProps{
     listColor:string
@@ -46,34 +46,62 @@ export default function TaskDetail(props:TaskDetailProps){
         if(isSyncData) setIsSyncData(false)
     }, [isSyncData])
 
-    const handleUpdateTaskTitle = (currentTitle:string) => {
-        handleResponse(async() => {
-            await updateTaskTitle({taskID:props.task.id, title: currentTitle})
-            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+    const handleUpdateTaskTitle = (currentTitle: string) => {
+        handleResponse({
+            request: () => updateTaskTitle({ taskID: props.task.id, title: currentTitle }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                    previousLists?.map(list => ({
+                        ...list,
+                        tasks: list.tasks.map(task =>
+                            task.id === props.task.id ? { ...task, title: currentTitle } : task
+                        )
+                    }))
+                )
+            }
         })
     }
 
-    const handleUpdateTaskContent = (currentContent:string) => {
-        handleResponse(async() => {
-            await updateTaskContent({taskID:props.task.id, content: currentContent})
-            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+    const handleUpdateTaskContent = (currentContent: string) => {
+        handleResponse({
+            request: () => updateTaskContent({ taskID: props.task.id, content: currentContent }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                    previousLists?.map(list => ({
+                        ...list,
+                        tasks: list.tasks.map(task =>
+                            task.id === props.task.id ? { ...task, content: currentContent } : task
+                        )
+                    }))
+                )
+            }
         })
     }
 
     const handleToggleFavorite = () => {
-        handleResponse(async() => {
-            await toggleTaskFavorite({taskID:props.task.id})
-            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
-            toast.dismiss()
+        handleResponse({
+            request: () => toggleTaskFavorite({ taskID: props.task.id }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                    previousLists?.map(list => ({
+                        ...list,
+                        tasks: list.tasks.map(task =>
+                            task.id === props.task.id ? { ...task, favorite: !task.favorite } : task
+                        )
+                    }))
+                )
+            }
         })
     }
 
     useEffect(() => {
+        if(isSyncData) return
         handleUpdateTaskContent(debouncedContent)
         setIsSyncData(true)
     }, [debouncedContent])
 
     useEffect(() => {
+        if(isSyncData) return
         handleUpdateTaskTitle(debouncedTitle)
         setIsSyncData(true)
     }, [debouncedTitle])

@@ -3,13 +3,12 @@ import s from "./styles.module.scss"
 import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react"
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
-import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
 import COLOR from "@/constants/color"
 import StarIcon from "@/components/ui/icons/Star"
 import LIST_COLOR from "@/constants/listColor"
-import { deleteList, toggleListFavorite, updateList, updateListColor } from "@/app/actions/list"
+import { deleteList, deleteListResponse, toggleListFavorite, updateList, updateListColor } from "@/app/actions/list"
 import { useQueryClient } from "@tanstack/react-query"
 import Overlay from "@/components/overlay"
 import { ListWithTaskAndFolder } from "@/types/list"
@@ -26,7 +25,7 @@ interface ListOptionsProps{
 export default function ListOptions(props:ListOptionsProps){
     const queryClient   = useQueryClient()
     const router        = useRouter()
-    const {standaloneListID} = useDashboardContext()
+    const {standaloneListID, trashFilter} = useDashboardContext()
     const [listTitle, setListTitle]         = useState(props.list?.title)
     const [listColor, setListColor]         = useState(LIST_COLOR[props.list.color ?? 0])
     const [listFavorite, setListFavorite]   = useState(props.list?.favorite)
@@ -57,22 +56,35 @@ export default function ListOptions(props:ListOptionsProps){
         return JSON.stringify(serverState) !== JSON.stringify(formState)
     }, [serverState, formState])
 
-    const refetch = () => {
-        queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
-        
-    }
+
     
     // Supprime une liste avec son ID
     // Si on est actuellement dans une vue liste unique (standaloneListID), et que cette liste est celle qui vient d'être supprimer, on reviens à la vue global
     const handleDeleteList = async() => {
         if(props.list?.id){
             const listID = props.list.id
-            handleResponse(async () => {
-                await deleteList(listID)
-                refetch()
-                props.setSelectedListOptions(null)
-                if(standaloneListID && standaloneListID === listID){
-                    router.push(`/dashboard/${props.list.folderId}`)
+            handleResponse({
+                request: () => deleteList(listID),
+                onSuccess: (response: deleteListResponse) => {
+                    if(response.success){
+
+                        queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', props.list.folderId] }, (previousLists) => {
+                            if(!previousLists) return previousLists
+                            if(trashFilter === "yes" || trashFilter === "only"){
+                                return previousLists?.map(list => list.id === listID 
+                                        ? {...list, deletedAt:response.deletedAt, tasks: list.tasks.map(task => ({ ...task, deletedAt: response.deletedAt }))} 
+                                        : list
+                                )
+                            }else{
+                                return previousLists?.filter(list => list.id !== listID)
+                            }
+                        })
+                        props.setSelectedListOptions(null)
+                        if(standaloneListID && standaloneListID === listID){
+                            router.push(`/dashboard/${props.list.folderId}`)
+                        }
+                        queryClient.invalidateQueries({queryKey: ["lists", props.list.folderId]})
+                    }
                 }
             })
         }
@@ -81,42 +93,57 @@ export default function ListOptions(props:ListOptionsProps){
     const handleToggleFavorite = async() => {
         if(props.list?.id){
             const listID = props.list.id
-            handleResponse(async () => {
-                await toggleListFavorite(listID)
-                setListFavorite(current => !current)
-                refetch()
+            handleResponse({
+                request: () => toggleListFavorite(listID),
+                onSuccess: () => {
+                    setListFavorite(current => !current)
+                    queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', props.list.folderId] }, (previousLists) =>
+                        previousLists?.map(list =>
+                            list.id === props.list.id ? { ...list, favorite: !list.favorite } : list
+                        )
+                    )
+                }
             })
         }
     }
 
     const handleSave = async() => {
-        handleResponse(async() => {
-            await updateList({
+        handleResponse({
+            request: () => updateList({
                 listID:props.list?.id,
                 title:listTitle,
                 countElement:listCountElement
-                // checkable: checkable
-            })
-            refetch()
-            setOnEditTitle(false)
-            props.setSelectedListOptions(current => {
-                if (!current) return null;
-                return {
-                    ...current,
-                    title: listTitle,
-                    countElement: listCountElement,
-                    // checkable: checkable
-                };
-            });
+            }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', props.list.folderId] }, (previousLists) =>
+                    previousLists?.map(list =>
+                        list.id === props.list.id ? { ...list, title: listTitle, countElement: listCountElement } : list
+                    )
+                )
+                setOnEditTitle(false)
+                props.setSelectedListOptions(current => {
+                    if (!current) return null;
+                    return {
+                        ...current,
+                        title: listTitle,
+                        countElement: listCountElement,
+                    };
+                });
+            }
         })
     }
 
     const handleUpdateColor = async(colorIndex:number) => {
-        handleResponse(async() => {
-            await updateListColor(props.list.id, colorIndex)
-            toast.dismiss()
-            setListColor(LIST_COLOR[colorIndex])
-            refetch()
+        handleResponse({
+            request: () => updateListColor(props.list.id, colorIndex),
+            onSuccess: () => {
+                setListColor(LIST_COLOR[colorIndex])
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', props.list.folderId] }, (previousLists) =>
+                    previousLists?.map(list =>
+                        list.id === props.list.id ? { ...list, color: colorIndex } : list
+                    )
+                )
+            }
         })
     }
 

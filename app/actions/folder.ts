@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache"
 import checkUser from "./utils"
 import { TrashFilter } from "@/types/trashFilter"
 import { withTrash } from "@/utils/trash"
+import { responseError } from "@/utils/responseError"
 
 
 
@@ -14,15 +15,24 @@ const checkFolderExist = async(folderID:string) => {
     const folder = await prisma.folder.findUnique({
         where:{id:folderID}
     })
-    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+    if(!folder) return responseError("Le dossier que vous essayez de modifier n'existe pas")
 }
 
+
+// ------------------------------------
+// getNextFolderColorIndexForCurrentUser
+// ------------------------------------
+
 export async function getNextFolderColorIndexForCurrentUser(){
-    const user = await getCurrentUser();
-    if (!user?.id) throw new Error("Non autorisé");
+    const user = await checkUser()
     const colorIndex = await getNextAvailableFolderColorIndex(user.id);
     return colorIndex;
 }
+
+
+// ------------------------------------
+// getFolders
+// ------------------------------------
 
 export async function getFolders(userID: string, trashFilter: TrashFilter = "no"){
     await checkUser()
@@ -37,6 +47,11 @@ export async function getFolders(userID: string, trashFilter: TrashFilter = "no"
     return {success: true, folders: folders}
 }
 
+
+// ------------------------------------
+// deleteFolder
+// ------------------------------------
+export type deleteFolderResponse = Awaited<ReturnType<typeof deleteFolder>>;
 export async function deleteFolder(id:string){
     await checkUser()
 
@@ -44,17 +59,24 @@ export async function deleteFolder(id:string){
         where:{id}}
     )
 
-    if(!folder) throw new Error("Le dossier que vous essayez de supprimer n'existe pas")
+    if(!folder) return responseError("Le dossier que vous essayez de supprimer n'existe pas")
 
     const deletedFolder = await prisma.folder.delete({
         where:{id:id}
     })
 
-    revalidatePath("/dashboard")
-    return {success:true, message:`Le dossier ${deletedFolder.title} a été supprimer avec succès`}
+    return {success:true, deletedAt:deletedFolder.deletedAt}
 }
 
-export async function addFolder({title}:{title:string}) {
+
+// ------------------------------------
+// addFolder
+// ------------------------------------
+
+type addFolderProps = {title:string}
+export type addFolderResponse = Awaited<ReturnType<typeof addFolder>>;
+
+export async function addFolder({title}:addFolderProps) {
     const user = await checkUser()
     
     const maxOrder = await prisma.folder.aggregate({
@@ -62,7 +84,7 @@ export async function addFolder({title}:{title:string}) {
         _max: { order: true }
     })
 
-    const createdFolder = await prisma.folder.create({
+    const newFolder = await prisma.folder.create({
         data:{
             title: title,
             color: await getNextAvailableFolderColorIndex(user.id),
@@ -71,28 +93,36 @@ export async function addFolder({title}:{title:string}) {
         }
     })
 
-    revalidatePath('/dashboard')
+    
     const nextAvailableColor = await getNextAvailableFolderColorIndex(user.id)
-    return {success:true, message:`Le dossier ${createdFolder.title} a été ajouter`, nextAvailableColor:nextAvailableColor}
+    return {success:true, nextAvailableColor:nextAvailableColor, newFolder:newFolder}
 }
 
+
+
+// ------------------------------------
+// updateFolder
+// ------------------------------------
+
+type updateFolderProps = {
+    folderID:string|undefined, 
+    title?:string|undefined
+    listStandaloneID?: string|null
+}
+export type updateFolderResponse = Awaited<ReturnType<typeof updateFolder>>;
 
 export async function updateFolder({
     folderID, 
     title,
     listStandaloneID
-}:{
-    folderID:string|undefined, 
-    title?:string|undefined
-    listStandaloneID?: string|null
-}){
+}:updateFolderProps){
     await checkUser()
 
     const folder = await prisma.folder.findUnique({
         where:{id:folderID}
     })
 
-    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+    if(!folder) return responseError("Le dossier que vous essayez de modifier n'existe pas")
 
     const updatedFolder = await prisma.folder.update({
         where:{id:folderID},
@@ -102,10 +132,14 @@ export async function updateFolder({
         }
     })
 
-    revalidatePath("/dashboard")
-    return {success:true, message:`Le dossier a été correctement modifier`}
+    return {success:true, updatedFolder:updatedFolder}
 }
 
+
+// ------------------------------------
+// toggleFolderFavorite
+// ------------------------------------
+export type toggleFolderFavoriteResponse = Awaited<ReturnType<typeof toggleFolderFavorite>>;
 export async function toggleFolderFavorite(folderID: string){
     await checkUser()
 
@@ -113,38 +147,44 @@ export async function toggleFolderFavorite(folderID: string){
         where:{id:folderID}
     })
 
-    if(!folder) throw new Error("Le dossier que vous essayez de modifier n'existe pas")
+    if(!folder) return responseError("Le dossier que vous essayez de modifier n'existe pas")
 
     const newFavoriteState = !folder.favorite
-    await prisma.folder.update({
+    const updatedFolder = await prisma.folder.update({
         where:{id:folderID},
         data:{
             favorite:newFavoriteState
         }
     }) 
 
-    const message = newFavoriteState ? "Dossier ajouter aux favoris" : "Dossier retirer des favoris"
-    revalidatePath("/dashboard")
-    return {success:true, message:message}
+    return {success:true, updatedFolder:updatedFolder}
 }
 
+
+// ------------------------------------
+// updateFolderColor
+// ------------------------------------
+
+export type updateFolderColorResponse = Awaited<ReturnType<typeof updateFolderColor>>;
 export async function updateFolderColor(folderID:string, colorIndex:number){
 
     await checkUser()
     await checkFolderExist(folderID)
 
-    await prisma.folder.update({
+    const updatedFolder = await prisma.folder.update({
         where:{id:folderID},
         data:{
             color:colorIndex
         }
     })
 
-    revalidatePath("/dashboard")
-    const message = "Couleur du dossier modifier avec succès"
-    return {success:true, message:message}
+    return {success:true, updatedFolder:updatedFolder}
 }
 
+
+// ------------------------------------
+// reorderFolders
+// ------------------------------------
 
 export async function reorderFolders(orderedFolderIds:string[]) {
     await checkUser()
@@ -160,10 +200,14 @@ export async function reorderFolders(orderedFolderIds:string[]) {
         )
     )
 
-    revalidatePath("/dashboard")
     return { success: true }
 }
 
+
+// ------------------------------------
+// restoreFolder
+// ------------------------------------
+export type restoreFolderResponse = Awaited<ReturnType<typeof restoreFolder>>;
 export async function restoreFolder(folderID:string){
     await checkUser()
 
@@ -174,14 +218,14 @@ export async function restoreFolder(folderID:string){
         }
     })
 
-    if(!folder) throw new Error("Le dossier que vous essayez de restaurer n'existe pas")
+    if(!folder) return responseError("Le dossier que vous essayez de restaurer n'existe pas")
 
-    await prisma.folder.update({
+    const updatedFolder = await prisma.folder.update({
         where:{id:folderID},
         data:{
             deletedAt: null
         }
     })
 
-    return {success:true}
+    return {success:true, updatedFolder:updatedFolder}
 }

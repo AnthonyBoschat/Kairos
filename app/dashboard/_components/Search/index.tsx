@@ -173,12 +173,13 @@ export default function Search() {
   const handleSearch = (value: string) => {
     const requestId = ++latestRequestIdRef.current
     setIsLoading(true)
-
-    handleResponse(async () => {
-      const response = await search(value, trashFilter)
-      if (requestId !== latestRequestIdRef.current) return
-      setSearchResult(response)
-      setIsLoading(false)
+    handleResponse({
+        request: () => search(value, trashFilter),
+        onSuccess: (response:any) => {
+          if (requestId !== latestRequestIdRef.current) return
+          setSearchResult(response)
+          setIsLoading(false)
+        }
     })
   }
 

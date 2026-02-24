@@ -19,13 +19,14 @@ export default function ForgotPassword(props:ForgotPasswordProps){
         const form = event.currentTarget
         const formData = new FormData(form)
         const email = formData.get("email") as string
-        handleResponse(async() => {
-            const response = await forgotPassword(email);
-            if(response.success){
+        handleResponse({
+            request: () => forgotPassword(email),
+            onSuccess: () => {
                 toast.success("Code de réinitialisation envoyé.")
                 form.reset()
             }
         })
+       
     }
 
     return(

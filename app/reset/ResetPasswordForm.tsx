@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import s from "./styles.module.scss";
 import { resetPassword } from "../actions/auth";
-import { toast } from "react-toastify";
 import handleResponse from "@/utils/handleResponse";
 
 type ResetPasswordFormProps = {
@@ -17,22 +16,22 @@ export default function ResetPasswordForm({ token }: ResetPasswordFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
 
-    handleResponse(async () => {
-      setIsSubmitting(true);
-      const form = event.currentTarget;
-      const formData = new FormData(form);
-      formData.set("token", token);
-      
-      const result = await resetPassword(formData);
-      
-      
-      toast.success(result.message)
-      router.replace("/");  
-      setIsSubmitting(false);
-    }, () => {
-      setIsSubmitting(false);
+    event.preventDefault();
+    setIsSubmitting(true);
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    formData.set("token", token);
+
+    handleResponse({
+        request: () => resetPassword(formData),
+        onSuccess: () => {
+            router.replace("/");  
+            setIsSubmitting(false);
+        },
+        onError: () => {
+            setIsSubmitting(false);
+        }
     })
     
   }
