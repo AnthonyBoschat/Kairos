@@ -33,10 +33,9 @@ export default function TaskList(props:TaskListProps){
     useEffect(() => setOrderedTasks(sortedTasks) ,[sortedTasks])
 
     const handleReorderTasks = async(newTasks:Task[]) => {
-        handleResponse(() => {
-            setOrderedTasks(newTasks)
-            const orderedTasksIds = newTasks.map(task => task.id)
-            reorderTasks(orderedTasksIds)
+        setOrderedTasks(newTasks)
+        handleResponse({
+            request: () => reorderTasks(newTasks.map(task => task.id)),
         })
     }
         

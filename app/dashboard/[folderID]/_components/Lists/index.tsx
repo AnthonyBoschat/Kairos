@@ -1,8 +1,8 @@
 "use client";
 
-import { getLists, reorderLists } from "@/app/actions/list";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import { reorderLists } from "@/app/actions/list";
+import { useQueryClient } from "@tanstack/react-query";
+import { useEffect, useMemo, useState } from "react";
 import ListItem from "../ListItem";
 import s from "./styles.module.scss";
 import ListOptions from "../ListOptions";
@@ -53,20 +53,16 @@ export default function Lists() {
 
 
     const handleReorderList = (newLists: ListWithTaskAndFolder[]) => {
-        handleResponse(() => {
-            setOrderedLists(newLists)
-            reorderLists(newLists.map((list) => list.id))
-            queryClient.invalidateQueries({queryKey:["lists", selectedFolderID]})
+        setOrderedLists(newLists)
+        handleResponse({
+            request: () => reorderLists(newLists.map((list) => list.id)),
         })
     }
 
     const handleReorderTasks = async(newTasks: Task[]) => {
-        handleResponse(() => {
-            if(setOrderedTasks){
-                setOrderedTasks(newTasks)
-                const orderedTasksIds = newTasks.map(task => task.id)
-                reorderTasks(orderedTasksIds)
-            }
+        setOrderedTasks(newTasks)
+        handleResponse({
+            request: () => reorderTasks(newTasks.map(task => task.id))
         })
     }
 

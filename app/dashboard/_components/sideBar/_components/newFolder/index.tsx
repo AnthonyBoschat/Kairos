@@ -2,12 +2,13 @@
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
-import { addFolder, getNextFolderColorIndexForCurrentUser } from "@/app/actions/folder"
+import { addFolder, addFolderResponse, getNextFolderColorIndexForCurrentUser } from "@/app/actions/folder"
 import FOLDER_COLORS from "@/constants/folderColor"
 import handleResponse from "@/utils/handleResponse"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 import { useQueryClient } from "@tanstack/react-query"
 import { useDashboardContext } from "@/context/DashboardContext"
+import { FolderWithList } from "@/types/list"
 
 interface FolderProps{
     setIsAddingFolder: Dispatch<SetStateAction<boolean>>
@@ -37,16 +38,22 @@ export default function AddFolderButton(props:FolderProps){
     const handleAddFolder = (title:string, keyboardEvent?:React.KeyboardEvent) => {
         if(keyboardEvent) keyboardEvent.preventDefault()
         if(title.trim()){
-            handleResponse(async () => {
-                await addFolder({title:title})
-                queryClient.invalidateQueries({queryKey:['folders', user.id]})
+            handleResponse({
+                request: () => addFolder({title:title}),
+                onSuccess: (response: addFolderResponse) => {
+                    if(response.success){
+                        queryClient.setQueriesData<FolderWithList[]>({ queryKey: ['folders', user.id] }, (previousFolders) =>
+                            previousFolders ? [...previousFolders, { ...response.newFolder, lists: [] }] : previousFolders
+                        )
+                        setFolderColor(response.nextAvailableColor)
+                    }
+                }
             })
             
         }
         if(keyboardEvent){
             setTitle("")
             props.setIsAddingFolder(true)
-            fetchFolderColor()
         }else{
             props.setIsAddingFolder(false)
         }

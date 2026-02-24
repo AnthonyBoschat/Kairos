@@ -5,11 +5,9 @@ import { Dispatch, SetStateAction, useEffect, useState } from "react"
 import FolderItem from "../folderItem"
 import FolderOptions from "../folderOptions"
 import { FolderWithList } from "@/types/list"
-import StorageService from "@/services/StorageService"
 import { reorderFolders } from "@/app/actions/folder"
 import DragAndDrop from "@/components/dragAndDrop"
 import handleResponse from "@/utils/handleResponse"
-import { useDashboardContext } from "@/context/DashboardContext"
 
 interface FolderListProps{
     isAddingFolder:boolean
@@ -26,10 +24,9 @@ export default function FolderList(props:FolderListProps){
     useEffect(() => setOrderedFolders(props.folders), [props.folders]);
 
     const handleReorderFolders = async (newFolders: FolderWithList[]) => {
-        handleResponse(() => {
-            setOrderedFolders(newFolders);
-            const orderedFolderIds = newFolders.map(folder => folder.id)
-            reorderFolders(orderedFolderIds);
+        setOrderedFolders(newFolders)
+        handleResponse({
+            request: () => reorderFolders(newFolders.map(folder => folder.id)),
         })
     }
 

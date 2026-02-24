@@ -35,10 +35,12 @@ export default function ListItem(props:ListItemProps){
         if(props.list?.id){
             event.stopPropagation()
             const listID = props.list.id
-            handleResponse(async () => {
-                await restoreList(listID)
-                queryClient.invalidateQueries({queryKey: ["lists", props.list.folderId]})
-                queryClient.invalidateQueries({queryKey: ["folders", user.id]})
+            handleResponse({
+                request: () => restoreList(listID),
+                onSuccess: () => {
+                    queryClient.invalidateQueries({queryKey: ["lists", props.list.folderId]})
+                    queryClient.invalidateQueries({queryKey: ["folders", user.id]})
+                }
             })
         }
     }

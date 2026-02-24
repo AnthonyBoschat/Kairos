@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "
 import withClass from "@/utils/class"
 import EditIcon from "@/components/ui/icons/Edit"
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
-import { deleteFolder, toggleFolderFavorite, updateFolder, updateFolderColor } from "@/app/actions/folder"
+import { deleteFolder, deleteFolderResponse, toggleFolderFavorite, toggleFolderFavoriteResponse, updateFolder, updateFolderColor, updateFolderColorResponse, updateFolderResponse } from "@/app/actions/folder"
 import { toast } from "react-toastify"
 import handleResponse from "@/utils/handleResponse"
 import Confirmation from "@/components/confirm"
@@ -57,58 +57,80 @@ export default function FolderOptions(props:FolderOptionsProps){
         return JSON.stringify(serverState) !== JSON.stringify(formState)
     }, [serverState, formState])
 
+    const syncQueryClientData = (response:any) => {
+        if(response.success && response.updatedFolder){
+            queryClient.setQueriesData<FolderWithList[]>({queryKey:['folders', user.id]}, (previousFolders) => {
+                if(!previousFolders) return previousFolders
+                return previousFolders.map(folder => folder.id === response.updatedFolder.id ? {...folder, ...response.updatedFolder} : folder)
+            })
+        }
+    }
+
     const handleDeleteFolder = async() => {
         if(props.folder?.id){
             const folderID = props.folder.id
-            handleResponse(async () => {
-                await deleteFolder(folderID)
-                props.setSelectedFolderOptions(null)
-                StorageService.remove("selectedFolderID")
-                queryClient.invalidateQueries({queryKey:['folders', user.id]})
-                if(trashFilter === "yes" || trashFilter === "only"){
-                    queryClient.invalidateQueries({queryKey: ["lists", folderID]})
-                }else{
-                    router.push("/dashboard")
-                }
+            handleResponse({
+                request: () => deleteFolder(folderID),
+                onSuccess: (response:deleteFolderResponse ) => {
+                    if(response.success){
+                        props.setSelectedFolderOptions(null)
+                        StorageService.remove("selectedFolderID")
+                        queryClient.setQueriesData<FolderWithList[]>({queryKey:['folders', user.id]}, (previousFolders) => {
+                            if(!previousFolders) return previousFolders
+                            if(trashFilter === "yes" || trashFilter === "only"){
+                                return previousFolders.map(folder => folder.id === folderID ? {...folder, deletedAt:response.deletedAt} : folder)
+                            }else{
+                                return previousFolders.filter(folder => folder.id !== folderID)
+                            }
+                        })
+                        queryClient.invalidateQueries({ queryKey: ['folders', user.id] })
+                        if(trashFilter === "yes" || trashFilter === "only"){
+                            queryClient.invalidateQueries({queryKey: ["lists", folderID]})
+                        }else{
+                            router.push("/dashboard")
+                        }
+                    }
+                },
             })
+            
         }
     }
 
     const handleToggleFavorite = async() => {
         if(props.folder?.id){
             const folderID = props.folder.id
-            handleResponse(async () => {
-                await toggleFolderFavorite(folderID)
-                setFolderFavorite(current => !current)
+            handleResponse({
+                request: () => toggleFolderFavorite(folderID),
+                onSuccess: (response:toggleFolderFavoriteResponse) => {
+                    setFolderFavorite(current => !current)
+                    syncQueryClientData(response)
+                },
             })
         }
     }
 
     const handleSave = async() => {
-        handleResponse(async() => {
-            await updateFolder({
+        handleResponse({
+            request: () => updateFolder({
                 folderID:props.folder?.id,
                 title:folderTitle,
-            })
-            setOnEditTitle(false)
-            
-            queryClient.invalidateQueries({queryKey:["lists", props.folder.id]})
-            props.setSelectedFolderOptions(prev => prev ? {
-                ...prev,
-                title: folderTitle
-            } : null)
+            }),
+            onSuccess: (response: updateFolderResponse) => {
+                setOnEditTitle(false)
+                setFolderTitle(folderTitle)
+                syncQueryClientData(response)
+            },
         })
     }
 
     const handleUpdateColor = async(colorIndex:number) => {
-        handleResponse(async() => {
-            await updateFolderColor(props.folder.id, colorIndex)
-            toast.dismiss()
-            setFolderColor(FOLDER_COLORS[colorIndex])
-            props.setSelectedFolderOptions(prev => prev ? {
-                ...prev,
-                color: colorIndex
-            } : null)
+        handleResponse({
+            request: () => updateFolderColor(props.folder.id, colorIndex),
+            onSuccess: (response: updateFolderColorResponse) => {
+                toast.dismiss()
+                setFolderColor(FOLDER_COLORS[colorIndex])
+                syncQueryClientData(response)
+            },
         })
     }
 

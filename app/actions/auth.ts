@@ -4,11 +4,11 @@ import { randomBytes, createHash, scryptSync } from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { sendMail } from '@/lib/mail';
 import bcrypt from 'bcryptjs';
+import { responseError } from '@/utils/responseError';
 
 export async function sha256(value: string):Promise<string> {
   return createHash("sha256").update(value).digest("hex");
 }
-
 
 export async function forgotPassword(email: string) {
   
@@ -59,9 +59,8 @@ export async function resetPassword(formData: FormData): Promise<ResetPasswordRe
   const newPassword = String(formData.get("newPassword") ?? "");
   const confirmPassword = String(formData.get("confirmPassword") ?? "");
 
-  // throw new Error("Lien invalide. Demande un nouveau reset.")
-  if (!token) throw new Error("Lien invalide. Demande un nouveau reset.")
-  if (newPassword !== confirmPassword) throw new Error("Les mots de passe ne correspondent pas.")
+  if (!token) return responseError("Lien invalide. Demande un nouveau reset.")
+  if (newPassword !== confirmPassword) return responseError("Les mots de passe ne correspondent pas.")
   
 
   const tokenHash = await sha256(token);
@@ -72,7 +71,7 @@ export async function resetPassword(formData: FormData): Promise<ResetPasswordRe
   });
 
   const now = new Date();
-  if (!resetToken || resetToken.usedAt || resetToken.expiresAt <= now) throw new Error("Lien invalide, expiré, ou déjà utilisé." )
+  if (!resetToken || resetToken.usedAt || resetToken.expiresAt <= now) return responseError("Lien invalide, expiré, ou déjà utilisé." )
 
   const passwordHash = await bcrypt.hash(newPassword, 10);
 

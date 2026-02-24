@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import checkUser from "./utils";
 import { withTrash } from "@/utils/trash";
 import { TrashFilter } from "@/types/trashFilter";
+import { responseError } from "@/utils/responseError";
 
 
 
@@ -14,7 +15,7 @@ const checkListExist = async(listID:string) => {
     const list = await prisma.list.findUnique({
         where:{id:listID}
     })
-    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+    if(!list) return responseError("La liste que vous essayez de modifier n'existe pas")
 }
 
 export async function getNextFolderColorIndexForThisFolder(folderID:string){
@@ -46,6 +47,7 @@ export async function getLists(id:string, trashFilter: TrashFilter = "no"){
     return {success:true, lists:lists}
 }
 
+export type deleteListResponse = Awaited<ReturnType<typeof deleteList>>;
 export async function deleteList(id:string){
     await checkUser()
 
@@ -53,16 +55,16 @@ export async function deleteList(id:string){
         where:{id}}
     )
 
-    if(!list) throw new Error("La liste que vous essayez de supprimer n'existe pas")
+    if(!list) return responseError("La liste que vous essayez de supprimer n'existe pas")
 
     const deletedList = await prisma.list.delete({
         where:{id:id}
     })
 
-    revalidatePath("/dashboard")
-    return {success:true, message:`La liste ${deletedList.title} a été supprimer avec succès`}
+    return {success:true, deletedAt:deletedList.deletedAt}
 }
 
+export type addListResponse = Awaited<ReturnType<typeof addList>>;
 export async function addList({title, folderID}:{title:string, folderID:string}) {
     const user = await checkUser()
     
@@ -70,7 +72,7 @@ export async function addList({title, folderID}:{title:string, folderID:string})
     const folder = await prisma.folder.findFirst({
         where: { id: folderID, userId: user.id }
     })
-    if (!folder) throw new Error("Dossier non trouvé")
+    if (!folder) return responseError("Dossier non trouvé")
 
     const maxOrder = await prisma.list.aggregate({
         where: { folderId: folder.id },
@@ -83,11 +85,14 @@ export async function addList({title, folderID}:{title:string, folderID:string})
             color: await getNextFolderColorIndexForThisFolder(folder.id),
             order: (maxOrder._max.order ?? -1) + 1,
             folderId: folder.id
+        },
+        include: {
+            folder: { select: { title: true } },
+            tasks: true
         }
     })
 
-    revalidatePath('/dashboard')
-    return {success:true, message:`La liste ${createdList.title} a été ajouter`}
+    return {success:true, newList:createdList}
 }
 
 export async function toggleListFavorite(listID: string){
@@ -97,7 +102,7 @@ export async function toggleListFavorite(listID: string){
         where:{id:listID}
     })
 
-    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+    if(!list) return responseError("La liste que vous essayez de modifier n'existe pas")
 
     const newFavoriteState = !list.favorite
     await prisma.list.update({
@@ -107,9 +112,7 @@ export async function toggleListFavorite(listID: string){
         }
     }) 
 
-    const message = newFavoriteState ? "Liste ajouter aux favoris" : "Liste retirer des favoris"
-    revalidatePath("/dashboard")
-    return {success:true, message:message}
+    return {success:true}
 }
 
 export async function toggleListCheckable(listID: string){
@@ -119,7 +122,7 @@ export async function toggleListCheckable(listID: string){
         where:{id:listID}
     })
 
-    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+    if(!list) return responseError("La liste que vous essayez de modifier n'existe pas")
 
     const newCheckableState = !list.checkable
     await prisma.list.update({
@@ -129,9 +132,7 @@ export async function toggleListCheckable(listID: string){
         }
     }) 
 
-    const message = newCheckableState ? "Les éléments de la liste sont maintenant réalisable" : "Les éléments de la liste ne sont plus réalisable"
-    revalidatePath("/dashboard")
-    return {success:true, message:message}
+    return {success:true}
 }
 
 export async function updateList({
@@ -143,7 +144,6 @@ export async function updateList({
     listID:string|undefined, 
     title:string|undefined,
     countElement:boolean|undefined,
-    // checkable:boolean|undefined,
 }){
     await checkUser()
 
@@ -151,7 +151,7 @@ export async function updateList({
         where:{id:listID}
     })
 
-    if(!list) throw new Error("La liste que vous essayez de modifier n'existe pas")
+    if(!list) return responseError("La liste que vous essayez de modifier n'existe pas")
 
     const updatedList = await prisma.list.update({
         where:{id:listID},
@@ -162,8 +162,7 @@ export async function updateList({
         }
     })
 
-    revalidatePath("/dashboard")
-    return {success:true, message:`La liste a été correctement modifier`}
+    return {success:true}
 }
 
 export async function updateListColor(listID:string, colorIndex:number){
@@ -178,9 +177,7 @@ export async function updateListColor(listID:string, colorIndex:number){
         }
     })
 
-    revalidatePath("/dashboard")
-    const message = "Couleur da la liste modifier avec succès"
-    return {success:true, message:message}
+    return {success:true}
 }
 
 
@@ -188,7 +185,7 @@ type reorderListsType = string[]
 
 export async function reorderLists(orderedListsIds:reorderListsType) {
     const user = await getCurrentUser()
-    if (!user.id) throw new Error("Non autorisé")
+    if (!user.id) return responseError("Non autorisé")
 
     if (orderedListsIds.length === 0) return { success: true }
 
@@ -216,7 +213,7 @@ export async function restoreList(listID:string){
         }
     })
 
-    if(!folder) throw new Error("La liste que vous essayez de restaurer n'existe pas")
+    if(!folder) return responseError("La liste que vous essayez de restaurer n'existe pas")
 
     await prisma.list.update({
         where:{id:listID},

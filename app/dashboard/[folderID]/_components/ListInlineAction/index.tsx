@@ -4,7 +4,6 @@ import s from "./styles.module.scss"
 import StarIcon from "@/components/ui/icons/Star"
 import OptionsIcon from "@/components/ui/icons/Options"
 import withClass from "@/utils/class"
-import { List } from "@prisma/client"
 import { useCallback } from "react"
 import handleResponse from "@/utils/handleResponse"
 import { toggleListCheckable, toggleListFavorite } from "@/app/actions/list"
@@ -20,16 +19,24 @@ interface DefaultProps{
 export default function ListInlineAction(props:DefaultProps){
 
     const queryClient = useQueryClient()
-    const {setSelectedListOptions} = useDashboardContext()
+    const {setSelectedListOptions, selectedFolderID} = useDashboardContext()
     const isFavorite = props.list.favorite
     const isCheckable = props.list.checkable
 
     const handleToggleFavorite = useCallback(async() => {
         if(props.list){
             const listID = props.list.id
-            handleResponse(async () => {
-                await toggleListFavorite(listID)
-                queryClient.invalidateQueries({ queryKey: ['lists', props.list.folderId] })
+            handleResponse({
+                request: () => toggleListFavorite(listID),
+                onSuccess: () => {
+                    queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                        previousLists?.map(list =>
+                            list.id === listID
+                                ? { ...list, favorite: !list.favorite }
+                                : list
+                        )
+                    )
+                }
             })
         }
     }, [props.list])
@@ -37,9 +44,17 @@ export default function ListInlineAction(props:DefaultProps){
     const handleToggleCheckable = useCallback(async() => {
         if(props.list){
             const listID = props.list.id
-            handleResponse(async () => {
-                await toggleListCheckable(listID)
-                queryClient.invalidateQueries({ queryKey: ['lists', props.list?.folderId] })
+            handleResponse({
+                request: () => toggleListCheckable(listID),
+                onSuccess: () => {
+                    queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                        previousLists?.map(list =>
+                            list.id === listID
+                                ? { ...list, checkable: !list.checkable }
+                                : list
+                        )
+                    )
+                }
             })
         }
     }, [props.list])

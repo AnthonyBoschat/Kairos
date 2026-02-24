@@ -2,10 +2,11 @@
 import React, { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
 import s from "./styles.module.scss"
 import handleResponse from "@/utils/handleResponse"
-import { addTask } from "@/app/actions/task"
+import { addTask, addTaskResponse } from "@/app/actions/task"
 import { useQueryClient } from "@tanstack/react-query"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 import { useDashboardContext } from "@/context/DashboardContext"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface NewTaskItemProps{
     listColor:string
@@ -33,10 +34,19 @@ export default function NewTaskItem(props:NewTaskItemProps){
     const handleAddTask = (keyboardEvent?:React.KeyboardEvent) => {
         if(keyboardEvent) keyboardEvent.preventDefault()
         if(taskTitle.trim()){
-            handleResponse(async() => {
-                await addTask({title:taskTitle, listID:props.listID})
-                queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
-                
+            handleResponse({
+                request: () => addTask({title:taskTitle, listID:props.listID}),
+                onSuccess: (response: addTaskResponse) => {
+                    if(response.success){
+                        queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                            previousLists?.map(list =>
+                                list.id === props.listID
+                                    ? { ...list, tasks: [response.task, ...list.tasks] }
+                                    : list
+                            )
+                        )
+                    }
+                }
             })
         }
         if(keyboardEvent){

@@ -4,9 +4,8 @@ import s from "./styles.module.scss"
 import React, { useEffect, useRef, useState } from "react"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
-import { deleteTask, restoreTask, toggleTaskDone, toggleTaskFavorite } from "@/app/actions/task"
+import { deleteTask, deleteTaskResponse, restoreTask, toggleTaskDone, toggleTaskFavorite } from "@/app/actions/task"
 import { useQueryClient } from "@tanstack/react-query"
-import { toast } from "react-toastify"
 import withClass from "@/utils/class"
 import DeleteIcon from "@/components/ui/icons/delete"
 import Confirmation from "@/components/confirm"
@@ -17,6 +16,7 @@ import { useDashboardContext } from "@/context/DashboardContext"
 import Highlight from "@/components/highlight"
 import CheckIcon from "@/components/ui/icons/check"
 import RestoreIcon from "@/components/ui/icons/restore"
+import { ListWithTaskAndFolder } from "@/types/list"
 
 interface TaskItemProps{
     listCheckable:boolean
@@ -29,7 +29,7 @@ interface TaskItemProps{
 
 export default function TaskItem(props:TaskItemProps){
 
-    const {user, taskDetail, setTaskDetail, selectedTaskID, setSelectedTaskID, selectedFolderID, searchContextValue} = useDashboardContext()
+    const {user, taskDetail, setTaskDetail, selectedTaskID, setSelectedTaskID, selectedFolderID, searchContextValue, trashFilter} = useDashboardContext()
     const [isHover, setIsHover]         = useState(false)
     const [isTruncated, setIsTruncated] = useState(false)
     const queryClient           = useQueryClient()
@@ -46,26 +46,61 @@ export default function TaskItem(props:TaskItemProps){
     const isTaskDeleted = props.task.deletedAt !== null
 
     const handleAddTaskToFavorite = () => {
-        handleResponse(async() => {
-            await toggleTaskFavorite({taskID:props.task.id})
-            queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
-            toast.dismiss()
+        handleResponse({
+            request: () => toggleTaskFavorite({ taskID: props.task.id }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                    previousLists?.map(list => ({
+                        ...list,
+                        tasks: list.tasks.map(task =>
+                            task.id === props.task.id ? { ...task, favorite: !task.favorite } : task
+                        )
+                    }))
+                )
+            }
         })
     }
 
     const handleDeleteTask = () => {
-        handleResponse(async() => {
-            await deleteTask({taskID:props.task.id})
-            queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
-            
+        handleResponse({
+            request: () => deleteTask({ taskID: props.task.id }),
+            onSuccess: (response: deleteTaskResponse) => {
+                if(response.success){
+                    queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) => {
+                        if(!previousLists) return previousLists
+                        if(trashFilter === "yes" || trashFilter === "only"){
+                            return previousLists?.map(list => ({
+                                ...list,
+                                tasks: list.tasks.map(task => task.id === props.task.id ? {...task, deletedAt:response.deletedAt} : task)
+                            }))
+                        }else{
+                            return previousLists?.map(list => ({
+                                ...list,
+                                tasks: list.tasks.filter(task => task.id !== props.task.id)
+                            }))
+                        }
+                        
+                    })
+                    queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
+                }
+            }
         })
     }
 
     const handleToggleDone = (event: React.MouseEvent) => {
         event.stopPropagation()
-        handleResponse(async() => {
-            await toggleTaskDone({taskID:props.task.id})
-            queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
+        handleResponse({
+            request: () => toggleTaskDone({ taskID: props.task.id }),
+            onSuccess: () => {
+                queryClient.setQueriesData<ListWithTaskAndFolder[]>({ queryKey: ['lists', selectedFolderID] }, (previousLists) =>
+                    previousLists?.map(list => ({
+                        ...list,
+                        tasks: list.tasks.map(task =>
+                            task.id === props.task.id ? { ...task, done: !task.done } : task
+                        )
+                    }))
+                )
+            }
         })
     }
 
@@ -82,11 +117,12 @@ export default function TaskItem(props:TaskItemProps){
     const handleRestoreTask = (event: React.MouseEvent) => {
         if(props.task?.id){
             event.stopPropagation()
-            const taskID = props.task.id
-            handleResponse(async () => {
-                await restoreTask(taskID)
-                queryClient.invalidateQueries({queryKey: ["lists", selectedFolderID]})
-                queryClient.invalidateQueries({queryKey: ["folders", user.id]})
+            handleResponse({
+                request: () => restoreTask(props.task.id),
+                onSuccess: () => {
+                    queryClient.invalidateQueries({ queryKey: ['lists', selectedFolderID] })
+                    queryClient.invalidateQueries({queryKey: ["folders", user.id]})
+                }
             })
         }
     }
