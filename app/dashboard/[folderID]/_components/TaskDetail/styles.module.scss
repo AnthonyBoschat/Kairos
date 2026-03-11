@@ -1,32 +1,30 @@
-.container{
+.container {
     position: fixed;
     inset: 0;
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
     z-index: 1000;
-    width: fit-content;
-    height: fit-content;
-    width: 35%;
+    width: 45%;
     min-width: 30rem;
     font-family: var(--font-mulish);
     @include m.overlayMixin;
-    user-select:text;
+    user-select: text;
 
-
-    .card{
-        height: auto;
+    .card {
         padding: 1rem 1.5rem 0rem 1.5rem;
         border-radius: 8px;
         background-color: v.$light-primary;
         position: relative;
-        display: flex;
-        flex-direction: column;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr;
+
         box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.1);
         height: 25rem;
-        
-        .cardBefore{
+        min-height: 0;
+
+        .cardBefore {
             position: absolute;
             left: -0.5rem;
             z-index: -1;
@@ -37,9 +35,7 @@
             box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.2);
         }
 
-        .header{
-            user-select:text;
-
+        .header {
             width: 100%;
             display: flex;
             align-items: start;
@@ -47,98 +43,62 @@
             font-size: 1.25rem;
             font-weight: 600;
             gap: 0.5rem;
+            max-height: 4rem;
+            overflow: auto;
+            &::-webkit-scrollbar { width: 6px; }
+            &::-webkit-scrollbar-track {
+                background: transparent;
+            }
+            &::-webkit-scrollbar-thumb {
+                background: rgba(0, 0, 0, 0.2);
+                border-radius: 3px;
+            }
+            &::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
 
-            >textarea{
+            > textarea {
                 width: 100%;
-                height: fit-content;
                 overflow: hidden;
                 resize: none;
                 border: 0;
                 outline: 0;
                 line-height: 1.4;
-    
                 font-size: 1.25rem;
                 font-weight: 600;
                 user-select: text;
             }
-            button.favorite{
-                all:unset;
+
+            button.favorite {
+                all: unset;
                 display: flex;
                 align-items: center;
                 opacity: 0.8;
                 transition: opacity 0.1s linear;
-                margin-top: 0.5rem;
+                margin-top: 0.25rem;
                 cursor: pointer;
-                &:hover{opacity: 1;}
+
+                &:hover {
+                    opacity: 1;
+                }
             }
         }
+
         .content {
             width: 100%;
-            height: 100%;         
-            position: relative;
-            overflow: hidden;    
+            min-height: 0;
+            
             --fade: 3rem;
             margin-top: 1rem;
             margin-bottom: 1rem;
-            &::before,
-            &::after {
-                content: "";
-                position: absolute;
-                left: 0; right: 0;
-                height: var(--fade);
-                pointer-events: none;
-                z-index: 2;
-            }
-
-            &::before {
-                top: 0;
-                background: linear-gradient(to bottom, v.$light-primary, transparent);
-            }
-            // &::after {
-            //     bottom: 0;
-            //     background: linear-gradient(to top, v.$light-primary, transparent);
-            // }
-            .textarea {
-                width: 100%;
-                height: 100%;
-                overflow: visible;
-                resize: none;
-                border: 0;
-                outline: 0;
-    
-                white-space: pre-wrap;
-                font-weight: 500;
-                font-size: 0.9rem;
-                user-select: text;
-    
-                padding-top: 2rem;
-                padding-bottom: 1rem;
-                padding-right: 2rem;
-                
-                &::-webkit-scrollbar { width: 6px; }
-                &::-webkit-scrollbar-track {
-                    background: transparent;
-                    margin-top: 2rem;
-                    margin-bottom: 1rem;
-                }
-                &::-webkit-scrollbar-thumb {
-                    background: rgba(0, 0, 0, 0.2);
-                    border-radius: 3px;
-                }
-                &::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
-            }
-
-
         }
-        .sync{
-            // outline: 1px solid red;
+
+        .sync {
             position: absolute;
             right: 0.3rem;
             bottom: -0.2rem;
-            svg{
+
+            svg {
                 opacity: 0.8;
             }
         }
-
     }
 }

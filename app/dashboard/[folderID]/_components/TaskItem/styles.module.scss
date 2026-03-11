@@ -55,6 +55,11 @@
     }
     
     &:hover{
+        .buttons{
+            button{
+                visibility: visible !important;
+            }
+        }
         .content{
             background-color: rgb(250, 248, 245, 0.95) !important;
         }

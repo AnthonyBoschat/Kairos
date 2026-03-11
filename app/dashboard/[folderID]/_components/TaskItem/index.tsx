@@ -217,42 +217,42 @@ export default function TaskItem(props:TaskItemProps){
 
                     {/* Options d'un élémént (Favori, suppression), si non supprimé */}
 
-                        <div className={s.buttons}>
-                        
-                            {!isTaskDeleted && (
-                                <>
-                                    <Confirmation 
-                                        disabled={canDeleteWithoutConfirmation}
-                                        onClose={() => setIsHover(false)}
-                                        onClick={handleDeleteTask} 
-                                        content={
-                                            <div>
-                                                <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette tâche ?</span>
-                                                <div>Son contenu sera définitivement perdu.</div>
-                                            </div>
-                                        }
-                                    >
-                                        {(open, isClosing) => (
-                                            <button title="Supprimer l'élément" ref={deleteButtonRef} className={withClass(s.button, s.delete, isHover && s.visible, (open && !isClosing) && s.active)}>
-                                                <DeleteIcon size={18}/>
-                                            </button>
-                                        )}
-                                    </Confirmation>
-                                    <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isHover && s.visible, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
-                                        <StarIcon animate active={props.task.favorite} size={16}/>
-                                    </button>
-                                </>
-                            )}
-                            {isTaskDeleted && (
-                                <div 
-                                    className={s.restore}
-                                    title={`Restaurer l'élément "${props.task.title}"` }
-                                    onClick={handleRestoreTask}
+                    <div className={s.buttons}>
+                    
+                        {!isTaskDeleted && (
+                            <>
+                                <Confirmation 
+                                    disabled={canDeleteWithoutConfirmation}
+                                    onClose={() => setIsHover(false)}
+                                    onClick={handleDeleteTask} 
+                                    content={
+                                        <div>
+                                            <span style={{fontWeight:700}}>Êtes vous sûres de vouloir <span style={{color:COLOR.state.error_dark}}>supprimer</span> cette tâche ?</span>
+                                            <div>Son contenu sera définitivement perdu.</div>
+                                        </div>
+                                    }
                                 >
-                                    <RestoreIcon size={20}/>
-                                </div>
-                            )}
-                        </div>
+                                    {(open, isClosing) => (
+                                        <button title="Supprimer l'élément" ref={deleteButtonRef} className={withClass(s.button, s.delete, (open && !isClosing) && s.active)}>
+                                            <DeleteIcon size={18}/>
+                                        </button>
+                                    )}
+                                </Confirmation>
+                                <button title={isFavorite ? "Retirer l'élément des favoris" : "Ajouter l'élément aux favoris"} ref={favoriteButtonRef} className={withClass(s.button, s.favorite, isFavorite && s.active)} onClick={handleAddTaskToFavorite}>
+                                    <StarIcon animate active={props.task.favorite} size={16}/>
+                                </button>
+                            </>
+                        )}
+                        {isTaskDeleted && (
+                            <div 
+                                className={s.restore}
+                                title={`Restaurer l'élément "${props.task.title}"` }
+                                onClick={handleRestoreTask}
+                            >
+                                <RestoreIcon size={20}/>
+                            </div>
+                        )}
+                    </div>
 
 
                 </div>
