@@ -6,13 +6,14 @@ import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } fr
 import withClass from "@/utils/class"
 import handleResponse from "@/utils/handleResponse"
 import { toggleTaskFavorite, updateTaskContent, updateTaskTitle } from "@/app/actions/task"
-import useDebouncedValue from "@/hooks/useDebouncedValue"
 import { useQueryClient } from "@tanstack/react-query"
 import LoadingIcon from "@/components/ui/icons/Loading"
 import SuccessIcon from "@/components/ui/icons/Success"
 import StarIcon from "@/components/ui/icons/Star"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { ListWithTaskAndFolder } from "@/types/list"
+import RichEditor from "@/components/richEditor"
+
 
 interface TaskDetailProps{
     listColor:string
@@ -23,28 +24,49 @@ interface TaskDetailProps{
 
 export default function TaskDetail(props:TaskDetailProps){
 
-    const titleRef                          = useRef<HTMLTextAreaElement>(null)
+    const titleRef          = useRef<HTMLTextAreaElement>(null)
+    const contentTimerRef   = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const titleTimerRef     = useRef<ReturnType<typeof setTimeout> | null>(null)
+    const contentValueRef   = useRef(props.task.content || "")
+    const titleValueRef     = useRef(props.task.title   || "")
 
-    const [titleMemory, setTitleMemory]     = useState(props.task.content || "")
-    const [isSyncData, setIsSyncData]       = useState(true)
-    const [content, setContent]             = useState(props.task.content || "")
-    const [title, setTitle]                 = useState(props.task.title || "")
+    const [titleMemory, setTitleMemory] = useState(props.task.title || "")
+    const [title, setTitle]             = useState(props.task.title || "")
+    const [isSyncData, setIsSyncData]   = useState(true)
     
     const queryClient           = useQueryClient()
     const {selectedFolderID}    = useDashboardContext()
-    const debouncedContent      = useDebouncedValue(content)
-    const debouncedTitle        = useDebouncedValue(title, 300)
     
+    const handleChangeTaskContent = useCallback((html: string) => {
+        contentValueRef.current = html
+        setIsSyncData(false)
 
-    const handleChangeTaskContent = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setContent(event.target.value)
-        if(isSyncData) setIsSyncData(false)
-    }, [isSyncData])
+        if (contentTimerRef.current){
+            clearTimeout(contentTimerRef.current)
+        }
+        contentTimerRef.current = setTimeout(() => {
+            handleUpdateTaskContent(contentValueRef.current)
+            setIsSyncData(true)
+        }, 800)
+    }, [])
+
+
 
     const handleChangeTaskTitle = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
-        setTitle(event.target.value)
-        if(isSyncData) setIsSyncData(false)
-    }, [isSyncData])
+        const value = event.target.value
+        setTitle(value)
+        titleValueRef.current = value
+
+        setIsSyncData(false)
+
+        if (titleTimerRef.current){
+            clearTimeout(titleTimerRef.current)
+        }
+        titleTimerRef.current = setTimeout(() => {
+            handleUpdateTaskTitle(titleValueRef.current)
+            setIsSyncData(true)
+        }, 300)
+    }, [])
 
     const handleUpdateTaskTitle = (currentTitle: string) => {
         handleResponse({
@@ -70,7 +92,7 @@ export default function TaskDetail(props:TaskDetailProps){
                     previousLists?.map(list => ({
                         ...list,
                         tasks: list.tasks.map(task =>
-                            task.id === props.task.id ? { ...task, content: currentContent } : task
+                            task.id === props.task.id ? { ...task, content: currentContent.trim() === "" ? null : currentContent  } : task
                         )
                     }))
                 )
@@ -95,35 +117,17 @@ export default function TaskDetail(props:TaskDetailProps){
     }
 
     useEffect(() => {
-        if(isSyncData) return
-        handleUpdateTaskContent(debouncedContent)
-        setIsSyncData(true)
-    }, [debouncedContent])
-
-    useEffect(() => {
-        if(isSyncData) return
-        handleUpdateTaskTitle(debouncedTitle)
-        setIsSyncData(true)
-    }, [debouncedTitle])
-
-    useEffect(() => {
-        if(props.task.title){
-            setTitleMemory(props.task.title)
-        }
-    }, [props.task.title])
-
-    useEffect(() => {
         if (titleRef.current) {
             titleRef.current.style.height = "auto"
             titleRef.current.style.height = titleRef.current.scrollHeight + "px"
         }
-    }, [title])
+    }, [titleValueRef.current])
 
     return(
         <Overlay root onClose={() => props.setTaskDetail(null)}>
             {(isClosing) => {
 
-                if (isClosing && !isSyncData) handleUpdateTaskContent(content)
+                if (isClosing && !isSyncData) handleUpdateTaskContent(contentValueRef.current)
                     
                 return(
                     <div className={withClass(s.container, isClosing && s.closing)}>
@@ -137,7 +141,14 @@ export default function TaskDetail(props:TaskDetailProps){
                                 </button>
                             </div>
                             <div className={s.content}>
-                                <textarea placeholder="Commencer à rédiger du contenu" onChange={handleChangeTaskContent} value={content} className={s.textarea} />
+                                <RichEditor
+                                    value={contentValueRef.current}
+                                    color={props.listColor}
+                                    placeholder="Commencer à rédiger du contenu"
+                                    onChange={(html) => {
+                                        handleChangeTaskContent(html)
+                                    }}
+                                />
                             </div>
 
 

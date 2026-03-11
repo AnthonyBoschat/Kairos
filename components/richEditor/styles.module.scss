@@ -1,0 +1,240 @@
+.editor {
+    height: 100%;
+    overflow: auto;
+
+    &::-webkit-scrollbar { width: 6px; }
+    &::-webkit-scrollbar-track {
+        background: transparent;
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+    }
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 3px;
+    }
+    &::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.3); }
+
+    :global(.ProseMirror p.is-editor-empty:first-child::before) {
+        content: attr(data-placeholder);
+        color: rgba(0, 0, 0, 0.5);
+        pointer-events: none;
+        float: left;
+        height: 0;
+    }
+
+    :global(.ProseMirror) {
+        min-height: 100%;
+        height: auto;
+        overflow: visible;
+        outline: none;
+        white-space: pre-wrap;
+        font-size: 0.9rem;
+        font-weight: 500;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+        padding-right: 2rem;
+    
+        strong{
+            color: var(--editor-color, inherit);
+        }
+        a{
+            cursor: pointer;
+        }
+        // Headings
+        h1, h2, h3, h4 {
+            font-weight: 700;
+            line-height: 1.3;
+            margin: 1.2rem 0 0.4rem;
+            color: color-mix(in srgb, var(--editor-color, #888) 90%, black);;
+        }
+        h1 { font-size: 1.6rem; }
+        h2 { font-size: 1.3rem; }
+        h3 { font-size: 1.1rem; }
+        h4 { font-size: 1rem; }
+
+        // Blockquote
+        blockquote {
+            border-left: 4px solid var(--editor-color, #ccc);
+            margin: 0.75rem 0;
+            padding: 0.3rem 0 0.3rem 1rem;
+            color: rgba(0,0,0,0.7);
+            font-style: italic;
+            background-color: color-mix(in srgb, var(--editor-color, #888) 10%, transparent);
+        }
+
+        // Inline code
+        code {
+            background: color-mix(in srgb, var(--editor-color, #888) 10%, transparent);
+            color: var(--editor-color, inherit);
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85em;
+        }
+
+        // Code block
+        pre {
+            background: #0b1020; // editor.background de ton thème
+            color: #D4D4D4;
+            padding: 1.2rem 1.4rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+
+            code {
+                background: none;
+                color: inherit;
+                padding: 0;
+                font-size: inherit;
+            }
+
+            // Lowlight tokens
+            :global(.hljs-keyword),
+            :global(.hljs-storage),
+            :global(.hljs-tag)        { color: #569CD6; } // keyword, storage, entity.name.tag
+            :global(.hljs-string),
+            :global(.hljs-attr)       { color: #CE9178; } // string
+            :global(.hljs-number)     { color: #B5CEA8; } // constant.numeric
+            :global(.hljs-comment)    { color: #6A9955; font-style: italic; } // comment
+            :global(.hljs-function),
+            :global(.hljs-title)      { color: #DCDCAA; } // entity.name.function
+            :global(.hljs-variable),
+            :global(.hljs-params)     { color: #9CDCFE; } // variable
+            :global(.hljs-built_in),
+            :global(.hljs-type)       { color: #4EC9B0; } // support.class / entity.name.type
+            :global(.hljs-regexp)     { color: #D16969; } // string.regexp
+            :global(.hljs-selector-tag),
+            :global(.hljs-name)       { color: #C586C0; } // keyword.control (2nd override)
+            :global(.hljs-literal)    { color: #569CD6; } // constant.language
+        }
+
+        // HR
+        hr {
+            border: none;
+            border-top: 1px solid rgba(0,0,0,0.2);
+            margin: 1.5rem 0;
+        }
+
+        // Listes
+        ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+        }
+
+        li {
+            margin: 0.125rem 0;
+        }
+
+        li > p:empty {
+            min-height: 1em;
+        }
+
+        // Checkboxes
+        ul[data-type="taskList"] {
+            list-style: none;
+            padding: 0;
+
+            li {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+
+                input[type="checkbox"] {
+                    appearance: none;
+                    width: 1rem;
+                    height: 1rem;
+                    border: 1px solid rgba(0,0,0,0.3);
+                    border-radius: 999px;
+                    cursor: pointer;
+                    flex-shrink: 0;
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+
+                    &::after {
+                        content: '';
+                        position: absolute;
+                        display: none;
+                        left: 50%;
+                        top: 45%;
+                        transform: translate(-50%, -50%) rotate(45deg);
+                        width: 0.25rem;
+                        height: 0.45rem;
+                        border: 2px solid white;
+                        border-top: none;
+                        border-left: none;
+                    }
+
+                    &:checked {
+                        background-color: var(--editor-color, #888);
+                        border-color: var(--editor-color, #888);
+
+                        &::after {
+                            display: block;
+                        }
+                    }
+
+                    &:hover {
+                        background-color: color-mix(in srgb, var(--editor-color, #888) 20%, transparent);
+                        border-color: var(--editor-color, #888);
+                    }
+
+                    &:checked:hover {
+                        background-color: color-mix(in srgb, var(--editor-color, #888) 80%, transparent);
+                        border-color: var(--editor-color, #888);
+                    }
+                }
+
+                &[data-checked="true"] > div {
+                    opacity: 0.4;
+                    font-weight: 300;
+                    text-decoration: line-through;
+                }
+            }
+        }
+    }
+}
+
+.menu{
+    position: absolute;
+    top: 20%;
+    right: 0;
+    width: max-content;
+    outline: 1px solid blue;
+    .toolbar{
+        width: fit-content;
+        border-radius: 4px;
+        position: absolute;
+        right: 0;
+        transform: translateX(calc(100% + 0.5rem));
+        display: flex;
+        flex-direction: column;
+        
+        gap: 0.2rem;
+        
+        
+        .section{
+            padding-left: 0.4rem;
+            padding-right: 0.4rem;
+            border-radius: 4px;
+            background-color: v.$light-primary;
+            box-shadow: 0px 0px 6px -2px black;
+            width: max-content;
+
+        }
+        .lists{
+            display: flex;
+
+        }
+    }
+}

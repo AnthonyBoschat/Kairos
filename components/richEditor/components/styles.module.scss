@@ -1,0 +1,85 @@
+.toolbarButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.45rem;
+  border: none;
+  margin: 0.2rem;
+  border-radius: 999px;
+  background: white;
+  color: rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition:
+    background-color 0.1s ease,
+    border-color 0.1s ease,
+    color 0.1s ease,
+    outline-color 0.1s ease;
+
+  &:hover:not(:disabled) {
+    background-color: color-mix(in srgb, var(--editor-color, #888) 20%, transparent);
+    border-color: #d1d5db;
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+}
+
+
+
+.toolbarButtonActive {
+  background: var(--editor-color);
+  border-color: #d1d5db;
+  color: v.$light-primary;
+
+  &:hover {
+    background-color: color-mix(in srgb, var(--editor-color, #888) 80%, transparent) !important;
+    color: v.$light-primary !important;
+  }
+}
+
+
+
+.toolbarButtonIcon {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.highlightColorSwatch {
+  display: block;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  border: 1px solid rgb(0 0 0 / 12%);
+}
+
+
+// Couleurs
+.highlightColorSwatch{
+  transition: transform 0.1s linear;
+}
+.toolbarColorButton{
+  opacity: 0.9;
+  &:hover:not(:disabled){
+    background-color: transparent !important;
+    opacity: 1;
+    .highlightColorSwatch{
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      transform: scale(1.1);
+    }
+  }
+}
+
+.toolbarColorButtonActive {
+  opacity: 1;
+  .highlightColorSwatch{
+
+      box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 0, 0, 0.3);
+      transform: scale(1.1);
+  }
+}
