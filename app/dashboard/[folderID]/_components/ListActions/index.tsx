@@ -41,10 +41,17 @@ export default function ListsActions(){
 
     const isStandaloneView      = standaloneListID !== null
 
-    const standaloneListOptions = [
-        { label: "Toute les listes", value: null },
-        ...(lists?.map(list => ({ label: list.title, value: list.id })) ?? [])
-    ]
+    const standaloneListOptions = useMemo(() => {
+    return [
+        { label: "Toutes les listes", value: null },
+        ...[...(lists ?? [])]
+        .sort((firstList, secondList) => firstList.order - secondList.order)
+        .map((list) => ({
+            label: list.title,
+            value: list.id,
+        })),
+    ];
+    }, [lists]);
 
     const addLabel = useMemo(() => standaloneListID ? "Ajouter un élément" : "Ajouter une liste", [standaloneListID])
 

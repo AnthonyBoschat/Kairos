@@ -224,3 +224,20 @@ export async function restoreList(listID:string){
 
     return {success:true}
 }
+
+
+export async function updateListTemplate(listID:string, template:string){
+
+    await checkUser()
+    await checkListExist(listID)
+
+    const nullTemplate = template.trim() === "" 
+    await prisma.list.update({
+        where:{id:listID},
+        data:{
+            template:nullTemplate ? null : template
+        }
+    })
+
+    return {success:true}
+}

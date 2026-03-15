@@ -35,7 +35,8 @@ export async function addTask({title, listID}: addTaskProps){
         data:{
             listId:list.id,
             title:title,
-            order: (maxOrder._max.order ?? -1) + 1
+            order: (maxOrder._max.order ?? -1) + 1,
+            content: list.template ? list.template : null
         }
     })
 
