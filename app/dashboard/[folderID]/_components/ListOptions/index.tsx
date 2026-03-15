@@ -15,6 +15,8 @@ import { ListWithTaskAndFolder } from "@/types/list"
 import ColorOptions from "@/components/colorOptions"
 import { useRouter } from "next/navigation"
 import { useDashboardContext } from "@/context/DashboardContext"
+import ListTemplate from "../ListTemplate"
+import SuccessIcon from "@/components/ui/icons/Success"
 
 interface ListOptionsProps{
     list: ListWithTaskAndFolder
@@ -33,8 +35,11 @@ export default function ListOptions(props:ListOptionsProps){
     const [checkable, setCheckable]         = useState(props.list?.checkable)
     const [listCountElement, setListCountElement]       = useState(props.list?.countElement)
     const [isOpenColorOptions, setIsOpenColorOptions]   = useState<Boolean>(false)
+    const [templateOpen, setTemplateOpen] = useState(false)
+
     const listTitleInputRef = useRef<null|HTMLInputElement>(null)
     const canDeleteWithoutConfirmation = props.list.tasks.length === 0
+    const hasTemplate = props.list.template
 
     const serverState = useMemo(() => {
         return {
@@ -160,9 +165,9 @@ export default function ListOptions(props:ListOptionsProps){
         <>
             <Overlay root onClose={() => props.setSelectedListOptions(null)}>
                 {(isClosing) => (
-                    <div className={withClass(s.container, isClosing && s.closing)}>
+                    <div className={withClass(s.container, isClosing && s.closing, templateOpen && s.templateOpen)} style={{ '--list-color': listColor } as React.CSSProperties}>
                         
-                        <div className={s.card}>
+                        <div className={s.card} >
                             <div className={s.header}>
                                 <span>
                                     Paramètres de liste
@@ -195,6 +200,18 @@ export default function ListOptions(props:ListOptionsProps){
                                         <button onClick={() => setListCountElement(false)} className={withClass(!listCountElement && s.active)}>Non</button>
                                     </span>
                                 </li>
+                                <li className={withClass(s.template)}>
+                                    <span className={s.key}>Template</span>
+                                    <span onClick={() => setTemplateOpen(true)} className={s.empty}>
+                                        {!hasTemplate && <span className={s.text}>Ajouter un template</span>}
+                                        {hasTemplate && <> 
+                                            <span className={s.text}>Modifier mon template</span>
+                                            <span className={s.icon}><SuccessIcon size={16}/></span> 
+                                        </>
+                                        }
+                                    </span>
+                                </li>
+                                
                             </ul>
                             <div className={s.footer}>
                                 <Confirmation 
@@ -215,6 +232,21 @@ export default function ListOptions(props:ListOptionsProps){
                     </div>
                 )}
             </Overlay>
+        
+            {templateOpen && (
+                <ListTemplate 
+                    list={props.list} 
+                    listColor={listColor} 
+                    setTemplateOpen={setTemplateOpen}
+                    onUpdate={(template) => {
+                        props.setSelectedListOptions(current => 
+                            current ? { ...current, template } : null
+                        )
+                    }}
+                />
+            )}
+
+
         </>
         
     )

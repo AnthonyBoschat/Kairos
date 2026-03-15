@@ -28,12 +28,12 @@ export default function Lists() {
         setOrderedTasks,
         orderedTasks,
         selectedListOptions,
-        setSelectedListOptions
+        setSelectedListOptions,
+        trashFilter
     } = useDashboardContext()
 
     const queryClient                       = useQueryClient()
 
-    // const [selectedListOptions, setSelectedListOptions] = useState<ListWithTaskAndFolder | null>(null)
     const [orderedLists, setOrderedLists]               = useState<ListWithTaskAndFolder[]>([])
     const [standaloneList, setStandalonelist]           = useState<null|ListWithTaskAndFolder>(null)
 
@@ -51,13 +51,28 @@ export default function Lists() {
     [lists, standaloneListID])
 
 
-
     const handleReorderList = (newLists: ListWithTaskAndFolder[]) => {
-        setOrderedLists(newLists)
+        setOrderedLists(newLists);
+
         handleResponse({
             request: () => reorderLists(newLists.map((list) => list.id)),
-        })
-    }
+            onSuccess: () => {
+            queryClient.setQueryData<ListWithTaskAndFolder[]>(
+                ['lists', selectedFolderID, trashFilter],
+                (previousLists) => {
+                    if (!previousLists) {
+                        return previousLists;
+                    }
+
+                    return newLists.map((list, index) => ({
+                        ...list,
+                        order: index,
+                    }));
+                },
+            );
+            },
+        });
+    };
 
     const handleReorderTasks = async(newTasks: Task[]) => {
         setOrderedTasks(newTasks)
