@@ -35,21 +35,18 @@ export default function FolderOptions(props:FolderOptionsProps){
     const [folderColor, setFolderColor]         = useState(FOLDER_COLORS[props.folder?.color ?? 0])
     const [folderFavorite, setFolderFavorite]   = useState(props.folder?.favorite)
     const [onEditTitle, setOnEditTitle]         = useState<Boolean>(false)
-    const folderTitleInputRef = useRef<null|HTMLInputElement>(null)
+    const folderTitleInputRef = useRef<null|HTMLTextAreaElement>(null)
     const canDeleteWithoutConfirmation = props.folder.lists.length === 0
 
     const serverState = useMemo(() => {
         return {
-            title: props.folder.title,
-            color: FOLDER_COLORS[props.folder?.color ?? 0],
-            folderStandaloneListID: props.folder?.listStandaloneID,
+            title: props.folder.title
         }
-    }, [props])
+    }, [props.folder.title])
 
     const formState = useMemo(() => {
         return {
             title: folderTitle,
-            color: folderColor,
         }
     }, [folderTitle])
 
@@ -119,6 +116,14 @@ export default function FolderOptions(props:FolderOptionsProps){
                 setOnEditTitle(false)
                 setFolderTitle(folderTitle)
                 syncQueryClientData(response)
+                props.setSelectedFolderOptions(current => {
+                    if (!current) return null;
+                    return {
+                        ...current,
+                        title: folderTitle,
+                        lists: current.lists, // ensure lists is always present
+                    };
+                })
             },
         })
     }
@@ -166,10 +171,7 @@ export default function FolderOptions(props:FolderOptionsProps){
                             <li className={s.title}>
                                 <span className={s.key}>Nom</span>
                                 <span className={s.value}>
-                                    <input ref={folderTitleInputRef} onChange={(e) => setFolderTitle(e.target.value)} className={withClass(onEditTitle && s.active)} type="text" value={folderTitle} />
-                                    <button className={withClass(onEditTitle && s.active)} onClick={() => setOnEditTitle(current => !current)}>
-                                        <EditIcon/>
-                                    </button>
+                                    <textarea ref={folderTitleInputRef} onChange={(e) => setFolderTitle(e.target.value)} className={withClass(onEditTitle && s.active)} value={folderTitle} />
                                 </span>
                             </li>
 

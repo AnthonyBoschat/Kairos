@@ -32,30 +32,27 @@ export default function ListOptions(props:ListOptionsProps){
     const [listColor, setListColor]         = useState(LIST_COLOR[props.list.color ?? 0])
     const [listFavorite, setListFavorite]   = useState(props.list?.favorite)
     const [onEditTitle, setOnEditTitle]     = useState<Boolean>(false)
-    const [checkable, setCheckable]         = useState(props.list?.checkable)
     const [listCountElement, setListCountElement]       = useState(props.list?.countElement)
     const [isOpenColorOptions, setIsOpenColorOptions]   = useState<Boolean>(false)
     const [templateOpen, setTemplateOpen] = useState(false)
 
-    const listTitleInputRef = useRef<null|HTMLInputElement>(null)
+    const listTitleInputRef = useRef<null|HTMLTextAreaElement>(null)
     const canDeleteWithoutConfirmation = props.list.tasks.length === 0
     const hasTemplate = props.list.template
 
     const serverState = useMemo(() => {
         return {
             title:props.list.title,
-            countElement: props.list.countElement,
-            checkable: props.list.checkable
+            countElement: props.list.countElement
         }
     }, [props.list.title, props.list.countElement, props.list.checkable])
 
     const formState = useMemo(() => {
         return {
             title:listTitle,
-            countElement: listCountElement,
-            checkable: checkable
+            countElement: listCountElement
         }
-    }, [listTitle, listCountElement, checkable ])
+    }, [listTitle, listCountElement ])
 
     const haveModificationUnsaved = useMemo(() => {
         return JSON.stringify(serverState) !== JSON.stringify(formState)
@@ -179,12 +176,11 @@ export default function ListOptions(props:ListOptionsProps){
                             <ul className={s.options}>
                                 <li className={s.title}>
                                     <span className={s.key}>Nom</span>
+
                                     <span className={s.value}>
-                                        <input ref={listTitleInputRef} onChange={(e) => setListTitle(e.target.value)} className={withClass(onEditTitle && s.active)} type="text" value={listTitle} />
-                                        <button className={withClass(onEditTitle && s.active)} onClick={() => setOnEditTitle(current => !current)}>
-                                            <EditIcon/>
-                                        </button>
+                                        <textarea ref={listTitleInputRef} onChange={(e) => setListTitle(e.target.value)} className={withClass(s.active)} value={listTitle} />
                                     </span>
+                                    
                                 </li>
                                 <li className={s.color}>
                                     <span className={s.key}>Couleur</span>

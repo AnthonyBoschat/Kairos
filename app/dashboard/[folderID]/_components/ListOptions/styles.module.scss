@@ -81,16 +81,18 @@
                         display: flex;
                         align-items: center;
                         gap: 0.5rem;
-                        input{
+                        textarea{
                             border: none;
                             text-align: right;
                             padding-right: 0.5rem;
                             border-radius: 4px;
-                            pointer-events: none;
-                            &.active{
-                                pointer-events: all;
-                                outline: 1px solid black;
-                                border: default;
+                            user-select: text;
+                            resize: none;
+                            line-height:inherit;
+                            line-height: 0.6;
+                            &:focus{
+                                border: none;
+                                outline: none;
                             }
                         }
                         button{
