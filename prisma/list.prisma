@@ -6,6 +6,7 @@ model List {
   color             Int
   order             Int      
   checkable         Boolean  @default(false)
+  template          String?   @db.Text
 
   folderId          String
   folder            Folder   @relation(fields: [folderId], references: [id], onDelete:Cascade)

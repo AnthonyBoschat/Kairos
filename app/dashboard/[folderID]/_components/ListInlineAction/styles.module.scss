@@ -4,6 +4,18 @@
         all:unset;
         display: flex;
         align-items: center;
+        &.template{
+            opacity: 0.3;
+            margin-bottom: 2px;
+            &:hover{
+                opacity: 0.4;
+            }
+            &.active{
+                opacity: 1;
+                color: #1971B8;
+            }
+
+        }
         &.checkable {
             padding-bottom: 0.1rem;
             
