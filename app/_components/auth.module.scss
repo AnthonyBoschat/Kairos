@@ -117,10 +117,18 @@
                 font-size: 1.25rem;
                 cursor: pointer;
                 transition: all 0.08s linear;
+                display: flex;
+                justify-content: center;
+                align-items: center;
                 &:hover, &:focus{
                     outline: 1px solid v.$dark-secondary;
                     background-color: v.$light-primary;
                     color: v.$dark-secondary;
+                }
+                &:disabled{
+                    filter: brightness(0.5);
+                    opacity: 0.8;
+                    pointer-events: none;
                 }
             }
         }

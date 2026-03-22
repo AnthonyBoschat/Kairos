@@ -2,19 +2,21 @@
 import FolderSolidIcon from "@/components/ui/icons/FolderSolid"
 import s from "./styles.module.scss"
 import FOLDER_COLORS from "@/constants/folderColor"
-import React, { Dispatch, SetStateAction, useCallback, useMemo, useState } from "react"
+import React, { Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState } from "react"
 import ArrowLeftIcon from "@/components/ui/icons/ArrowLeft"
 import withClass from "@/utils/class"
 import OptionsIcon from "@/components/ui/icons/Options"
 import StarIcon from "@/components/ui/icons/Star"
 import handleResponse from "@/utils/handleResponse"
 import { restoreFolder, restoreFolderResponse, toggleFolderFavorite, toggleFolderFavoriteResponse } from "@/app/actions/folder"
-import { FolderWithList } from "@/types/list"
+import { FolderWithList, ListWithTaskAndFolder } from "@/types/list"
 import Highlight from "@/components/highlight"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { usePathname, useRouter } from "next/navigation"
 import RestoreIcon from "@/components/ui/icons/restore"
 import { useQueryClient } from "@tanstack/react-query"
+import Link from "next/link"
+import { getLists } from "@/app/actions/list"
 
 interface FolderItemProps{
     folder: FolderWithList
@@ -54,6 +56,7 @@ export default function FolderItem(props:FolderItemProps){
 
     const handleToggleFavorite = (event:React.MouseEvent) => {
         if(props.folder?.id){
+            event.preventDefault()
             event.stopPropagation()
             const folderID = props.folder.id
             handleResponse({
@@ -67,6 +70,7 @@ export default function FolderItem(props:FolderItemProps){
 
     const handleRestoreFolder = (event: React.MouseEvent) => {
         if(props.folder?.id){
+            event.preventDefault()
             event.stopPropagation()
             const folderID = props.folder.id
             handleResponse({
@@ -80,26 +84,35 @@ export default function FolderItem(props:FolderItemProps){
         }
     }
 
-    const handleClick = useCallback(() => {
-        if(pathname === folderDetailURL){
-            router.push("/dashboard")
-        }else{
-            router.push(`${folderDetailURL}${URLoptions}`)
-        }
-    }, [isSelected, props.folder, pathname, folderDetailURL ])
-
     const handleClickOptions = useCallback((event:React.MouseEvent) => {
         if(props.folder){
+            event.preventDefault()
             event.stopPropagation()
             props.setSelectedFolderOptions(props.folder)
         }
     }, [props.folder])
 
+    const { trashFilter } = useDashboardContext()
+
+    // Au survol de la souris, prefetch les données pour un affichage plus rapide
+    const handleMouseEnter = useCallback(() => {
+        setIsHover(true)
+        queryClient.prefetchQuery({
+            queryKey: ['lists', props.folder.id, trashFilter],
+            queryFn: async () => {
+                const result = await getLists(props.folder.id, trashFilter)
+                if (!result.success) throw new Error('Erreur chargement')
+                return result.lists as ListWithTaskAndFolder[]
+            },
+            staleTime: Infinity,
+        })
+    }, [props.folder.id, trashFilter])
+
     return(
-        <button 
-            onClick={handleClick} 
-            onMouseLeave={() => setIsHover(false)} 
-            onMouseEnter={() => setIsHover(true)} title="Accéder au contenu d'un dossier" 
+        <Link
+            href={isSelected ? "/dashboard" : `${folderDetailURL}${URLoptions}`}
+            onMouseLeave={() => setIsHover(false)}
+            onMouseEnter={handleMouseEnter}
             className={withClass(
                 s.container, 
                 isSelected && s.active,
@@ -151,6 +164,6 @@ export default function FolderItem(props:FolderItemProps){
                 )}
             </div>
 
-        </button>
+        </Link>
     )
 }

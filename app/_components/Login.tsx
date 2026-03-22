@@ -8,6 +8,7 @@ import s from "./auth.module.scss"
 import withClass from "@/utils/class"
 import EyesOpenIcon from "@/components/ui/icons/EyesOpen"
 import EyesCloseIcon from "@/components/ui/icons/EyesClose"
+import LoadingIcon from "@/components/ui/icons/Loading"
 
 interface LoginProps{
     email:string,
@@ -22,6 +23,7 @@ export default function Login(props:LoginProps) {
 
   const [showPassword, setShowPassword] = useState(false)
   const [showError, setShowError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if(showError){
@@ -31,6 +33,7 @@ export default function Login(props:LoginProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     setShowError(false)
+    setLoading(true)
     e.preventDefault()
     const result = await signIn("credentials", {
       email:props.email,
@@ -44,12 +47,17 @@ export default function Login(props:LoginProps) {
       router.push("/dashboard")
       toast.success("Connexion réussi")
     }
+    setLoading(false)
   }
 
 
   const handleForgotPassword = async () => {
     router.push("/forgot")
   };
+
+  useEffect(() => {
+    router.prefetch("/dashboard")
+  }, [])
 
   return (
     <form className={s.container} onSubmit={handleSubmit}>
@@ -91,7 +99,10 @@ export default function Login(props:LoginProps) {
         </span>
       </div>
       <div className={withClass(s.row, s.submit)}>
-        <button type="submit">Se connecter</button>
+        <button disabled={loading} type="submit">
+          {!loading && "Se connecter"}
+          {loading && <LoadingIcon duration={0.75} size={30}/>}
+        </button>
       </div>
     </form>
   )
