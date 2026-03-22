@@ -1,6 +1,8 @@
 import { PrismaClient } from '@prisma/client';
 
-const basePrisma = new PrismaClient();
+const basePrisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+});
 
 function softDeleteExtension(model: 'folder' | 'list' | 'task') {
   return {

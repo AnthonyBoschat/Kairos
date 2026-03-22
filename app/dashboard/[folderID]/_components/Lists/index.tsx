@@ -16,6 +16,7 @@ import TaskItem from "../TaskItem";
 import LIST_COLOR from "@/constants/listColor";
 import { Task } from "@prisma/client";
 import { reorderTasks } from "@/app/actions/task";
+import LoadingIcon from "@/components/ui/icons/Loading";
 
 export default function Lists() {
 
@@ -102,6 +103,7 @@ export default function Lists() {
         setOrderedLists(sortedLists)
     }, [sortedLists])
 
+    if (isLoadingLists) return <div className={s.loading}><LoadingIcon size={50}/></div>
     if(!selectedFolderID) return
     if (!hasLists && !isLoadingLists) return <div className={s.noLists}>Ce dossier ne contient aucune liste</div>
     return (

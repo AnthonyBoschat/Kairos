@@ -1,11 +1,9 @@
 import { DashboardProvider } from "@/context/DashboardContext"
 import { getCurrentUser } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
 import SideBar from "./_components/sideBar"
 import s from "./styles.module.scss"
 import { Metadata } from "next"
 import Search from "./_components/Search"
-import { withTrash } from "@/utils/trash"
 
 export const metadata: Metadata = {
   title: 'Kairos - Dashboard',

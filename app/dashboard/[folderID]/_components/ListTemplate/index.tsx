@@ -5,7 +5,6 @@ import React, { Dispatch, SetStateAction, useCallback, useRef, useState } from "
 import withClass from "@/utils/class"
 import handleResponse from "@/utils/handleResponse"
 import { useQueryClient } from "@tanstack/react-query"
-import LoadingIcon from "@/components/ui/icons/Loading"
 import SuccessIcon from "@/components/ui/icons/Success"
 import { useDashboardContext } from "@/context/DashboardContext"
 import { ListWithTaskAndFolder } from "@/types/list"
@@ -13,6 +12,7 @@ import RichEditor from "@/components/richEditor"
 import useCallbackOnClickOutside from "@/hooks/useCallbackOnClickOutside"
 import { updateListTemplate } from "@/app/actions/list"
 import TemplateIcon from "@/components/ui/icons/Template"
+import SyncIcon from "@/components/ui/icons/Sync"
 
 
 interface TaskDetailProps{
@@ -103,7 +103,7 @@ export default function ListTemplate(props:TaskDetailProps){
 
                             <div className={s.sync}>
                                 {isSyncData && <span title="Contenu enregistré"><SuccessIcon size={16} /></span>}
-                                {!isSyncData && <span title="Contenu en cours de sauvegarde"><LoadingIcon size={16}/></span>}
+                                {!isSyncData && <span title="Contenu en cours de sauvegarde"><SyncIcon size={16}/></span>}
                             </div>
                         </div>
 

@@ -1,17 +1,19 @@
+export default function LoadingIcon({ size = 24, duration = 1.5 }) {
+    const d = `${duration}s`
+    const b1 = duration / 3
+    const b2 = (duration / 3) * 2
 
-
-export default function LoadingIcon({ size = 24 }) {
-
-    return(
-        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"><path fill="currentColor" d="M18.43 4.25a.76.76 0 0 0-.75.75v2.43l-.84-.84a7.24 7.24 0 0 0-12 2.78a.74.74 0 0 0 .46 1a.7.7 0 0 0 .25 0a.76.76 0 0 0 .71-.51a5.6 5.6 0 0 1 1.37-2.2a5.76 5.76 0 0 1 8.13 0l.84.84h-2.41a.75.75 0 0 0 0 1.5h4.24a.74.74 0 0 0 .75-.75V5a.75.75 0 0 0-.75-.75m.25 9.43a.76.76 0 0 0-1 .47a5.6 5.6 0 0 1-1.37 2.2a5.76 5.76 0 0 1-8.13 0l-.84-.84h2.47a.75.75 0 0 0 0-1.5H5.57a.74.74 0 0 0-.75.75V19a.75.75 0 0 0 1.5 0v-2.43l.84.84a7.24 7.24 0 0 0 12-2.78a.74.74 0 0 0-.48-.95"><animateTransform
-      attributeName="transform"
-      type="rotate"
-      from="0 12 12"
-      to="360 12 12"
-      dur="1.5s"
-      repeatCount="indefinite"
-    /></path></svg>
-
+    return (
+        <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24">
+            <circle cx={18} cy={12} r={0} fill="currentColor">
+                <animate attributeName="r" begin={b2} calcMode="spline" dur={d} keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate>
+            </circle>
+            <circle cx={12} cy={12} r={0} fill="currentColor">
+                <animate attributeName="r" begin={b1} calcMode="spline" dur={d} keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate>
+            </circle>
+            <circle cx={6} cy={12} r={0} fill="currentColor">
+                <animate attributeName="r" begin={0} calcMode="spline" dur={d} keySplines="0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8;0.2 0.2 0.4 0.8" repeatCount="indefinite" values="0;2;0;0"></animate>
+            </circle>
+        </svg>
     )
-
 }
