@@ -4,4 +4,5 @@ generator client {
 
 datasource db {
   provider = "postgresql"           // Pour postgres
+  url      = env("DATABASE_URL")
 }
