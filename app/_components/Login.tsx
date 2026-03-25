@@ -55,10 +55,6 @@ export default function Login(props:LoginProps) {
     router.push("/forgot")
   };
 
-  useEffect(() => {
-    router.prefetch("/dashboard")
-  }, [])
-
   return (
     <form className={s.container} onSubmit={handleSubmit}>
       <div className={s.row}>
